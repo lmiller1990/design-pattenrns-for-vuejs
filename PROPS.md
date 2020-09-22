@@ -4,7 +4,7 @@ In this section we explore `props`, and the kinds of tests you might want to con
 
 Consider one of the big ideas behind frameworks like Vue and React:
 
-> UI is a function of your data
+> Your user interface is a function of your data.
 
 This idea comes in many forms; another is "data driven interfaces". Basically, your UI should be a function of your data. Given X data, your UI should be Y. In computer science, this is referred to as *determinism*. Another name for this a *pure* system. Take the `sum` function. It is a *pure* function:
 
@@ -38,7 +38,8 @@ You can declare props in a few ways. We will work with the `<Message>` component
 <script>
 export default {
   const Message = {
-    props: ['variant'] // can be 'success', 'warning', 'error'
+    // can be 'success', 'warning', 'error'
+    props: ['variant']
   }
 }
 </script>
@@ -87,7 +88,11 @@ props: {
     required: true,
     validator: (variant) => {
       if (!['success', 'warning', 'error'].includes(variant)) {
-        throw Error(`variant is required and must be either 'success', 'warning' or 'error'. You passed: ${variant}`)
+        throw Error(
+          `variant is required and must` + 
+          `be either 'success', 'warning' or 'error'.` +
+          `You passed: ${variant}`
+        )
       }
 
       return true
@@ -110,7 +115,11 @@ First we need to refactor `<Message>` a little to separate the validator from th
 <script>
 export function validateVariant(variant) {
   if (!['success', 'warning', 'error'].includes(variant)) {
-    throw Error(`variant is required and must be either 'success', 'warning' or 'error'. You passed: ${variant}`)
+    throw Error(
+      `variant is required and must` + 
+      `be either 'success', 'warning' or 'error'.` +
+      `You passed: ${variant}`
+    )
   }
 
   return true
@@ -254,13 +263,15 @@ Let's revisit the idea of separation of concerns; is this a UI or business logic
 
 ## The real test: Does it refactor?
 
-We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are tesing behaviorsa, not implementation details.
+We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are tesing behaviors, not implementation details.
 
 Let's refactor `<Navbar>`:
 
 ```html{2}
 <template>
-  <button>{{ `${authenticated ? 'Logout' : 'Login'}` }}</button>
+  <button>
+    {{ `${authenticated ? 'Logout' : 'Login'}` }}
+  </button>
 </template>
 
 <script>
@@ -277,7 +288,7 @@ export default {
 
 Everything still passes! Our tests are doing what they are supposed to be. Or are they? What if we decide we would like to use a `<a>` tag instead of a `<button>`?
 
-```html{2}
+```html {2}
 <template>
   <a>{{ `${authenticated ? 'Logout' : 'Login'}` }}</a>
 </template>
@@ -303,7 +314,7 @@ it('shows login authenticated is true', () => {
 })
 ```
 
-By using `html() and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. In my system, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assest against `html` using `toContain()`, rather than using `find` and `text()`.
+By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. In my system, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assest against `html` using `toContain()`, rather than using `find` and `text()`.
 
 ## Conclusion
 
