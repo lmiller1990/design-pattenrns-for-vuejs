@@ -1,22 +1,17 @@
 import {
   required,
   isBetween,
-  isBetweenAge,
-  patientForm,
   validateMeasurement,
-  formValidity
+  patientForm,
+  isFormValid
 } from './form.js'
 
 describe('required', () => {
-  it('returns true when null', () => {
-    expect(required(null)).toEqual({ valid: false, message: 'Required' })
-  })
-
-  it('returns true when undefined', () => {
+  it('is invalid when undefined', () => {
     expect(required(undefined)).toEqual({ valid: false, message: 'Required' })
   })
 
-  it('returns true when empty string', () => {
+  it('is invalid when empty string', () => {
     expect(required('')).toEqual({ valid: false, message: 'Required' })
   })
 
@@ -48,7 +43,7 @@ describe('isBetween', () => {
 })
 
 describe('validateMeasurement', () => {
-  it('returns invalid for not nullable value', () => {
+  it('returns invalid for input', () => {
     const constraints = { min: 10, max: 30 }
     const actual = validateMeasurement(undefined, { constraints, nullable: false })
     expect(actual).toEqual({ valid: false, message: 'Required' })
@@ -68,14 +63,14 @@ describe('validateMeasurement', () => {
   })
 })
 
-describe('formValidity', () => {
+describe('isFormValid', () => {
   it('returns true when name and weight field are valid', () => {
     const form = {
       name: { valid: true },
       weight: { valid: true }
     }
 
-    expect(formValidity(form)).toBe(true)
+    expect(isFormValid(form)).toBe(true)
   })
 
   it('returns false when any field is invalid', () => {
@@ -84,7 +79,7 @@ describe('formValidity', () => {
       weight: { valid: true }
     }
 
-    expect(formValidity(form)).toBe(false)
+    expect(isFormValid(form)).toBe(false)
   })
 })
 

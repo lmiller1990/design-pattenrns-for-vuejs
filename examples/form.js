@@ -4,16 +4,14 @@
  */
 
 export function required(value) {
-  if (value) {
+  if (!value) {
     return {
-      valid: true
+      valid: false,
+      message: 'Required'
     }
   }
 
-  return {
-    valid: false,
-    message: 'Required'
-  }
+  return { valid: true }
 }
 
 export function isBetween(value, { min, max }) {
@@ -27,28 +25,21 @@ export function isBetween(value, { min, max }) {
   return { valid: true }
 }
 
-export function isBetweenAge(value, { min, max }) {
-}
-
 const limits = {
   kg: { min: 30, max: 200 },
   lb: { min: 66, max: 440 },
-  cm: { min: 120, max: 200 },
-  in: { min: 47, max: 78 },
 }
 
-export function validateMeasurement(value, { constraints, nullable }) {
-  if (!nullable) {
-    const result = required(value)
-    if (!result.valid) {
-      return result
-    }
+export function validateMeasurement(value, { constraints }) {
+  const result = required(value)
+  if (!result.valid) {
+    return result
   }
 
   return isBetween(value, constraints)
 }
 
-export function formValidity(form) {
+export function isFormValid(form) {
   return form.name.valid && form.weight.valid
 }
 
@@ -63,7 +54,6 @@ export function patientForm(patient) {
   return {
     name,
     weight,
-    formValidity
   }
 }
 
