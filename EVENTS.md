@@ -277,5 +277,5 @@ We discussed emitting events, and the various features Vue provides to keep our 
 
 Finally, we saw how our tests was focused on inputs and outputs (in this case, the input is the user interation via the buttons, and the output is the emitted `submit` event).
 
-We touch on eents again later on, in the `v-model` chapter - stay tuned.
+We touch on events again later on, in the `v-model` chapter - stay tuned.
 
