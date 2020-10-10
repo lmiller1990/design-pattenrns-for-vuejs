@@ -20,8 +20,12 @@ body {
   color: white;
 }
 
+.black {
+  color: black;
+}
+
 .call-to-action {
-  width: 500px;
+  max-width: 500px;
   padding: 35px;
   color: black;
   background: white;
@@ -42,11 +46,11 @@ body {
   margin: 10px 0;
 }
 
-#email {
+.email-form__email {
   background: #b8c2cc57;
 }
 
-#email, #subscribe {
+.email-form__email, .email-form__button {
   box-sizing: border-box;
   margin: 5px 0;
   font-size: 1.2rem;
@@ -56,7 +60,11 @@ body {
   border: none;
 }
 
-#subscribe {
+.email-form__button:disabled {
+  opacity: 0.8; 
+}
+
+.email-form__button {
   background: #30373b;
   text-transform: uppercase;
   border: none;
@@ -120,6 +128,36 @@ section {
 .cards {
   display: flex;
   align-items: center;
+}
+
+.cards__outer {
+  box-shadow: 0 15px 35px 0 rgba(18,37,49,.1),0 5px 15px 0 rgba(0,0,0,.05);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 350px;
+}
+
+.cards__outer:first-child {
+  margin-left: 10px;
+}
+
+.cards__outer:last-child {
+  margin-left: -10px;
+}
+
+@media screen and (max-width: 768px) {
+  .section__content {
+    margin: 0 20px;
+  }
+
+  .cards {
+    flex-direction: column-reverse;
+  }
+
+  .cards__outer:first-child, .cards__outer:last-child {
+    margin: 10px 0;
+    margin-left: 0px;
+  }
 }
 
 .cards__image-wrapper {
@@ -191,23 +229,8 @@ b {
   font-weight: bold;
 }
 
-.cards__outer:first-child {
-  margin-left: 10px;
-}
-
-.cards__outer:last-child {
-  margin-left: -10px;
-}
-
-.cards__outer {
-  box-shadow: 0 15px 35px 0 rgba(18,37,49,.1),0 5px 15px 0 rgba(0,0,0,.05);
-  border-radius: 10px;
-  overflow: hidden;
-  width: 400px;
-}
-
 .who-am-i > a {
-  color: black;
+  color: white;
 }
 
 .profile {

@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <title></title>
+  <title>Design Patterns for Vue.js</title>
+  <meta name="viewport" content="width=device-width initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"
     integrity="sha512-IJEbgDEF7OeKJRa0MY2PApnyJHRIsgzCveek4ec8VWQ+7KG3ZSKVNYa5xP/Gh0hVP0Mwb+gBsk+GwR3JQGhQNg=="
     crossorigin="anonymous" />
@@ -11,8 +12,36 @@
 </head>
 
 <body>
+
   <main>
 
+<script>
+  function postEmail(payload) {
+    return window.fetch('https://vuejs-course.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const $forms = document.querySelectorAll('.email-form')
+    for (const $form of Array.from($forms)) {
+      $form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const $email = $form.querySelector('.email-form__email')
+        const $button = $form.querySelector('.email-form__button')
+        $button.setAttribute('disabled', 'disabled')
+        $button.textContent = 'Submitting...'
+        await postEmail({ email: $email.value, referrer: 'lachlan-miller.me/design-patterns' })
+        $button.removeAttribute('disabled')
+        $button.textContent = 'Thanks!'
+      })
+    }
+  })
+  </script>
     <section>
       <div class="section__content">
         <h1 class="text-center">Design Patterns for Vue.js</h1>
@@ -31,9 +60,9 @@
           </div>
 
           <form class="email-form">
-            <input name="email" placeholder="Your email address" id="email" />
+            <input name="email" placeholder="Your email address" class="email-form__email" />
             <!-- <button type="submit" id="subscribe">Send me the preview</button> -->
-            <button type="submit" id="subscribe">Sign me up</button>
+            <button type="submit" class="email-form__button">Sign me up</button>
           </form>
 
           <!-- 
@@ -251,7 +280,7 @@
         <h4>Do you offer purchasing power parity?</h4>
         <p>
           Yep, absolutely. I understand not every country has the same salaries, please 
-          <a class="white" href="mailto:lachlan@vuejs-course.com">send me an email</a>
+          <a class="black" href="mailto:lachlan@vuejs-course.com">send me an email</a>
           and we can work something out!
         </p>
       </div>
@@ -288,10 +317,10 @@
     <section>
       <div class="section__content">
         <div>
-        Thanks to <a class="white" href="https://www.flaticon.com/authors/linector" title="Linector">Linector</a> 
-        and <a class="white" href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from
+        Thanks to <a class="black" href="https://www.flaticon.com/authors/linector" title="Linector">Linector</a> 
+        and <a class="black" href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from
         <a
-          class="white" href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+          class="black" href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
           for the cute onigiri icons.
         </div>
       </div>
@@ -300,7 +329,6 @@
 
 
   </main>
-
 </body>
 
 </html>
