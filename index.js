@@ -1,4 +1,4 @@
 import { createApp } from 'vue'
-import form from './examples/form-validation.vue'
+import datetime from './examples/App.vue'
 
-createApp(form).mount('#app')
+createApp(datetime).mount('#app')
