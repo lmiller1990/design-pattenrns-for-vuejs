@@ -1,38 +1,34 @@
 <template>
-  <h3>date-time component with luxon</h3>
+  <h3>Luxon</h3>
   <date-time 
     v-model="dateLuxon" 
-    :serialize="serialize"
     :deserialize="deserialize"
+    :serialize="serialize"
   />
-  {{ dateLuxon.toFormat('yyyy-MM-dd') }}
+  {{ dateLuxon }}
 
-  <hr />
-
-  <h3>date-time component with moment</h3>
+  <h3>Moment</h3>
   <date-time 
     v-model="dateMoment" 
-    :serialize="serializeMoment"
     :deserialize="deserializeMoment"
+    :serialize="serializeMoment"
   />
-
-    <div v-if="dateMoment.format">
-      {{ dateMoment.format('YYYY-MM-DD') }}
-    </div>
-
+  {{ dateMoment }}
+  <hr />
 </template>
 
 <script>
-import { ref, watch  } from 'vue'
-import dateTime from './date-time.vue'
+import { ref } from 'vue'
 import { DateTime } from 'luxon'
 import moment from 'moment'
+import dateTime from './date-time.vue'
 
 export function serializeMoment(value) {
+  console.log(value)
   const toString = `${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`
-  const ser = moment(toString, 'YYYY-MM-DD', true)
-  if (ser.isValid()) {
-    return ser
+  const toObject = moment(toString, 'YYYY-MM-DD', true)
+  if (toObject.isValid()) {
+    return toObject
   }
   return value
 }
@@ -59,6 +55,15 @@ export function deserialize(value) {
 }
 
 function serialize(value) {
+  try {
+    const obj = DateTime.fromObject(value)
+    if (obj.invalid) {
+      return 
+    }
+  } catch {
+    return 
+  }
+
   return DateTime.fromObject(value)
 }
 
@@ -66,16 +71,20 @@ export default {
   components: { dateTime },
 
   setup() {
-    const dateLuxon = ref(DateTime.local())
-    const dateMoment = ref(moment())
+    const dateLuxon = ref(DateTime.fromObject({
+      year: '2019',
+      month: '01',
+      day: '01',
+    }))
+    const dateMoment = ref(moment('2019-02-02', 'YYYY-MM-DD'))
 
     return {
       dateLuxon,
       serialize,
       deserialize,
       dateMoment,
-      deserializeMoment,
-      serializeMoment
+      serializeMoment,
+      deserializeMoment
     }
   }
 }

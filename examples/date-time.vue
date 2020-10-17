@@ -1,9 +1,9 @@
 <template>
-  <input v-model="date.year" @input="handle" />
-  <input v-model="date.month" @input="handle" />
-  <input v-model="date.day" @input="handle" />
+  <input :value="date.year" @input="update($event, 'year')" />
+  <input :value="date.month" @input="update($event, 'month')" />
+  <input :value="date.day" @input="update($event, 'day')" />
 <pre>
-Date is:
+date is:
 {{ date }} 
 </pre>
 </template>
@@ -29,18 +29,28 @@ export default {
     const date = computed(() => {
       return props.deserialize(props.modelValue)
     })
-
-    const handle = () => {
-      const serial = props.serialize(date.value)
-      if (!serial) {
+    const update = ($event, field) => {
+      const { year, month, day } = props.deserialize(props.modelValue)
+      let newValue
+      if (field === 'year') {
+        newValue = { year: $event.target.value, month, day }
+      }
+      if (field === 'month') {
+        newValue = { year, month: $event.target.value, day }
+      }
+      if (field === 'day') {
+        newValue = { year, month, day: $event.target.value }
+      }
+      const asObject = props.serialize(newValue)
+      if (!asObject) {
         return
       }
-      emit('update:modelValue', props.serialize(date.value))
+      emit('update:modelValue', asObject)
     }
 
     return {
-      date,
-      handle
+      update,
+      date
     }
   }
 }
