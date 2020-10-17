@@ -5,7 +5,7 @@
     :deserialize="deserialize"
     :serialize="serialize"
   />
-  {{ dateLuxon }}
+  Formatted: {{ dateLuxon.toFormat('yyyy-MM-dd') }}
 
   <h3>Moment</h3>
   <date-time 
@@ -13,7 +13,7 @@
     :deserialize="deserializeMoment"
     :serialize="serializeMoment"
   />
-  {{ dateMoment.format ? dateMoment.format('YYYY-MM-DD') : dateMoment }}
+  Formatted: {{ dateMoment.format ? dateMoment.format('YYYY-MM-DD') : dateMoment }}
   <hr />
 </template>
 

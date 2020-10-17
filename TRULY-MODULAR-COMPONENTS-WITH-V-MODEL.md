@@ -6,9 +6,9 @@ In this section we will author a reusable date component. Usage will be like thi
 <date-time v-model="date" />
 ```
 
-You can find the [completed source code, including exercise, here](https://gist.github.com/lmiller1990/bca97f1a32e5878ea1652a4b594d3ab1).
+Where `date` can be... whatever you want. Some applications use the native JavaScript `Date` object (don't do this; it's not a fun experience). Older applications will often use [Moment](https://momentjs.com/) and newer ones common opt for [Luxon](https://moment.github.io/luxon/). I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
 
-Where `date` can be... whatever you want. Some applications use the native JavaScript `Date` object (don't do this; it's not a fun experience). Older applications will often use [moment](https://momentjs.com/) and newer ones common opt for [luxon](https://moment.github.io/luxon/). I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
+You can find the [completed source code, including exercise, here](https://gist.github.com/lmiller1990/bca97f1a32e5878ea1652a4b594d3ab1).
 
 One way to handle this would be to pick a simple format of our own, for example `YYYY-MM-DD`, and then have the user wrap the component and provide their own integration layer. For example a user wanting to use Luxon might wrap `<date-time>` in their own `<date-time-luxon>` component:
 
@@ -55,6 +55,8 @@ Here is the API I am proposing to make `<date-time>` truly agnostic, not needing
 ```
 
 `date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value.
+
+A diagram might make this more clear:
 
 ## Foundations of v-model
 
