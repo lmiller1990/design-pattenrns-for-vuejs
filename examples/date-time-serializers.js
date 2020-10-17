@@ -2,13 +2,12 @@ import { DateTime } from 'luxon'
 import moment from 'moment'
 
 export function serializeMoment(value) {
-  console.log(value)
   const toString = `${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`
   const toObject = moment(toString, 'YYYY-MM-DD', true)
   if (toObject.isValid()) {
     return toObject
   }
-  return value
+  return 
 }
 
 export function deserializeMoment(value) {

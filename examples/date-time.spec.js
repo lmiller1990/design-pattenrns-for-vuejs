@@ -1,7 +1,35 @@
 import { mount } from '@vue/test-utils'
+import moment from 'moment'
 import { DateTime } from 'luxon'
 import dateTime from './date-time.vue'
-import { serialize, deserialize } from './date-time-serializers.js'
+import { 
+  serialize,
+  deserialize,
+  serializeMoment,
+  deserializeMoment
+} from './date-time-serializers.js'
+
+describe('serializeMoment', () => {
+  it('serializes valid moment', () => {
+    const actual = serializeMoment({ year: '2020', month: '1', day: '1' })
+    // compare as strings. moment is pain.
+    expect(actual.toString()).toEqual(moment('2020-01-01').toString())
+  })
+
+  it('returns undefined for invalid moment', () => {
+    const actual = serializeMoment({ year: '200000020', month: '1xxxxx', day: 'bbbb' })
+    expect(actual).toEqual(undefined)
+  })
+})
+
+describe('deserialize', () => {
+  it('deserializes to Luxon DateTime', () => {
+    const actual = deserialize(DateTime.fromObject({ year: '2020', month: '1', day: '1' }))
+    expect(actual).toEqual({ year: 2020, month: 1, day: 1 })
+  })
+})
+
+
 
 describe('serialize', () => {
   it('serializes valid Luxon DateTime', () => {
