@@ -38,11 +38,11 @@ describe('Navbar', () => {
 
   it('shows logout by default', () => {
     const wrapper = navbarFactory()
-    expect(wrapper.find('button').text()).toBe('Login')
+    expect(wrapper.find('a').text()).toBe('Login')
   })
 
   it('shows login when authenticated is false', () => {
     const wrapper = navbarFactory({ authenticated: false })
-    expect(wrapper.find('button').text()).toBe('Login')
+    expect(wrapper.find('a').text()).toBe('Login')
   })
 })
