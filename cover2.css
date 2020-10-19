@@ -1,0 +1,45 @@
+
+body {
+  font-family: system-ui,BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif !important;
+  text-align: center;
+  margin: 50px;
+}
+
+
+h1 {
+  padding: 0; margin: 0;
+}
+
+#cover {
+  color: white;
+
+  background-color: #7fcec5;
+background-image: linear-gradient(315deg, #7fcec5 0%, #14557b 74%);
+
+  width: 500px;
+  height: 700px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+img {
+  filter: invert();
+  width: 200px;
+}
+
+#vuejs {
+  font-size: 7rem;
+}
+
+#byline {
+  width: 250px;
+  display: flex;
+  justify-content: center;
+}
+
+h3 {
+  text-align: center;
+}

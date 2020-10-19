@@ -1,4 +1,4 @@
 import { createApp } from 'vue'
-import datetime from './examples/App.vue'
+import ComposableApp from './examples/composable-app.vue'
 
-createApp(datetime).mount('#app')
+createApp(ComposableApp).mount('#app')

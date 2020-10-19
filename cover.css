@@ -1,0 +1,75 @@
+h3, html, body, img {
+  margin: 0; padding: 0;
+}
+
+body {
+  font-family: system-ui,BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif !important;
+  margin: 50px;
+}
+
+#bg {
+  filter: brightness(80%);
+  object-fit: cover;
+  width: 500px;
+  height: 80vh;
+}
+
+#book {
+  height: 80vh;
+  width: 500px;
+  position: relative;
+}
+  /*
+  height: 80vh;
+  width: 500px;
+  background-image: url('https://images.unsplash.com/photo-1600132806370-bf17e65e942f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1757&q=80');
+  z-index: 0;
+}
+  */
+
+#design, #vuejs {
+  left: 100px;
+  z-index: 1;
+}
+
+
+#author { 
+  left: 190px;
+  font-size: 1.0rem;
+  width: 286px;
+  top: 525px;
+  position: absolute;
+  color: white;
+}
+
+
+#tdd { 
+  left: 150px;
+  font-size: 1.0rem;
+  width: 286px;
+  top: 450px;
+  position: absolute;
+  color: white;
+}
+
+#design { 
+  font-size: 2.0rem;
+  top: 250px;
+  position: absolute;
+  color: white;
+}
+
+#vuejs { 
+  font-size: 6.3rem;
+  top: 280px;
+  position: absolute;
+  color: white;
+}
+
+#vue {
+  width: 200px;
+  height: 200px;
+  left: 150px;
+  top: 20px;
+  position: absolute;
+}
