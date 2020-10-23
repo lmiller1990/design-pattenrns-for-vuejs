@@ -242,7 +242,6 @@ export function useTicTacToe() {
 Tests are still passing, definitely a good sign. Now add an `initialState` argument:
 
 ```js
-```js
 import { ref, readonly, computed } from 'vue'
 
 export function useTicTacToe(initialState) {

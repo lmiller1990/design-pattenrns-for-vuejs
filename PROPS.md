@@ -288,7 +288,7 @@ export default {
 
 Everything still passes! Our tests are doing what they are supposed to be. Or are they? What if we decide we would like to use a `<a>` tag instead of a `<button>`?
 
-```html {2}
+```html
 <template>
   <a>{{ `${authenticated ? 'Logout' : 'Login'}` }}</a>
 </template>

@@ -1,4 +1,4 @@
 import { createApp } from 'vue'
-import ComposableApp from './examples/composable-app.vue'
+import App from './examples/foo.vue'
 
-createApp(ComposableApp).mount('#app')
+createApp(App).mount('#app')
