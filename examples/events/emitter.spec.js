@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils'
-import App from './App.vue'
 import Emitter from './Emitter.vue'
 
 test('app', async () => {
