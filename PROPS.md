@@ -263,7 +263,7 @@ Let's revisit the idea of separation of concerns; is this a UI or business logic
 
 ## The real test: Does it refactor?
 
-We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are tesing behaviors, not implementation details.
+We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
 
 Let's refactor `<Navbar>`:
 
@@ -314,7 +314,7 @@ it('shows login authenticated is true', () => {
 })
 ```
 
-By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. In my system, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assest against `html` using `toContain()`, rather than using `find` and `text()`.
+By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. In my system, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assert against `html` using `toContain()`, rather than using `find` and `text()`.
 
 ## Conclusion
 

@@ -1,9 +1,9 @@
 ## Writing Good Forms
 
-Forms are the primary way a user enters information into any web based system, so getting them right is important. The focus on this section will be on forms, specifially *writing good forms*. What exactly is a *good* form? We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. In traditional server rendered apps, you would only get validation after submitting the form - not really a great user experience. Vue makes client side validation trivial, so we will make use of this and implement two levels of validation:
+Forms are the primary way a user enters information into any web based system, so getting them right is important. The focus on this section will be on forms, specifically *writing good forms*. What exactly is a *good* form? We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. In traditional server rendered apps, you would only get validation after submitting the form - not really a great user experience. Vue makes client side validation trivial, so we will make use of this and implement two levels of validation:
 
-1. field validation - if a user enters incorrect in invalid data in a single field, we will show an error immediately.
-2. form validation - the submit button should only be enabled when the entire form is correctly filled out.
+1. Field validation - if a user enters incorrect in invalid data in a single field, we will show an error immediately.
+2. Form validation - the submit button should only be enabled when the entire form is correctly filled out.
 
 Finally, we need two levels of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly, and that the user can enter data, see error messages, and correctly submit the form.
 
@@ -38,7 +38,7 @@ There are plenty of full-featured Vue (and non-Vue) form validation frameworks o
 
 We need two validation functions: `required` and `isBetween`. While TDD isn't always the right tool, for these two functions I believe it is. We know the inputs and outputs, and all the possible states of the system. 
 
-so let's go ahead and write some tests, starting with `required`. Each validator will return an object with the validation status, and a message if there is an error. Using a TypeScript `interface` to notation purposes:
+Let's write some tests, starting with `required`. Each validator will return an object with the validation status, and a message if there is an error. Using a TypeScript `interface` to notation purposes:
 
 ```js
 interface ValidationResult {
@@ -484,9 +484,9 @@ describe('FormValidation', () => {
 
 We don't have any tests to ensure the `<button>` is correctly disabled - see below for more.
 
-## Impovements and Conclusion
+## Improvements and Conclusion
 
-The goal here wasn't to build the *perfect* form, but illustrate how to separeate your form validation and business logic from the UI layer. 
+The goal here wasn't to build the *perfect* form, but illustrate how to separate your form validation and business logic from the UI layer. 
 
 As it stands, you can enter any string into the weight field and it will be considered valid - not ideal, but also trivial to fix. A good exercise would be to write some tests to ensure the input is a number, and if not, return a useful error message. We also haven't got any tests to ensure the `<button>` is correctly disabled.
 

@@ -6,7 +6,7 @@ You know how to code. You know Vue. You are (or, you know you should be) testing
 
 As time passes, requirements change, and your once simple components start to grow. You end up passing 10s of props up and down, and all over the place. A "single source of truth" starts to be come "several sources of truth". The lines between your business logic, the problem you are solving and the presentation components starts to blur. Eventually velocity slows, and subtle bugs start to creep in.
 
-A few years later, all the original developers are gone and no-one really knows how things work, or what exactly // TODO: fix this actually refers to. The business opts to do a major rewrite, and the cycle continues.
+A few years later, all the original developers are gone and no-one really knows how things work, or what exactly `// TODO: fix this` actually refers to. The business opts to do a major rewrite, and the cycle continues.
 
 This isn't unusual; a lot of modern development looks like this, for one reason or another. But it doesn't have to be like this! Vue is a powerful and flexible UI layer, JavaScript (and TypeScript) gets improvements every year and Jest is a first class test runner. All the tools needed to write great, maintainable applications that don't need a rewrite every few years are available. What's often missing is the design patterns, best practices and separation on concerns, and a reliable test suite.
 
@@ -22,9 +22,9 @@ Most books that teach you frameworks, languages or testing will be an app or two
 
 We start of with some patterns for `props`, as well as a discussion around one of the most fundamental ideas in this book, *separation of concerns*. We proceed to cover a wide variety of design patterns for events, forms, components, renderless components, feature separation with the Composition API, and everything else you'll need to know to create well engineered Vue.js applications.
 
-Finally, each section ends with some exercises to help you improve and practice what you learned. The source code, including all the solutions for the exercises, is included in the source code (and the appendix of this book) so you can check your solutions.
+Finally, most sections end with some exercises to help you improve and practice what you learned. The source code, including all the solutions for the exercises are [included in the source code](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code), so you can check your solutions.
 
-Each section is independant; you don't need to read it in order, so if there is a particular section you are interested in, feel free to skip to it. Try to think of this book as a reference tool; I hope it is something you can come back to for years to come and learn something useful each time.
+Each section is independent; you don't need to read it in order, so if there is a particular section you are interested in, feel free to skip to it. Try to think of this book as a reference tool; I hope it is something you can come back to for years to come and learn something useful each time.
 
 I hope this has given you a good idea of what to expect. If you have any feedback, questions ors comments, or just want to chat about Vue and testing, feel free to reach out via email or Twitter (find my most up to date contact details on the website you got this book).
 
