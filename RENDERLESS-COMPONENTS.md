@@ -165,9 +165,9 @@ Let's keep going and add the a customizable `complexity` feature, to rate whethe
 
 For now we will implement something very naive; most developers will want to customize this, but this makes for a good example none the less. For now the algorithm will be purely based on length:
 
-- high: length > 10
-- mid: length > 7
-- low: anything else
+- high: length >= 10
+- mid: length >= 7
+- low: length >= 5
 
 As with `isMatching`, we will make a `calcComplexity` function that is a pure function. Decoupled and easily testable.
 
@@ -262,14 +262,14 @@ export default {
     })
 
     const complexityStyle = (complexity) => {
-      if (complexity < 2) {
-        return 'low'
-      }
-      if (complexity < 3) {
-        return 'mid'
-      }
       if (complexity >= 3) {
         return 'high'
+      }
+      if (complexity >= 2) {
+        return 'mid'
+      }
+      if (complexity >= 1) {
+        return 'low'
       }
     }
 

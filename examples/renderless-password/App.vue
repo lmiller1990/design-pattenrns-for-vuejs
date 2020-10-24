@@ -48,14 +48,14 @@ export default {
     })
 
     const complexityStyle = (complexity) => {
-      if (complexity < 2) {
-        return 'low'
-      }
-      if (complexity < 3) {
-        return 'mid'
-      }
       if (complexity >= 3) {
         return 'high'
+      }
+      if (complexity >= 2) {
+        return 'mid'
+      }
+      if (complexity >= 1) {
+        return 'low'
       }
     }
 
