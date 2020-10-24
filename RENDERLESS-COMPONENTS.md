@@ -8,10 +8,10 @@ There is a few requirements. We'd like to publish this on npm; to make it as fle
 
 We would like to support the following features:
 
-- a `matching` varible that returns true if the password and confirmation match
-- support a `minComplexity` prop; by default the minimum complexity is 0 and maximum complexity is 3
-- support a custom complexity algorithm (eg, require specific characters or numbers in the password)
-- expose a `valid` value which is true when the password and confirmation match, and the password meets the minimum complexity
+- A `matching` varible that returns true if the password and confirmation match.
+- Support a `minComplexity` prop; by default the minimum complexity is 0 and maximum complexity is 3. This is represented by the bar above the submit button in the screenshot above.
+- support a custom complexity algorithm (eg, require specific characters or numbers in the password).
+- Expose a `valid` value which is true when the password and confirmation match, and the password meets the minimum complexity.
 
 Let's get started.
 
@@ -29,7 +29,7 @@ export default {
 }
 ```
 
-This is the trick; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. Let's see this in action but using the component in a regular `vue` file:
+This is the how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. Let's see this in action but using the component in a regular `vue` file:
 
 ```html
 <template>
@@ -53,7 +53,9 @@ export default {
 </script>
 ```
 
-We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very intersting. 
+We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting. 
+
+ss1
 
 ## Adding password and confirmation inputs
 
@@ -125,7 +127,7 @@ Let's try it out:
       </div>
     </div>
 
-    Matches: {{ matching }}
+    <p>Matches: {{ matching }}</p>
 
   </renderless-password>
 </template>
@@ -152,6 +154,8 @@ export default {
 }
 </script>
 ```
+
+ss2
 
 The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
 
@@ -234,14 +238,16 @@ Let's try it out:
         <label for="confirmation">Confirmation</label>
         <input v-model="input.confirmation" id="confirmation" />
       </div>
-      <div
-        class="complexity"
-        :class="complexityStyle(complexity)"
-      />
+      <div class="complexity-field">
+        <div
+          class="complexity"
+          :class="complexityStyle(complexity)"
+        />
+      </div>
     </div>
 
-    Matches: {{ matching }}
-    Complexity: {{ complexity }}
+    <p>Matches: {{ matching }}</p>
+    <p>Complexity: {{ complexity }}</p>
 
   </renderless-password>
 </template>
@@ -307,6 +313,8 @@ export default {
 }
 </style>
 ```
+
+ss3
 
 I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
 
@@ -374,14 +382,16 @@ Update the usage to include a `<button>` that binds to `valid`:
       </div>
     </div>
 
-    Matches: {{ matching }}
-    Complexity: {{ complexity }}
+    <p>Matches: {{ matching }}</p>
+    <p>Complexity: {{ complexity }}</p>
 
   </renderless-password>
 </template>
 ```
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
+
+ss-done
 
 ## Exercises
 
