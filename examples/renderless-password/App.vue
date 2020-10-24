@@ -26,9 +26,8 @@
       </div>
     </div>
 
-    Matches: {{ matching }}
-    Complexity: {{ complexity }}
-
+    <p>Matches: {{ matching }}</p>
+    <p>Complexity: {{ complexity }}</p>
   </renderless-password>
 </template>
 
@@ -70,9 +69,13 @@ export default {
 <style>
 .wrapper {
   width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .field {
+  width: 100%;
   display: flex;
   flex-direction: column;
   font-size: 1.1rem;
