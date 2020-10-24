@@ -496,4 +496,4 @@ As it stands, you can enter any string into the weight field and it will be cons
 - add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.
  - submit the form using Vue Test Utils and assert the correct event and payload is emitted.
 
-You can find the completed source code (including exercises) in the GitHub repository.
+You can find the completed source code (including exercises) in the [GitHub repository](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
