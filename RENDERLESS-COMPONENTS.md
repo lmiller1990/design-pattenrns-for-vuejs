@@ -18,3 +18,384 @@ Let's get started.
 ## Rendering without a render function
 
 I will work out of a file called `renderless-password.js`. That's right - not a `vue` file. No need - we won't be shipping a `<template>`.
+
+```js
+export default {
+  setup(props, { slots }) {
+    return () => slots.default({
+      complexity: 5
+    })
+  }
+}
+```
+
+This is the trick; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. Let's see this in action but using the component in a regular `vue` file:
+
+```html
+<template>
+  <renderless-password 
+    v-slot="{ 
+      complexity
+    }"
+  >
+    {{ complexity }}
+  </renderless-password>
+</template>
+
+<script>
+import RenderlessPassword from './renderless-password.js'
+
+export default {
+  components: { 
+    RenderlessPassword
+  }
+}
+</script>
+```
+
+We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very intersting. 
+
+## Adding password and confirmation inputs
+
+The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, which the developer is free to use as they see fit.
+
+There are several ways we could handle this. Let's see what is probably the most idiomatic, in my opinion. The first thing we need to do is update `renderless-password.js` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
+
+```js
+export function isMatching(password, confirmation) {
+  if (!password || !confirmation) {
+    return false
+  }
+  return password === confirmation
+}
+
+import { computed } from 'vue'
+
+export function isMatching(password, confirmation) {
+  if (!password || !confirmation) {
+    return false
+  }
+  return password === confirmation
+}
+
+export default {
+  props: {
+    password: {
+      type: String
+    },
+
+    confirmation: {
+      type: String
+    }
+  },
+
+  setup(props, { slots }) {
+    const matching = computed(() => isMatching(props.password, props.confirmation))
+
+    return () => slots.default({
+      matching: matching.value
+    })
+  }
+}
+```
+
+You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep is separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. I also removed `complexity: 5`; we will come back to this, but we aren't using it right now.
+
+One thing that might be a little surprising if you need to pass `matching.value` to `slots.default()`. This is because I would like to let the developer destructure `matching` by doing `v-slot={ matching }"` as opposed to `v-slot="{ matching: matching.value }"`; the former feels more clean to me.
+
+Let's try it out:
+
+```html
+<template>
+  <renderless-password 
+    :password="input.password"
+    :confirmation="input.confirmation"
+    v-slot="{ 
+      matching
+    }"
+  >
+    <div class="wrapper">
+      <div class="field">
+        <label for="password">Password</label>
+        <input v-model="input.password" id="password" />
+      </div>
+      <div class="field">
+        <label for="confirmation">Confirmation</label>
+        <input v-model="input.confirmation" id="confirmation" />
+      </div>
+    </div>
+
+    Matches: {{ matching }}
+
+  </renderless-password>
+</template>
+
+<script>
+import { reactive } from 'vue'
+import RenderlessPassword from './renderless-password.js'
+
+export default {
+  components: { 
+    RenderlessPassword
+  },
+
+  setup(props) {
+    const input = reactive({
+      password: '',
+      confirmation: ''
+    })
+
+    return {
+      input
+    }
+  }
+}
+</script>
+```
+
+The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
+
+I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code.
+
+This works, and it feels very intuitive to me. The complexity and business logic is nicely abstracted away, and the developer can use and style the component as they see fit.
+
+Let's keep going and add the a customizable `complexity` feature, to rate whether a password is sufficiently complex.
+
+## Adding Password Complexity
+
+For now we will implement something very naive; most developers will want to customize this, but this makes for a good example none the less. For now the algorithm will be purely based on length:
+
+- high: length > 10
+- mid: length > 7
+- low: anything else
+
+As with `isMatching`, we will make a `calcComplexity` function that is a pure function. Decoupled and easily testable.
+
+```js
+import { computed } from 'vue'
+
+// ...
+
+export function calcComplexity(val) {
+  if (!val) {
+    return 0
+  }
+
+  if (val.length > 10) {
+    return 3
+  }
+  if (val.length > 7) {
+    return 2
+  }
+  if (val.length > 5) {
+    return 1
+  }
+
+  return 0
+}
+
+export default {
+  props: {
+    // ...
+  },
+
+  setup(props, { slots }) {
+    const matching = computed(() => isMatching(props.password, props.confirmation))
+    const complexity = computed(() => calcComplexity(props.password))
+
+    return () => slots.default({
+      matching: matching.value,
+      complexity: complexity.value
+    })
+  }
+}
+```
+
+Nothing too exciting - we have will need to support a custom complexity function in the future, but other than that, everything is very similar to what we did with `matching`.
+
+Let's try it out:
+
+```html
+<template>
+  <renderless-password 
+    :password="input.password"
+    :confirmation="input.confirmation"
+    v-slot="{ 
+      matching,
+      complexity
+    }"
+  >
+    <div class="wrapper">
+      <div class="field">
+        <label for="password">Password</label>
+        <input v-model="input.password" id="password" />
+      </div>
+      <div class="field">
+        <label for="confirmation">Confirmation</label>
+        <input v-model="input.confirmation" id="confirmation" />
+      </div>
+      <div
+        class="complexity"
+        :class="complexityStyle(complexity)"
+      />
+    </div>
+
+    Matches: {{ matching }}
+    Complexity: {{ complexity }}
+
+  </renderless-password>
+</template>
+
+<script>
+import { reactive } from 'vue'
+import RenderlessPassword from './renderless-password.js'
+
+export default {
+  components: { 
+    RenderlessPassword
+  },
+
+  setup(props) {
+    const input = reactive({
+      password: '',
+      confirmation: ''
+    })
+
+    const complexityStyle = (complexity) => {
+      if (complexity < 2) {
+        return 'low'
+      }
+      if (complexity < 3) {
+        return 'mid'
+      }
+      if (complexity >= 3) {
+        return 'high'
+      }
+    }
+
+    return {
+      input,
+      complexityStyle
+    }
+  }
+}
+</script>
+
+<style>
+<!-- 
+  some styles excluded for brevity
+  see source code for full styling
+-->
+.complexity {
+  transition: 0.2s;
+  height: 10px;
+}
+
+.high {
+  width: 100%;
+  background: lime;
+}
+
+.mid {
+  width: 66%;
+  background: yellow;
+}
+
+.low {
+  width: 33%;
+  background: red;
+}
+</style>
+```
+
+I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
+
+You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is actually applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass). By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
+
+```js
+test('applies correct class based on password complexity', async () => {
+  // Foo is the component where we use `<renderless-password>`
+  const wrapper = mount(Foo)
+  await wrapper.find('#password').setValue('this is a long password')
+  expect(wrapper.find('.complexity.high').exists()).toBe(true)
+})
+```
+
+Let's add the final feature: a button that is only enabled when a `valid` property, exposed by the `<renderless-password>`.
+
+```js
+import { computed } from 'vue'
+
+// ...
+
+export default {
+  props: {
+    minComplexity: {
+      type: Number,
+      default: 3
+    },
+
+    // ...
+  },
+
+  setup(props, { slots }) {
+    const matching = computed(() => isMatching(props.password, props.confirmation))
+    const complexity = computed(() => calcComplexity(props.password))
+    const valid = computed(() => complexity.value >= props.minComplexity && matching.value)
+
+    return () => slots.default({
+      matching: matching.value,
+      complexity: complexity.value,
+      valid: valid.value
+    })
+  }
+}
+```
+
+I added a `valid` computed property, based on the result of `complexity` and `matching`. You could make a separate function for this, if you wanted to test it in isolation. If I was going to distribute this npm, I probably would; alternatively we can test this implicitly by binding `valid` to a button's `disabled` attribute, like we are about to do, and then assert against the DOM that the attribute is set correctly.
+
+Update the usage to include a `<button>` that binds to `valid`:
+
+```html
+<template>
+  <renderless-password 
+    :password="input.password"
+    :confirmation="input.confirmation"
+    v-slot="{ 
+      matching,
+      complexity,
+      valid
+    }"
+  >
+    <div class="wrapper">
+      <! -- ... omitted for brevity .. --> 
+      <div class="field">
+        <button :disabled="!valid">Submit</button>
+      </div>
+    </div>
+
+    Matches: {{ matching }}
+    Complexity: {{ complexity }}
+
+  </renderless-password>
+</template>
+```
+
+Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
+
+## Exercises
+
+This section intentionally omitted writing tests in order to focus on the concepts. Several techniques regarding tests were mentioned. As practice, try to write the following tests (find the solutions in the source code):
+
+- Some tests using Vue Test Utils to assert the correct complexity class is assigned.
+- Test that the button is appropriately disabled.
+
+You could also write some business logic tests, to make sure we didn't miss any edge cases:
+
+- Test the `calcComplexity` and `isMatching` functions in isolation.
+
+There are also some improvements you could try making:
+
+- Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
+- Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
+

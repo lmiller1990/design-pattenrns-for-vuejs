@@ -1,4 +1,11 @@
-import { h, computed, watch } from 'vue'
+import { computed } from 'vue'
+
+export function isMatching(password, confirmation) {
+  if (!password || !confirmation) {
+    return false
+  }
+  return password === confirmation
+}
 
 export function calcComplexity(val) {
   if (!val) {
@@ -18,36 +25,30 @@ export function calcComplexity(val) {
   return 0
 }
 
-export function isMatching(password, confirmation) {
-  if (!password || !confirmation) {
-    return false
-  }
-  return password === confirmation
-}
-
 export default {
   props: {
+    minComplexity: {
+      type: Number,
+      default: 3
+    },
+
     password: {
       type: String
     },
 
     confirmation: {
       type: String
-    },
-
-    minComplexity: {
-      type: Number
     }
   },
 
   setup(props, { slots }) {
-    const complexity = computed(() => calcComplexity(props.password))
     const matching = computed(() => isMatching(props.password, props.confirmation))
+    const complexity = computed(() => calcComplexity(props.password))
     const valid = computed(() => complexity.value >= props.minComplexity && matching.value)
 
     return () => slots.default({
-      complexity: complexity.value,
       matching: matching.value,
+      complexity: complexity.value,
       valid: valid.value
     })
   }
