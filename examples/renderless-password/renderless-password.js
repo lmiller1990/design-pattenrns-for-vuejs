@@ -32,6 +32,10 @@ export default {
       default: 3
     },
 
+    validator: {
+      type: Function,
+    },
+
     password: {
       type: String
     },
@@ -44,7 +48,15 @@ export default {
   setup(props, { slots }) {
     const matching = computed(() => isMatching(props.password, props.confirmation))
     const complexity = computed(() => calcComplexity(props.password))
-    const valid = computed(() => complexity.value >= props.minComplexity && matching.value)
+    const valid = computed(() => props.validator 
+      ? props.validator({ 
+        complexity: complexity.value, 
+        password: props.password,
+        confirmation: props.confirmation,
+        matching: matching.value,
+      })
+      : complexity.value >= props.minComplexity && matching.value
+    )
 
     return () => slots.default({
       matching: matching.value,

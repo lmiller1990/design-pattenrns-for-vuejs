@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import TestComponent from './App.vue'
+import AppWithCustomValidator from './AppWithCustomValidator.vue'
 import { isMatching, calcComplexity } from './renderless-password.js'
 
 describe('isMatching', () => {
@@ -25,8 +26,18 @@ describe('calcComplexity', () => {
   })
 })
 
-
 describe('component using renderless-password', () => {
+  it('supports custom validator', async () => {
+    const wrapper = mount(AppWithCustomValidator)
+
+    await wrapper.find('#password').setValue('this is a long password')
+    await wrapper.find('#confirmation').setValue('this is a long password')
+
+    // customValidator in AppWithCustomValidator return false no matter what
+    // so button is always disabled.
+    expect(wrapper.find('button').element.disabled).toBe(true)
+  })
+
   it('meets default requirements', async () => {
     const wrapper = mount(TestComponent)
 
