@@ -4,6 +4,8 @@ The primary way you reuse components in Vue is *slots*. This works great for a l
 
 In this section we will build the following component, a password strength form:
 
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
+
 There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will include no render function (or `<template>` tag, which compiles into a render function anyway), so developers can fully customize the style as they see fit.
 
 We would like to support the following features:
@@ -55,7 +57,7 @@ export default {
 
 We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting. 
 
-ss1
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss1.png)
 
 ## Adding password and confirmation inputs
 
@@ -155,7 +157,7 @@ export default {
 </script>
 ```
 
-ss2
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss2.png)
 
 The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
 
@@ -314,7 +316,7 @@ export default {
 </style>
 ```
 
-ss3
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss3.png)
 
 I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
 
@@ -391,7 +393,7 @@ Update the usage to include a `<button>` that binds to `valid`:
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
-ss-done
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 
 ## Exercises
 
