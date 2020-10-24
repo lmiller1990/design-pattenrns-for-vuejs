@@ -1,4 +1,3 @@
-<script>
 import { h, computed, watch } from 'vue'
 
 export function calcComplexity(val) {
@@ -53,5 +52,3 @@ export default {
     })
   }
 }
-</script>
-

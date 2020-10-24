@@ -1,5 +1,5 @@
 <template>
-  <renderless 
+  <renderless-password 
     :password="input.password"
     :confirmation="input.confirmation"
     :minComplexity="2"
@@ -27,16 +27,16 @@
       </div>
     </div>
 
-  </renderless>
+  </renderless-password>
 </template>
 
 <script>
 import { reactive } from 'vue'
-import Renderless from './renderless.vue'
+import RenderlessPassword from './renderless-password.js'
 
 export default {
   components: { 
-    Renderless 
+    RenderlessPassword
   },
 
   setup(props) {
