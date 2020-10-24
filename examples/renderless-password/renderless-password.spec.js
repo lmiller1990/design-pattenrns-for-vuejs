@@ -41,8 +41,8 @@ describe('component using renderless-password', () => {
   it('does not meet complexity requirements', async () => {
     const wrapper = mount(TestComponent)
 
-    await wrapper.find('#password').setValue('short')
-    await wrapper.find('#confirmation').setValue('short')
+    await wrapper.find('#password').setValue('shorty')
+    await wrapper.find('#confirmation').setValue('shorty')
 
     expect(wrapper.find('button').element.disabled).toBe(true)
     expect(wrapper.find('.complexity.high').exists()).not.toBe(true)
