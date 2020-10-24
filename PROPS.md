@@ -1,4 +1,4 @@
-## Patterns for Testing Props
+# Patterns for Testing Props
 
 In this section we explore `props`, and the kinds of tests you might want to consider writing. This leads into a much more fundamental and important topic; drawing a clear line between business logic and UI, also known as *separation of concerns*, and how your tests can help make this distinction clear.
 
@@ -307,7 +307,7 @@ export default {
 
 Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. The test are now *failing*. The behavior hasn't really changed, though, has it? Some people might argue it *has* - buttons normally don't take you to other pages, but anchor tags do. My personal preference here would be to change my test as follows:
 
-```js {3}
+```js
 it('shows login authenticated is true', () => {
   const wrapper = navbarFactory({ authenticated: true })
   expect(wrapper.html()).toContain('Logout')
@@ -321,3 +321,5 @@ By using `html()` and `toContain()`, we are focusing on what text is rendered - 
 This chapter discussed some Vue Test Utils APIs, including `classes()`, `html()`, `find()` and `text()`. We also discussed using a factory function to make similar tests more concise, and the idea of the data driving the UI.
 
 Finally, we dived into the concept of *separation of concerns*, and how it can make your business logic code outlast your framework. Finally, we saw how refactoring code and seeing how the tests pass or fail can potentially reveal tightly coupled code, and some alternative ways to test DOM content. 
+
+\pagebreak

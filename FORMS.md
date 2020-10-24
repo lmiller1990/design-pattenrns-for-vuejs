@@ -1,4 +1,4 @@
-## Writing Good Forms
+# Writing Testable Forms
 
 Forms are the primary way a user enters information into any web based system, so getting them right is important. The focus on this section will be on forms, specifically *writing good forms*. What exactly is a *good* form? We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. In traditional server rendered apps, you would only get validation after submitting the form - not really a great user experience. Vue makes client side validation trivial, so we will make use of this and implement two levels of validation:
 
@@ -59,11 +59,17 @@ import {
 
 describe('required', () => {
   it('is invalid when undefined', () => {
-    expect(required(undefined)).toEqual({ valid: false, message: 'Required' })
+    expect(required(undefined)).toEqual({ 
+      valid: false, 
+      message: 'Required' 
+    })
   })
 
   it('is invalid when empty string', () => {
-    expect(required('')).toEqual({ valid: false, message: 'Required' })
+    expect(required('')).toEqual({ 
+      valid: false, 
+      message: 'Required' 
+    })
   })
 
   it('returns true false value is present', () => {
@@ -107,24 +113,35 @@ import {
 
 describe('isBetween', () => {
   it('returns true when value is equal to min', () => {
-    expect(isBetween(5, { min: 5, max: 10 })).toEqual({ valid: true })
+    expect(isBetween(5, { min: 5, max: 10 }))
+    .toEqual({ valid: true })
   })
 
   it('returns true when value is between min/max', () => {
-    expect(isBetween(7, { min: 5, max: 10 })).toEqual({ valid: true })
+    expect(isBetween(7, { min: 5, max: 10 }))
+    .toEqual({ valid: true })
   })
 
   it('returns true when value is equal to max', () => {
-    expect(isBetween(10, { min: 5, max: 10 })).toEqual({ valid: true })
+    expect(isBetween(10, { min: 5, max: 10 }))
+    .toEqual({ valid: true })
   })
 
   it('returns false when value is less than min', () => {
-    expect(isBetween(4, { min: 5, max: 10 })).toEqual({ valid: false, message: 'Must be between 5 and 10' })
+    expect(isBetween(4, { min: 5, max: 10 }))
+      .toEqual({ 
+        valid: false, 
+        message: 'Must be between 5 and 10' 
+      })
   })
 
   it('returns false when value is greater than max', () => {
-    expect(isBetween(11, { min: 5, max: 10 })).toEqual({ valid: false, message: 'Must be between 5 and 10' })
-  })
+    expect(isBetween(11, { min: 5, max: 10 }))
+      .toEqual({ 
+        valid: false, 
+        message: 'Must be between 5 and 10' 
+      })
+    })
 })
 ```
 
@@ -163,14 +180,17 @@ import {
 describe('validateMeasurement', () => {
   it('returns invalid for input', () => {
     const constraints = { min: 10, max: 30 }
-    const actual = validateMeasurement(undefined, { constraints, nullable: false })
+    const actual = validateMeasurement(undefined, { constraints })
     expect(actual).toEqual({ valid: false, message: 'Required' })
   })
 
   it('returns invalid when outside range', () => {
     const constraints = { min: 10, max: 30 }
-    const actual = validateMeasurement(40, { constraints, nullable: false })
-    expect(actual).toEqual({ valid: false, message: 'Must be between 10 and 30' })
+    const actual = validateMeasurement(40, { constraints })
+    expect(actual).toEqual({ 
+      valid: false, 
+      message: 'Must be between 10 and 30' 
+    })
   })
 })
 ```
@@ -235,7 +255,10 @@ const validState = validateForm(patientForm)
 // Result should be:
 // {
 //   name: { valid: true }
-//   weight: { valid: false, message: 'Must be between 66 and 440' }
+//   weight: { 
+//     valid: false, 
+//     message: 'Must be between 66 and 440' 
+//   }
 // }
 
 ```
@@ -327,7 +350,10 @@ describe('patientForm', () => {
       }
     })
 
-    expect(form.weight).toEqual({ valid: false, message: 'Must be between 66 and 440' })
+    expect(form.weight).toEqual({ 
+      valid: false, 
+      message: 'Must be between 66 and 440' 
+    })
   })
 
   it('validates weight in metric', () => {
@@ -339,7 +365,10 @@ describe('patientForm', () => {
       }
     })
 
-    expect(form.weight).toEqual({ valid: false, message: 'Must be between 30 and 200' })
+    expect(form.weight).toEqual({ 
+      valid: false, 
+      message: 'Must be between 30 and 200' 
+    })
   })
 })
 ```
@@ -424,7 +453,11 @@ Let's add the `<template>` part now - it's very simple, just good old HTML.
         {{ validatedForm.weight.message }}
       </div>
       <label for="weight">Weight</label>
-      <input id="weight" name="weight" v-model.number="form.weight.value" />
+      <input 
+        id="weight" 
+        name="weight" 
+        v-model.number="form.weight.value" 
+      />
       <select name="weightUnits" v-model="form.weight.units">
         <option value="kg">kg</option>
         <option value="lb">lb</option>
@@ -496,4 +529,6 @@ As it stands, you can enter any string into the weight field and it will be cons
 - add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.
  - submit the form using Vue Test Utils and assert the correct event and payload is emitted.
 
-You can find the completed source code (including exercises) in the [GitHub repository](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+You can find the completed source code (including exercises) in the [GitHub repository](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+
+\pagebreak
