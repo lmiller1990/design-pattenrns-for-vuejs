@@ -17,10 +17,12 @@
         <label for="confirmation">Confirmation</label>
         <input v-model="input.confirmation" id="confirmation" />
       </div>
-      <div
-        class="complexity"
-        :class="complexityStyle(complexity)"
-      />
+      <div class="complexity-field">
+        <div
+          class="complexity"
+          :class="complexityStyle(complexity)"
+        />
+      </div>
       <div class="field">
         <button :disabled="!valid">Submit</button>
       </div>
@@ -85,6 +87,10 @@ export default {
 input {
   height: 30px;
   font-size: 1.5rem;
+}
+
+.complexity-field {
+  width: 100%;
 }
 
 .complexity {
