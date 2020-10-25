@@ -11,8 +11,11 @@ Finally, we need two levels of tests. The first is around the business logic; gi
 
 For this example, we are building a form to enter patient data for a hospital application. The form will look like this:
 
-![](./images/forms-dirty.png)
-![](./images/forms-clean.png)
+### Invalid Form with Debug Info
+![](./images/form-validation/ss-done-dirty.png)
+
+### Valid Form with Debug Info
+![](./images/form-validation/ss-done-clean.png)
 
 There are two inputs. The first is the patient name, which is required and can be any text. The second is the patient weight, which can be in imperial or metric units. The constraints are as follows:
 
@@ -482,7 +485,7 @@ Form State
 
 I added the `<pre>` block for some debugging. Everything works!
 
-![](./images/forms-clean.png)
+![](./images/form-validation/ss-done-clean.png)
 
 ## Some Basic UI Tests
 
