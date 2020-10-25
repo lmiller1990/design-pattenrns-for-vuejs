@@ -15,9 +15,10 @@ This isn't unusual; a lot of modern development looks like this, for one reason 
 This is a book about design patterns and testing. But it's also more. Thinking in design patterns is not about memorizing a lot of fancy names and diagrams. Knowing how to test is not really about learning a test runner or reading documentation. Testing starts *before* you even start writing code. Testing is a philosophy. It's a way of life. Finally, as engineer, writing tests is also your *obligation*, even if HR forgot to put it in your job description.
 
 My goal is to get you in the habit of writing testable code, and how to choose the right abstraction for the problem at hand. The first things you think when you hear a new business requirement or request should be: 
-- What design pattern will give me the most flexilibity moving forward? 
-- What new requirements could come up, and how will this decision deal with them?
-- How am I going to write my code in a testable, loosely coupled fashion? 
+\newline
+\newline - What design pattern will give me the most flexilibity moving forward? 
+\newline - What new requirements could come up, and how will this decision deal with them?
+\newline - How am I going to write my code in a testable, loosely coupled fashion? 
 
 The lessons and patterns I'll be sharing are not Vue-specific at all; they are framework agnostic. I'd even say that they are language agnostic; they are fundamental concepts you can take with you and apply them to any software design problem. Good developers focus on tools and frameworks, great developers focus on data structures and how they interact with each other, testability and maintainability.
 

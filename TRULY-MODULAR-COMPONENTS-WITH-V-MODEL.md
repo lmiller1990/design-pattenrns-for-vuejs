@@ -1,4 +1,4 @@
-## Truly Modular Components with v-model
+# Truly Modular Components with v-model
 
 In this section we will author a reusable date component. Usage will be like this:
 
@@ -433,3 +433,5 @@ Great! Now everything works correctly, and `<date-time>` will only update `model
 - Add support for another date library, like moment. Support for moment is implemented in the source code.
 - Add hours, minutes, seconds, and AM/PM support.
 - Write some tests with Vue Test Utils; you can use `setValue` to update the value of the `<input>` elements.
+
+\pagebreak

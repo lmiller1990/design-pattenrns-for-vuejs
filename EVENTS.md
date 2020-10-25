@@ -1,4 +1,4 @@
-## Emitting Events
+# Emitting Events
 
 Vue's primary mechanical for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierachy, you do so by *emitting events*, with `$emit` (Options API) and `emit` (Composition API).
 
@@ -279,3 +279,4 @@ Finally, we saw how our tests was focused on inputs and outputs (in this case, t
 
 We touch on events again later on, in the `v-model` chapter - stay tuned.
 
+\pagebreak

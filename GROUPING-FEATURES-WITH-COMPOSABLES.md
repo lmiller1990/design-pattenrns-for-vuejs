@@ -1,4 +1,4 @@
-## Grouping ...
+# Grouping Features with Composables
 
 Vue 3's flagship feature is The Composition API; it's main selling point is to easily group and reuse code by *feature*. In this section we will see some techniques to write testable composables by building a tic tac toe game. 
 
@@ -506,3 +506,4 @@ Some exercises to improve:
 
 The solutions can be found in the source code.
 
+\pagebreak

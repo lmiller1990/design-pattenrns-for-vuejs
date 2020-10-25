@@ -1,4 +1,4 @@
-## Renderless Components
+# Renderless Components
 
 The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility. One example is you have some complex logic that needs to be reused in two totally different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
 
