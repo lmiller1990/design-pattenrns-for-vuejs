@@ -287,3 +287,13 @@ There are some easy ways to see if you are separating your Vue UI logic from you
 
 - are you accessing Vue reactivity APIs in your business logic? This usually comes in the form of `.value` for accessing the values of `computed` and `ref`.
 - are you relying
+
+This also prompts another question: what and how should we be testing our functional core and imperative shell? In the previous section, we tested both in one go. This worked out fine, however, we still needed to write some UI tests with Vue Test Utils, which kind of duplicated our `useTicTacToe` composable tests.
+
+Another problem we encountered when testing the `useTicTacToe` composable in the previous section was *cross test contamination*. This is primarily caused by shared state in tests. This wasn't a problem when testing our functional core, because there is no shared state.
+
+Of course there is no one way to write applications, but I am more and more of the opinion that testing composables is generally not ideal. Instead, you should extract your logic into a immutable functional core with no shared state and test that. Then, you test your imperative shell, in this case the `useTicTacToe` composable, in the context of the UI - using something like Vue Test Utils.
+
+## Exercises
+
+- Trying adding an undo/redo functionality. This should be easy, because we keep track of each previous state in the `boards` array.
