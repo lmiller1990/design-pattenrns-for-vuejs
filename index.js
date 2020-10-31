@@ -1,4 +1,10 @@
-import { createApp } from 'vue'
-import App from './examples/form-validation/form-validation.vue'
+import { createApp, h } from 'vue'
+import Game from './examples/composition-functional/tic-tac-toe-app.vue'
+
+const App = {
+  render() {
+    return h(Game)
+  }
+}
 
 createApp(App).mount('#app')

@@ -27,6 +27,7 @@ function createNewGame(initialState) {
 
 const games = {}
 
+
 export function useGame(id) {
   return games[id]
 }

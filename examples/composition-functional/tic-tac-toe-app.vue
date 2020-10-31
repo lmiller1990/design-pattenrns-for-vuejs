@@ -1,5 +1,4 @@
 <template>
-  <div style="padding: 20px">
   <div v-for="row, rowIdx in currentBoard" class="row">
     <div 
       v-for="col, colIdx in row" 
@@ -10,9 +9,6 @@
       {{ col }}
     </div>
   </div>
-  <button>Undo</button>
-  <button>Redo</button>
-  </div>
 </template>
 
 <script>
@@ -20,13 +16,9 @@ import { useTicTacToe } from './tic-tac-toe.js'
 
 export default {
   setup(props) {
-    const { createGame, useGame } = useTicTacToe()
-    const { boards, currentBoard, makeMove, undo, redo } = createGame(Math.random().toFixed(1))
+    const { currentBoard, makeMove } = useTicTacToe()
 
     return {
-      boards,
-      undo,
-      redo,
       currentBoard,
       makeMove
     }
