@@ -1,5 +1,5 @@
 import { createApp, h } from 'vue'
-import Game from './examples/composition-functional/tic-tac-toe-app.vue'
+import Game from './examples/composition/tic-tac-toe-app.vue'
 
 const App = {
   render() {
