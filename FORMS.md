@@ -11,15 +11,15 @@ Finally, we need two levels of tests. The first is around the business logic; gi
 
 For this example, we are building a form to enter patient data for a hospital application. The form will look like this:
 
-### Invalid Form with Debug Info
+### Img: Invalid Form with Debug Info
 ![](./images/form-validation/ss-done-dirty.png)
 
-### Valid Form with Debug Info
+### Img: Valid Form with Debug Info
 ![](./images/form-validation/ss-done-clean.png)
 
 There are two inputs. The first is the patient name, which is required and can be any text. The second is the patient weight, which can be in imperial or metric units. The constraints are as follows:
 
- ?  | Imperial | Metric
+ .  | Imperial | Metric
 --- | --- | ---
 min | 66 | 30
 max | 440 | 200
@@ -485,6 +485,8 @@ Form State
 
 I added the `<pre>` block for some debugging. Everything works!
 
+### Img: Validation Debug Info
+
 ![](./images/form-validation/ss-done-clean.png)
 
 ## Some Basic UI Tests
@@ -526,7 +528,7 @@ The goal here wasn't to build the *perfect* form, but illustrate how to separate
 
 As it stands, you can enter any string into the weight field and it will be considered valid - not ideal, but also trivial to fix. A good exercise would be to write some tests to ensure the input is a number, and if not, return a useful error message. We also haven't got any tests to ensure the `<button>` is correctly disabled.
 
-## Exercises:
+## Exercises
 
 - add a test to ensure that any non numbers entered into the `weight` field cause the field to become invalid and show a "Weight must be a number" error.
 - add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.

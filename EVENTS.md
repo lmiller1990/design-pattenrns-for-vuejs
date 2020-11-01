@@ -84,7 +84,7 @@ describe('Counter', () => {
 })
 ```
 
-## Simple Templates
+## Clean Templates
 
 We discussed previous the ideal of *simple templates*. The same thing applies here; we want to avoid calling `$emit` in the template, where possible. Let's move this to the `<script>` section, where logic belongs:
 
@@ -130,7 +130,7 @@ As of Vue 3, you are able to (and encouraged to) declare the events your compone
 
 You can do this in the same way you declare props; using the array of strings syntax:
 
-```
+```js
 export default {
   emits: ['submit']
 }
@@ -138,7 +138,7 @@ export default {
 
 Or the more verbose but explicit object syntax:
 
-```
+```js
 export default {
   emits: {
     submit: null 
@@ -148,7 +148,7 @@ export default {
 
 The object syntax also supports *validation*. As an example, we could validate the payload is a number:
 
-```
+```js
 export default {
   emits: {
     submit: (count) => {
@@ -164,7 +164,7 @@ Depending on your application, you may want to have more thorough validation. I 
 
 The first step is to move the validation of of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
 
-```
+```html
 <script>
 export function submitValidator(count) {
   return typeof count !== 'string' && !isNaN(count)
@@ -188,13 +188,11 @@ export default {
 </script>
 ```
 
-Another convention is emerging:
-
-> TIP: Call event validators `xxxValidator`.
+Another convention is emerging: call event validators `xxxValidator`.
 
 I am also going to make a change to `submitValidator`; the argument *must* be a number; if not, bad things will happen. So instead of waiting for bad things to happen, I am going to throw an error:
 
-```
+```js
 export function submitValidator(count) {
   if (typeof count === 'string' || isNaN(count)) {
     throw Error(`

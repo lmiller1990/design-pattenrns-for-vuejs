@@ -4,6 +4,8 @@ The primary way you reuse components in Vue is *slots*. This works great for a l
 
 In this section we will build the following component, a password strength form:
 
+### Img: Completed password complexity component
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 
 There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will include no render function (or `<template>` tag, which compiles into a render function anyway), so developers can fully customize the style as they see fit.
@@ -57,6 +59,8 @@ export default {
 
 We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting. 
 
+### Img: Rendering with slots.default()
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss1.png)
 
 ## Adding password and confirmation inputs
@@ -94,7 +98,8 @@ export default {
   },
 
   setup(props, { slots }) {
-    const matching = computed(() => isMatching(props.password, props.confirmation))
+    const matching = computed(() => isMatching(
+      props.password, props.confirmation))
 
     return () => slots.default({
       matching: matching.value
@@ -157,6 +162,8 @@ export default {
 </script>
 ```
 
+### Img: Rendering inputs and debug info
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss2.png)
 
 The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
@@ -206,8 +213,10 @@ export default {
   },
 
   setup(props, { slots }) {
-    const matching = computed(() => isMatching(props.password, props.confirmation))
-    const complexity = computed(() => calcComplexity(props.password))
+    const matching = computed(() => isMatching(
+      props.password, props.confirmation))
+    const complexity = computed(() => calcComplexity(
+      props.password))
 
     return () => slots.default({
       matching: matching.value,
@@ -290,10 +299,10 @@ export default {
 </script>
 
 <style>
-<!-- 
+/**
   some styles excluded for brevity
   see source code for full styling
--->
+*/
 .complexity {
   transition: 0.2s;
   height: 10px;
@@ -316,6 +325,8 @@ export default {
 </style>
 ```
 
+### Img: Complexity indicator
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss3.png)
 
 I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
@@ -330,6 +341,8 @@ test('applies correct class based on password complexity', async () => {
   expect(wrapper.find('.complexity.high').exists()).toBe(true)
 })
 ```
+
+## Computing Form Validity 
 
 Let's add the final feature: a button that is only enabled when a `valid` property, exposed by the `<renderless-password>`.
 
@@ -349,9 +362,13 @@ export default {
   },
 
   setup(props, { slots }) {
-    const matching = computed(() => isMatching(props.password, props.confirmation))
-    const complexity = computed(() => calcComplexity(props.password))
-    const valid = computed(() => complexity.value >= props.minComplexity && matching.value)
+    const matching = computed(() => isMatching(
+          props.password, props.confirmation))
+    const complexity = computed(() => calcComplexity(
+          props.password))
+    const valid = computed(() => 
+        complexity.value >= props.minComplexity && 
+        matching.value)
 
     return () => slots.default({
       matching: matching.value,
@@ -393,6 +410,8 @@ Update the usage to include a `<button>` that binds to `valid`:
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
+### Img: Completed password complexity component
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 
 ## Exercises
@@ -411,3 +430,4 @@ There are also some improvements you could try making:
 - Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
 - Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
 
+\pagebreak

@@ -160,7 +160,7 @@ describe('Message', () => {
 
 This might not seem significant, but it's actually a big improvement. We have complete test coverage, and we can be confident the `<Message>` component can only be used with valid a `variant`
 
-# Separation of Concerns
+## Separation of Concerns
 
 You may be wondering; are we *really* testing the `variant` prop here? The answer is no - not really! We added a test for our business logic - our organization only supports three different button types. There is an important distinction here. The first tests, where we use `classes()`, is a UI test; we are verifying that the UI layer is working correctly. The second test, for `variant`, is business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
 

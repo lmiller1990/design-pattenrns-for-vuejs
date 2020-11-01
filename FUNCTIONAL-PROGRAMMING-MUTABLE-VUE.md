@@ -1,3 +1,5 @@
+# Functional Core, Imperative Shell - Immutable Logic, Mutable Vue
+
 In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We conciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
 
 In this chapter, we will explore an paradigm best characterized as "functional core, imperative shell". We will refactor the Tic Tic Toe logic to be purely functional, avoiding all mutation. This will be decoupled from Vue's reactivity system, which relies on mutation and side effects, something the functional paradigm avoids. 
@@ -232,8 +234,9 @@ export default {
 </style>
 ```
 
+### Img: Rendered game board
 
-[](./images/ttt-1.png)
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-1.png)
 
 ## Integrating makeMove
 
@@ -254,9 +257,11 @@ const move = ({ col, row }) => {
 }
 ```
 
+### Img: Completed game board
+
 That's it! Everything now works in it's functional, immutable glory.
 
-[](./images/ttt-2.png)
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-2.png)
 
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test from the previous section:
 
@@ -297,3 +302,5 @@ Of course there is no one way to write applications, but I am more and more of t
 ## Exercises
 
 - Trying adding an undo/redo functionality. This should be easy, because we keep track of each previous state in the `boards` array.
+
+\pagebreak
