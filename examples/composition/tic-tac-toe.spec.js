@@ -23,8 +23,7 @@ describe('useTicTacToe', () => {
       ['-', '-', '-'],
       ['-', '-', '-']
     ]
-    const { createGame } = useTicTacToe()
-    const { currentBoard } = createGame('1', [initialState])
+    const { currentBoard } = useTicTacToe([initialState])
 
     expect(currentBoard.value).toEqual(initialState)
   })
@@ -35,8 +34,7 @@ describe('useTicTacToe', () => {
       ['-', '-', '-'],
       ['-', '-', '-']
     ]
-    const { createGame } = useTicTacToe()
-    const { currentBoard } = createGame('1')
+    const { currentBoard } = useTicTacToe()
 
     expect(currentBoard.value).toEqual(initialBoard)
   })
@@ -44,8 +42,7 @@ describe('useTicTacToe', () => {
 
 describe('makeMove', () => {
   it('updates the board and adds the new state', () => {
-    const { createGame } = useTicTacToe()
-    const { currentBoard, makeMove, boards, currentPlayer } = createGame('1')
+    const { currentBoard, makeMove, boards, currentPlayer } = useTicTacToe()
     makeMove({ row: 0, col: 0 })
 
     expect(boards.value).toHaveLength(2)

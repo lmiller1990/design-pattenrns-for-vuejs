@@ -1,6 +1,6 @@
 import { ref, readonly, computed } from 'vue'
 
-function createNewGame(initialState) {
+export function useTicTacToe(initialState) {
   const initialBoard = [
     ['-', '-', '-'],
     ['-', '-', '-'],
@@ -11,7 +11,7 @@ function createNewGame(initialState) {
   const currentPlayer = ref('o')
 
   function makeMove({ row, col }) {
-    const newBoard = [...boards.value[boards.value.length - 1]]
+    const newBoard = JSON.parse(JSON.stringify(boards.value))[boards.value.length - 1]
     newBoard[row][col] = currentPlayer.value
     currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
     boards.value.push(newBoard)
@@ -25,25 +25,3 @@ function createNewGame(initialState) {
   }
 }
 
-const games = {}
-
-
-export function useGame(id) {
-  return games[id]
-}
-
-export function createGame(id, initialState) {
-  if (!id) {
-    throw Error('Please provide an id for the game')
-  }
-
-  games[id] = createNewGame(initialState)
-  return games[id]
-}
-
-export function useTicTacToe() {
-  return {
-    useGame,
-    createGame
-  }
-}
