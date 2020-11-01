@@ -1,2 +1,11 @@
 node_modules
 *.pdf
+
+*.aux
+*.log
+*.toc
+*.aux
+*.dvi
+*.log
+*.tex
+*.toc
