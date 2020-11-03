@@ -7,6 +7,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
+    "ts-node": "^9.0.0",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/test-utils": "^2.0.0-beta.4",
     "babel-jest": "^26.3.0",
