@@ -1,13 +1,5 @@
 <template>
   <div class="wrapper">
-    <h3>Dependency Injection with Provide/Inject</h3>
-    <form @submit.prevent="handleSubmit">
-      <input 
-        v-model="username" 
-        placeholder="Enter name..." 
-      />
-      <button>Add User</button>
-    </form>
     <ul>
       <li 
         v-for="user in users"

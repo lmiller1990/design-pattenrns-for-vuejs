@@ -87,7 +87,7 @@ export default {
 </script>
 ```
 
-SS1
+ss-basic
 
 It works! Good progress - I added a tiny bit of CSS as well, grab that from the source code. 
 
@@ -209,6 +209,8 @@ export default {
 ```
 
 Great! The test now passes.
+
+ss-complete
 
 ## Provide/Inject to avoid cross test contamination
 
