@@ -1,3 +1,5 @@
+# Dependency Injection with Provide and Inject
+
 In this section we discuss a pair of functions, provide and inject. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to ths Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. As such, `provide` and `inject` were not as common used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
 
 Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` hook. We will see why `provide` and `inject` are better.
@@ -208,7 +210,7 @@ export default {
 </script>
 ```
 
-Great! The test now passes.
+Great! The test now passes - again, I added a tiny bit of CSS and a nice title, which you can get in the source code if you like.
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-complete.png)
 

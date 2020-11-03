@@ -7,7 +7,8 @@ cat \
   EVENTS.md \
   TRULY-MODULAR-COMPONENTS-WITH-V-MODEL.md \
   GROUPING-FEATURES-WITH-COMPOSABLES.md \
-  FUNCTIONAL-PROGRAMMING-MUTABLE-VUE.md | \
+  FUNCTIONAL-PROGRAMMING-MUTABLE-VUE.md \
+  PROVIDE-INJECT.md | \
   pandoc \
   --highlight-style tango \
   --pdf-engine pdflatex \
