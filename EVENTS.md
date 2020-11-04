@@ -1,5 +1,9 @@
 # Emitting Events
 
+The completed source code for this section, including the exercises, can be found in `examples/events`.
+
+______
+
 Vue's primary mechanical for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierachy, you do so by *emitting events*, with `$emit` (Options API) and `emit` (Composition API).
 
 Let's see some examples on how this works, and some guidelines we can set to keep things clean and understandable.
@@ -31,7 +35,9 @@ export default {
 </script>
 ```
 
-There are two buttons; one increments a `count`, the other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. As with the other examples, this one uses Vue Test Utils, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
+There are two buttons; one increments a `count`, the other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
+
+As with the other examples, this one uses Vue Test Utils, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
 
 ```js
 import { mount } from '@vue/test-utils'
@@ -77,8 +83,10 @@ import Counter from './counter.vue'
 describe('Counter', () => {
   it('emits an event with the current count', async () => {
     const wrapper = mount(Counter) 
+
     await wrapper.find('#increment').trigger('click')
     await wrapper.find('#submit').trigger('click')
+
     expect(wrapper.emitted().submit[0]).toEqual([1])
   })
 })
@@ -126,7 +134,11 @@ The one you choose isn't really important; having a convention is generally a go
 
 ## Declaring emits 
 
-As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. Failing to do so will give you a warning in the browser console: "Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop". This can make it easier to understand what your component does, both for other developers, and yourself when you come back to your code-base in six months time.
+As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. 
+
+Failing to do so will give you a warning in the browser console: "Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop". 
+
+This can make it easier to understand what your component does, both for other developers, and yourself when you come back to your code-base in six months time.
 
 You can do this in the same way you declare props; using the array of strings syntax:
 
@@ -141,10 +153,12 @@ Or the more verbose but explicit object syntax:
 ```js
 export default {
   emits: {
-    submit: null 
+    submit: (count) => {} 
   }
 }
 ```
+
+If you are using TypeScript, you will get even better type safety, including the types for the payload.
 
 The object syntax also supports *validation*. As an example, we could validate the payload is a number:
 
@@ -160,7 +174,9 @@ export default {
 
 ## More Robust Event Validation
 
-Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely they might seem. I also have a strong emphasis on testing, and separation of concerns. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
+Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely they might seem. 
+
+I also have a strong emphasis on testing, and separation of concerns. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
 
 The first step is to move the validation of of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
 
@@ -188,7 +204,7 @@ export default {
 </script>
 ```
 
-Another convention is emerging: call event validators `xxxValidator`.
+Another convention is emerging: I like to call event validators `xxxValidator`.
 
 I am also going to make a change to `submitValidator`; the argument *must* be a number; if not, bad things will happen. So instead of waiting for bad things to happen, I am going to throw an error:
 
@@ -220,9 +236,15 @@ describe('submitValidator', () => {
 })
 ```
 
+A lot of these problems can be partial mitigated with TypeScript. TypeScript won't give you runtime validation though. If you are using an error logging service (like Sentry), throwing an error like this can give you valuable information for debugging.
+
 ## With the Composition API 
 
-The `<Counter>` example used the Options API; but all the topics discussed here translate to the Composition API fine. In fact, a good way to see if you are testing inputs and outputs, as opposed to implementation details, is to refactor your component from the Options API to the Composition API, or vice versa; good tests are resilient to refactor. Let's see the refactor:
+The `<counter>` example used the Options API; but all the topics discussed here translate to the Composition API fine. 
+
+A good way to see if you are testing inputs and outputs, as opposed to implementation details, is to refactor your component from the Options API to the Composition API, or vice versa; good tests are resilient to refactor. 
+
+Let's see the refactor:
 
 ```html
 <template>
@@ -267,7 +289,7 @@ export default {
 </script>
 ```
 
-Everything still passes - great news.
+Everything still passes - great news!
 
 ## Conclusion
 
@@ -276,5 +298,7 @@ We discussed emitting events, and the various features Vue provides to keep our 
 Finally, we saw how our tests was focused on inputs and outputs (in this case, the input is the user interation via the buttons, and the output is the emitted `submit` event).
 
 We touch on events again later on, in the `v-model` chapter - stay tuned.
+
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak
