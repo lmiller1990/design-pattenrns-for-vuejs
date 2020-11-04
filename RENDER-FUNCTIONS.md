@@ -56,7 +56,9 @@ This example shows a great use case for render functions. Without them, you migh
 </template>
 ```
 
-I think the former is much cleaner and lends itself to a better development experience. Furthermore, if you are writing a UI library (like Vuetify, for example) you will not know how many tabs the user is going to use, so this approach won't work - you will need something more generic and generalizable.
+As far as general development goes, I think the former is much cleaner and lends itself to a better development experience. 
+
+Another common use case for render functions is when you are writing a general component library (such as Vuetify). In these cases, you will not know how many tabs the user is going to use, so using `v-if` like above isn't an option. You will need something more generic and generalizable. There are other alternatives, but I've found render functions really useful for writing reusable components.
 
 ## Creating the Components
 
