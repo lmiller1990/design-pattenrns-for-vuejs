@@ -1,4 +1,4 @@
-## The Power of Raw Render Functions
+# The Power of Render Functions
 
 So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and actually rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
 
@@ -28,7 +28,7 @@ In this section we will build a tab component. The usage will look something lik
 
 ### Img: Completed Tabs Component
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/tabs-completed.png)
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-done.png)
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -141,7 +141,7 @@ export const TabContainer = {
 }
 ```
 
-If you prefer composition API, you could also do this with `setup`:
+If you prefer Composition API, you could also do this with `setup`:
 
 ```js
 export const TabContainer = {
@@ -157,7 +157,7 @@ export const TabContainer = {
 
 I will be using the Options API and a `render` function for this example. 
 
-The first thing we need to do is separate the slots. For example if the usage is like this:
+The first thing we need to do is separate the slots. I will use the following example for development:
 
 ```html
 <template>
@@ -167,22 +167,6 @@ The first thing we need to do is separate the slots. For example if the usage is
 
     <tab-content tabId="1" />
     <tab-content tabId="2" />
-  </tab-container>
-</template>
-```
-
-Then `this.$slots.default()` would contain *four* slots (technically, we can say four `VNodes`). Two `<tab>` components and two `<tab-content>` components. To make this more clear we will do some "console driven" development. First, make this component in a `vue` file (mine is in `examples/render-functions/app.vue`:
-
-```html
-<template>
-  <tab-container v-model:activeTabId="activeTabId">
-    <tab tabId="1" data-testid="1">Tab #1</tab>
-    <tab tabId="2" data-testid="2">Tab #2</tab>
-    <tab tabId="3" data-testid="3">Tab #3</tab>
-
-    <tab-content tabId="1">Content #1</tab-content>
-    <tab-content tabId="2">Content #2</tab-content>
-    <tab-content tabId="3">Content #3</tab-content>
   </tab-container>
 </template>
 
@@ -211,13 +195,15 @@ export default {
 </script>
 ```
 
-Create a new app using this component as the root component in a browser, and open up the console. You should see something like this:
+In this example, `this.$slots.default()` would contain *four* slots (technically, we can say four `VNodes`). Two `<tab>` components and two `<tab-content>` components. To make this more clear we will do some "console driven" development. 
+
+Create a new app using the above component as the root component. Open a browser and open up the console. You should see something like this:
 
 ### Img: Logging Slots (array of VNodes)
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-default-slots.png)
 
-An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I marked some of the relevant properties for this section:
+An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I expanded the first one and marked some of the relevant properties for this section:
 
 ### Img: Detailed View of the Tab VNode
 
@@ -272,7 +258,7 @@ The next goal will be to render the tabs. We will also add some classes to get s
 
 ## Adding Attributes to Render Functions
 
-First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy `h` function afterwards:
+First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy (amazing?) `h` function afterwards:
 
 ```js
 import { h } from 'vue'
@@ -306,7 +292,7 @@ Finally, we have something rendering:
 
 You may have noticed I did `h(() => tabs)` instead of just `return tabs`. `h` also accepts a callback - in which case, it will evaluate the callback function when it renders. I recommend always returning `h(() => /* render function */)` for the final value in `render` - if you don't, you may run into subtle caching issues.
 
-You can also return an array - this is known as a *fragment*. If this looks confusing, don't worry - I explain `h` in more detail immediately after.
+You can also return an array - this is known as a *fragment*.
 
 A more complex example of a component with a `render` function that returns an array of render functions, consisting of both regular HTML elements and a custom component.
 
@@ -329,6 +315,8 @@ const Comp = {
   }
 }
 ```
+
+If this looks confusing, don't worry - see the `h` crash course below.
 
 ## What is `h`? A crash course
 
@@ -369,10 +357,23 @@ Which renders:
 You can also pass more `VNodes`, created with nested calls to `h`:
 
 ```js
-const el = h('div', { class: 'tab', foo: 'bar' }, [h('span', {}, ['Hello world!'])])
+const el = h(
+  'div', 
+  { 
+    class: 'tab', 
+    foo: 'bar' 
+  }, 
+  [
+    h(
+      'span', 
+      {}, 
+      ['Hello world!']
+    )
+  ]
+)
 ```
 
-Which gives us:
+I spread it out to make it more readable. `render` functions using `h` can get messy - you need to be displined. Some tips will follow relating to this. Ths above call to `h` gives us:
 
 ```html
 <div class="tab" foo="bar>
@@ -385,7 +386,7 @@ As shown above, you are not just limited to standard HTML elements. You can pass
 ```js
 const Tab = {
   render() {
-    return h('span' /)
+    return h('span')
   }
 }
 
@@ -557,3 +558,5 @@ I added a `data-test` selector to my `app.vue` test component, to make it clear 
 ### Img: Typesafe Component with Render Function
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-ts.png)
+
+\pagebreak
