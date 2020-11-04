@@ -11,7 +11,7 @@ One example is you have some complex logic that needs to be reused in two totall
 
 In this section we will build the following component, a password strength form:
 
-### Img: Completed password complexity component
+### Img: Completed Password Complexity Component
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 
@@ -28,7 +28,7 @@ We would like to support the following features:
 
 Let's get started.
 
-## Rendering without markup
+## Rendering without Markup
 
 I will work out of a file called `renderless-password.js`. That's right - not a `vue` file. No need - we won't be shipping a `<template>`.
 
@@ -74,7 +74,7 @@ We can destructure the object passed to `slots.default()` in `v-slot`, and are f
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss1.png)
 
-## Adding password and confirmation inputs
+## Adding Password and Confirmation Inputs
 
 The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, which the developer is free to use as they see fit.
 
@@ -175,7 +175,7 @@ export default {
 </script>
 ```
 
-### Img: Rendering inputs and debug info
+### Img: Rendering Inputs and Debug Info
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss2.png)
 
@@ -338,7 +338,7 @@ export default {
 </style>
 ```
 
-### Img: Complexity indicator
+### Img: Complexity Indicator
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss3.png)
 
@@ -427,7 +427,7 @@ Update the usage to include a `<button>` that binds to `valid`:
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
-### Img: Completed password complexity component
+### Img: Completed Password Complexity Component
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 

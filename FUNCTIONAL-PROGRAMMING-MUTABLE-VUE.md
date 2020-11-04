@@ -257,7 +257,7 @@ const move = ({ col, row }) => {
 }
 ```
 
-### Img: Completed game board
+### Img: Completed Game Board
 
 That's it! Everything now works in it's functional, immutable glory.
 

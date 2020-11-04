@@ -32,7 +32,7 @@ In this section we will build a tab component. The usage will look something lik
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
-## Why render functions?
+## Why Render Functions?
 
 This example shows a great use case for render functions. Without them, you might need to write something like this:
 
@@ -61,7 +61,6 @@ As far as general development goes, I think the former is much cleaner and lends
 Another common use case for render functions is when you are writing a general component library (such as Vuetify). In these cases, you will not know how many tabs the user is going to use, so using `v-if` like above isn't an option. You will need something more generic and generalizable. There are other alternatives, but I've found render functions really useful for writing reusable components.
 
 ## Creating the Components
-
 
 One of the nice things about render function components is you can create multiple in the same file. Although I generally like to have one component per file, in this particular case I have no problem putting `<tab-container>`, `<tab-content>` and `<tab>` in the same file. The main reason for this is both `<tab>` and `<tab-content>` are very simple, and I don't see any use case where you would want to use them outside of nesting them in `<tab-container>`.
 
@@ -201,7 +200,7 @@ In this example, `this.$slots.default()` would contain *four* slots (technically
 
 Create a new app using the above component as the root component. Open a browser and open up the console. You should see something like this:
 
-### Img: Logging Slots (array of VNodes)
+### Img: Logging Slots (Array of VNodes)
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-default-slots.png)
 
@@ -320,7 +319,7 @@ const Comp = {
 
 If this looks confusing, don't worry - see the `h` crash course below.
 
-## What is `h`? A crash course
+## What is `h`? A Crash Course
 
 We are using `h` to render our tabs - `h(tab)` - where `tab` is a `VNode`, which in turn has a render function that returns `h`. What is `h`? It is derived from the term "hyperscript", which in turn owes its roots to `HTML` - specifically the `H`, which is stands for *hyper*. `h` is shorter, and easier to type. It can be thought of as "a JavaScript function that creates HTML structures`.
 
@@ -397,7 +396,7 @@ const el = h('div', {}, [h(Tab), {}, ['Tab #1']])
 
 This can get difficult to read quickly. The main strategy I use to work around this is creating a separate variable for each `VNode`, and returning them all at the end of the `render` function (keep reading to see this in action).
 
-## Adding a dynamic class attribute
+## Adding a Dynamic Class Attribute
 
 Now we have a better understanding of `h`, we can add some classes to the `<tab>` components. Each `<tab>` will have a `tab` class, and the active tab will have an `active` class. Update the `render` function:
 

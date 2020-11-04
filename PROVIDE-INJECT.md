@@ -214,7 +214,7 @@ Great! The test now passes - again, I added a tiny bit of CSS and a nice title, 
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-complete.png)
 
-## Provide/Inject to avoid cross test contamination
+## Provide/Inject to Avoid Cross Test Contamination
 
 Everything looks to be working on the surface, but we will eventually run into a problem as our application grows: shared state across tests. We have a *single* store instance for all of our tests - when we mutate the state, this change will impact all the other tests, too.
 
