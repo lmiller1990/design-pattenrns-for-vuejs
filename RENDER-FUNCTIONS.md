@@ -28,7 +28,7 @@ In this section we will build a tab component. The usage will look something lik
 
 ### Img: Completed Tabs Component
 
-ss: tabs-completed
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/tabs-completed.png)
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -213,11 +213,15 @@ export default {
 
 Create a new app using this component as the root component in a browser, and open up the console. You should see something like this:
 
-ss-render-default-slots
+### Img: Logging Slots (array of VNodes)
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-default-slots.png)
 
 An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I marked some of the relevant properties for this section:
 
-ss-slot-details
+### Img: Detailed View of the Tab VNode
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-slot-details.png)
 
 The first one is `children`. This is where the slots go. For example in:
 
@@ -260,7 +264,9 @@ export const TabContainer = {
 
 Since `type` is a direct reference to the original component (eg, not a copy), we can use `===` (strict equality) to filter the slots.
 
-ss-sorted-slots
+### Img: Filtered VNodes
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-sorted-slots.png)
 
 The next goal will be to render the tabs. We will also add some classes to get some nice styling, as well as show which tab is currently selected.
 
@@ -294,7 +300,9 @@ export const TabContainer = {
 
 Finally, we have something rendering:
 
-ss-render-tabs-basic
+### Img: Rendered Tabs
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-tabs-basic.png)
 
 You may have noticed I did `h(() => tabs)` instead of just `return tabs`. `h` also accepts a callback - in which case, it will evaluate the callback function when it renders. I recommend always returning `h(() => /* render function */)` for the final value in `render` - if you don't, you may run into subtle caching issues.
 
@@ -434,7 +442,9 @@ Does this look familiar?
 
 It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, active: tabId === activeTabId }"` in a render function. Here's how it looks in a browser (I added some CSS - grab the CSS from `examples/render-functions/app.vue`):
 
-ss-tabs-classes
+### Img: Dynamic Classes
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-classes.png)
 
 ## Event Listeners in Render Functions
 
@@ -454,7 +464,9 @@ The active tab needs to update when the user clicks a tab. Let's implement that.
 
 This is the render function version of `<tab v-on:click="update:activeTabId(tabId)" />`. `on:click` becomes `onClick`. Events need to be prepended with `on`. This is enough to update the active tab (I added some debugging information):
 
-ss-active
+### Img: Emitting Events in Render Functions
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-active.png)
 
 ## Filtering Content
 
@@ -511,7 +523,9 @@ It's possible to return an array of `VNodes` from `render`, which is what we do 
 
 It works!
 
-ss-tabs-done
+### Img: Completed Tabs Component
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-done.png)
 
 ## Testing Render Function Components
 
@@ -539,4 +553,7 @@ I added a `data-test` selector to my `app.vue` test component, to make it clear 
 - Rewrite this example using TypeScript. You will want to use `defineComponent` and the Composition API for maximum type safety. This screenshot illustrates some of the benefits of TypeScript. Combined with declaring `emits`, you can get type safety for both emitted events and props.
 - Attempt to refactor the other examples throughout this book to use render functions instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and the Composition API).
 
-ss-ts
+
+### Img: Typesafe Component with Render Function
+
+![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-ts.png)
