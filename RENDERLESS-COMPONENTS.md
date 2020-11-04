@@ -1,6 +1,13 @@
 # Renderless Components
 
-The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility. One example is you have some complex logic that needs to be reused in two totally different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
+The completed source code for this section, including the exercises, can be found in `examples/renderless-password`.
+
+______
+
+
+The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility.
+
+One example is you have some complex logic that needs to be reused in two totally different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
 
 In this section we will build the following component, a password strength form:
 
@@ -8,18 +15,20 @@ In this section we will build the following component, a password strength form:
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
 
-There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will include no render function (or `<template>` tag, which compiles into a render function anyway), so developers can fully customize the style as they see fit.
+There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "ernderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
+
+This means we will work with a `render` function, the low level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
 
 We would like to support the following features:
 
-- A `matching` varible that returns true if the password and confirmation match.
-- Support a `minComplexity` prop; by default the minimum complexity is 0 and maximum complexity is 3. This is represented by the bar above the submit button in the screenshot above.
+- A `matching` variable that returns true if the password and confirmation match.
+- Support a `minComplexity` prop; by default the minimum complexity is 0 and maximum complexity is 3. This is represented by the yellow bar above the submit button in the screenshot above.
 - support a custom complexity algorithm (eg, require specific characters or numbers in the password).
 - Expose a `valid` value which is true when the password and confirmation match, and the password meets the minimum complexity.
 
 Let's get started.
 
-## Rendering without a render function
+## Rendering without markup
 
 I will work out of a file called `renderless-password.js`. That's right - not a `vue` file. No need - we won't be shipping a `<template>`.
 
@@ -33,7 +42,9 @@ export default {
 }
 ```
 
-This is the how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. Let's see this in action but using the component in a regular `vue` file:
+This is the how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. 
+
+Let's see this in action but using the component in a regular `vue` file. Mine is called `app.vue`; find the completed version in the source code.
 
 ```html
 <template>
@@ -57,9 +68,9 @@ export default {
 </script>
 ```
 
-We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting. 
+We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting, but it illustrates the idea of exposing properties via `v-slot`.
 
-### Img: Rendering with slots.default()
+### Img: Rendering with slots.default() and v-slot
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss1.png)
 
@@ -108,7 +119,9 @@ export default {
 }
 ```
 
-You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep is separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. I also removed `complexity: 5`; we will come back to this, but we aren't using it right now.
+You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep is separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. You could declare it inside of `setup`, if you prefer that style.
+
+I also removed `complexity: 5`; we will come back to this, but we aren't using it right now.
 
 One thing that might be a little surprising if you need to pass `matching.value` to `slots.default()`. This is because I would like to let the developer destructure `matching` by doing `v-slot={ matching }"` as opposed to `v-slot="{ matching: matching.value }"`; the former feels more clean to me.
 
@@ -170,13 +183,13 @@ The main change is we now have a `reactive` input that has `password` and `confi
 
 I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code.
 
-This works, and it feels very intuitive to me. The complexity and business logic is nicely abstracted away, and the developer can use and style the component as they see fit.
+This works great. It also feels very intuitive to me. The complexity and business logic is nicely abstracted away, and the developer can use and style the component as they see fit.
 
 Let's keep going and add the a customizable `complexity` feature, to rate whether a password is sufficiently complex.
 
 ## Adding Password Complexity
 
-For now we will implement something very naive; most developers will want to customize this, but this makes for a good example none the less. For now the algorithm will be purely based on length:
+For now we will implement something a very naive complexity check. Most developers will want to customize this anyway, but this makes for a good example none the less. For now the algorithm will be purely based on length:
 
 - high: length >= 10
 - mid: length >= 7
@@ -329,12 +342,16 @@ export default {
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss3.png)
 
-I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
+I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
 
-You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is actually applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass). By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
+The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
+
+You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is actually applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass).
+
+By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
 
 ```js
-test('applies correct class based on password complexity', async () => {
+test('applies correct class based on complexity', async () => {
   // Foo is the component where we use `<renderless-password>`
   const wrapper = mount(Foo)
   await wrapper.find('#password').setValue('this is a long password')
@@ -344,7 +361,7 @@ test('applies correct class based on password complexity', async () => {
 
 ## Computing Form Validity 
 
-Let's add the final feature: a button that is only enabled when a `valid` property, exposed by the `<renderless-password>`.
+Let's add the final feature: a button that is only enabled when a `valid` property is `true`. The `valid` property is exposed by the `<renderless-password>` and accessed via `v-slot`.
 
 ```js
 import { computed } from 'vue'
@@ -429,5 +446,7 @@ There are also some improvements you could try making:
 
 - Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
 - Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
+
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

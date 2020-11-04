@@ -1,6 +1,16 @@
 # Writing Testable Forms
 
-Forms are the primary way a user enters information into any web based system, so getting them right is important. The focus on this section will be on forms, specifically *writing good forms*. What exactly is a *good* form? We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. In traditional server rendered apps, you would only get validation after submitting the form - not really a great user experience. Vue makes client side validation trivial, so we will make use of this and implement two levels of validation:
+The completed source code for this section, including the exercises, can be found in `examples/form-validation`.
+
+______
+
+Forms are the primary way a user enters information into any web based system, so getting them right is important. The focus on this section will be on forms, specifically *writing good forms*. 
+
+What exactly is a *good* form? 
+
+We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. 
+
+In traditional server rendered apps, you would only get validation after submitting the form - not really a great user experience. Vue makes client side validation trivial. We will make use of this and implement two levels of validation:
 
 1. Field validation - if a user enters incorrect in invalid data in a single field, we will show an error immediately.
 2. Form validation - the submit button should only be enabled when the entire form is correctly filled out.
@@ -37,11 +47,18 @@ The submit button should only be enabled if both inputs are valid. Finally, we s
 
 ## A Mini Form Validation Framework
 
-There are plenty of full-featured Vue (and non-Vue) form validation frameworks out there. For this simple example, we will write our own. We have two types of validations: a required field (the patient name) and a required field with specific constraints (the weight field). We also want to return an error message, if the input is not valid. This will help guide the user.
+There are plenty of full-featured Vue (and non-Vue) form validation frameworks out there. For this simple example, we will write our own - this will let us discuss some ideas, as well as avoid learning a specific API or library. 
 
-We need two validation functions: `required` and `isBetween`. While TDD isn't always the right tool, for these two functions I believe it is. We know the inputs and outputs, and all the possible states of the system. 
+We need two types of validations: 
 
-Let's write some tests, starting with `required`. Each validator will return an object with the validation status, and a message if there is an error. Using a TypeScript `interface` to notation purposes:
+1. A required field. Both the patient name and weight are required fields.
+2. Minimum and maximum constraints. This is for the weight field - it has to be within a specific range. 
+
+As well as validating the fields, our framework should also return an error message if the input is not valid.
+
+We will write two validation functions: `required` and `isBetween`. While TDD isn't always the right tool, for these two functions I believe it is. This is because we know the inputs and outputs, and all the possible states of the system, it's just a matter of writing the tests and then making them pass.
+
+Let's do that - starting with the tests for the `required` validator. Each validator will return an object with the validation status, and a message if there is an error. Using a TypeScript `interface` for notation purposes:
 
 ```js
 interface ValidationResult {
@@ -50,10 +67,9 @@ interface ValidationResult {
 }
 ```
 
-Now we've settled on our validation API, here are the tests for `required`.
+This will be the format our two validators (and any future ones) will need to conform to. Now we've settled on our validation API, we can write the tests for `required`.
 
 ## The `required` validator
-
 
 ```js
 import {
@@ -102,9 +118,17 @@ I like to put the invalid case first for my validators - that's just a personal 
 
 `isBetween` is a bit more interesting. We need to support imperial and metric; we will build another function on top of `isBetween` that will pass in the correct constraints.
 
-Let's start by identifying all the edge cases. If the minimum weight is 66 lb and the maximum weight is 440 lb, obviously 65 lb and 441 lb are invalid. 66 lb and 440 lb are valid, however, so we should make sure we add tests for those cases. This means we need 5 tests; the happy path, where the input is valid, above/below the constraints, and equal to the minimum and maximum constraint.
+Let's start by identifying all the edge cases. If the minimum weight is 66 lb and the maximum weight is 440 lb, obviously 65 lb and 441 lb are invalid. 66 lb and 440 lb are valid, however, so we should make sure we add tests for those cases. 
 
-We assume that only numbers can be passed as the input value; this validation is something we will handle at a higher level.
+This means we need 5 tests: 
+
+1. The "happy" path, where the input is valid. 
+2. Value is above the maximum value.
+3. Value is below the minimum value.
+4. Value is equal to the maximum value.
+5. Value is equal to the minimum value.
+
+For this function, it is safe to assume that only numbers can be passed as the input value; this validation is something we will handle at a higher level.
 
 ```js
 import {
@@ -112,7 +136,9 @@ import {
   isBetween
 } from './form.js'
 
-// ...
+describe('required' () => {
+  // ...
+})
 
 describe('isBetween', () => {
   it('returns true when value is equal to min', () => {
@@ -148,7 +174,7 @@ describe('isBetween', () => {
 })
 ```
 
-I think the tests are simple enough to have everything in a single `expect` statement. If the tests were more complex, I'd probably assign the result of `isBetween()` to a variable (I like to call it `actual`) and pass that to the `expect` assertion.
+I think the tests are simple enough to have everything in a single `expect` statement. If the tests were more complex, I'd probably assign the result of `isBetween()` to a variable (I like to call it `actual`) and pass that to the `expect` assertion. More on structuring larger, more complex tests later.
 
 The implementation is much less code than the tests; this is not unusual.
 
@@ -169,7 +195,17 @@ Again, I like to have the validation at the start of the function.
 
 ## Building `validateMeasurement` with `isBetween`
 
-Now we have written our little validation framework (well, two functions), it's time to validate the patient weight. We will build a `validateMeasurement` function using `isBetween` and `required`. Since we are supporting imperial and metric, we will be passing the constraints as an argument - dealing with which one is selected will be later on, in the UI layer. We will want three tests: the happy path, when the value is valid, a test for a null value, and for a value outside the constraints. I don't feel the need to add tests for all the cases like we did with `isBetween`, since we already tested that.
+Now we have written our little validation framework (well, two functions), it's time to validate the patient weight. We will build a `validateMeasurement` function using `isBetween` and `required`. 
+
+Since we are supporting imperial and metric, we will be passing the constraints as an argument. Dealing with which one is selected will be done later on, in the UI layer. 
+
+There are three scenarios to consider:
+
+1. The happy path when the value is valid. 
+2. The value is null/undefined. 
+3. The value is outside the constraints. 
+
+I don't feel the need to add tests for all the cases like we did with `isBetween`, since we already tested that thoroughly.
 
 ```js
 import {
@@ -178,18 +214,26 @@ import {
   validateMeasurement
 } from './form.js'
 
-// ...
+describe('required' () => {
+  // ...
+})
+
+describe('isBetween', () => {
+  // ...
+})
 
 describe('validateMeasurement', () => {
   it('returns invalid for input', () => {
     const constraints = { min: 10, max: 30 }
     const actual = validateMeasurement(undefined, { constraints })
+
     expect(actual).toEqual({ valid: false, message: 'Required' })
   })
 
   it('returns invalid when outside range', () => {
     const constraints = { min: 10, max: 30 }
     const actual = validateMeasurement(40, { constraints })
+
     expect(actual).toEqual({ 
       valid: false, 
       message: 'Must be between 10 and 30' 
@@ -198,9 +242,15 @@ describe('validateMeasurement', () => {
 })
 ```
 
-Since the test is a bit more complex, I decided to assign the result to `actual`, and assert against that. I think this makes it more clear. We don't need to use the specific constraints outlined in the table earlier; as long as the tests pass with the constraints we pass in here, we can be confident `validateMeasurement` will work correctly for any given set of `min/max` constraints.
+Since the test is a bit more complex, I decided to assign the result to `actual`, and assert against that. I think this makes it more clear. 
 
-As you might expect, the implementation is much shorter than the test code:
+We don't need to use the specific constraints for pounds and kilograms outlined in the table earlier. As long as the tests pass with the constraints we pass in here, we can be confident `validateMeasurement` will work correctly for any given set of `min/max` constraints.
+
+I also left a blank line between the body of the test and the assertion. This is a personal preference, loosely inspired by the three phases of a test: *arrange*, *act* and *assert*. We will talk about those later. 
+
+You don't have to write your tests like this. Personally, I find it useful to think in terms of "doing things" (eg, creating some variables, calling some functions) and asserting (where we say "given this scenario, this should happen").
+
+Personal philosophy aside - the implementation, again, is much shorter than the test code. Notice a pattern?
 
 ```js
 export function validateMeasurement(value, { constraints }) {
@@ -213,13 +263,21 @@ export function validateMeasurement(value, { constraints }) {
 }
 ```
 
-Nice! We were able to reuse `required` and `isBetween`.
+Nice! We were able to reuse `required` and `isBetween`. We "composed" a validator using two small ones. Reusability is good. Composability is good.
 
 ## The Form Object and Full Form Validation
 
-We have completed all the validations for each field. Let's think about the shape of the form, now. We have two fields: `name` and `weight`. `name` is a string, and weight is a number with associated units. This is the *input*. Again, using TypeScript for notation:
+We have completed all the validations for each field. Let's think about the structure of the form now. 
+
+We have two fields: `name` and `weight`. 
+
+1. `name` is a string. 
+2. `weight` is a number with associated units. 
+
+These are the *inputs*. I will use a TypeScript interface for notation purposes:
 
 ```js
+// definition
 interface PatientFormState {
   name: string
   weight: {
@@ -228,6 +286,7 @@ interface PatientFormState {
   }
 }
 
+// usage
 const patientForm: PatientFormState = {
   name: 'John',
   weight: {
@@ -241,6 +300,11 @@ Given an input (a `patientForm`), we can valid each field. Fields when validated
 
 
 ```js
+interface ValidationResult {
+  valid: boolean
+  messsage?: string
+}
+
 interface PatientFormValidity {
   name: ValidationResult
   weight: ValidationResult
@@ -255,7 +319,7 @@ const patientForm: PatientFormState = {
 }
 
 const validState = validateForm(patientForm)
-// Result should be:
+// Return value should be:
 // {
 //   name: { valid: true }
 //   weight: { 
@@ -266,7 +330,12 @@ const validState = validateForm(patientForm)
 
 ```
 
-We will need two functions: `isFormValid`, to tell us if the form is valid or not, and `patientForm`, which handles figuring out the correct weight units, and calling all the validators. Let's start with the tests for `isFormValid`. The form is considered valid when all fields are `valid`, so we only need two tests: the case where all fields are valid, and the case where at least one field is not: 
+We will need two functions: 
+
+1. `isFormValid()`, to tell us if the form is valid or not. 
+2. `patientForm()`, which handles figuring out the correct weight units, and calling all the validators.
+
+Let's start with the tests for `isFormValid`. The form is considered valid when all fields are `valid`, so we only need two tests: the case where all fields are valid, and the case where at least one field is not: 
 
 ```js
 import {
@@ -276,7 +345,17 @@ import {
   isFormValid
 } from './form.js'
 
-// ...
+describe('required' () => {
+  // ...
+})
+
+describe('isBetween', () => {
+  // ...
+})
+
+describe('validateMeasurement', () => {
+  // ...
+})
 
 describe('isFormValid', () => {
   it('returns true when name and weight field are valid', () => {
@@ -307,9 +386,11 @@ export function isFormValid(form) {
 }
 ```
 
-You could get fancy and iterate over the `form` using `Object.keys` or `Object.entries` if you were building a more generic form validation library; in this case we aren't, so I am keeping it as simple as possible.
+You could get fancy and iterate over the `form` using `Object.keys` or `Object.entries` if you were building a more generic form validation library. This would be a more general solution. In this case I am keeping it as simple as possible.
 
-The last test we need to complete the business logic is `patientForm`. This function takes an object with the `PatientFormState` shape we defined earlier and returns the validation result of each field. We will want to have a quite a few tests here, to make sure we don't miss anything. The cases I can think of are:
+The last test we need to complete the business logic is `patientForm`. This function takes an object with the `PatientFormState` interface we defined earlier. It returns the validation result of each field. 
+
+We will want to have a quite a few tests here, to make sure we don't miss anything. The cases I can think of are:
 
 1. Happy path: all inputs are valid
 2. Patient name is null
@@ -325,7 +406,21 @@ import {
   patientForm
 } from './form.js'
 
-// ...
+describe('required' () => {
+  // ...
+})
+
+describe('isBetween', () => {
+  // ...
+})
+
+describe('validateMeasurement', () => {
+  // ...
+})
+
+describe('isFormValid', () => {
+  // ...
+})
 
 describe('patientForm', () => {
   const validPatient = {
@@ -376,7 +471,7 @@ describe('patientForm', () => {
 })
 ```
 
-The test code is quite long. Thankfully, the implementation is trivial. In this example, I am just hard-coding the weight constraints in an object called `limits`; in a real world system, you'd likely get these from an API and pass them down to the `patientForm` function.
+The test code is quite long. The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real world system, you would likely get these from an API and pass them down to the `patientForm` function.
 
 ```js
 const limits = {
@@ -405,8 +500,7 @@ This completes the business logic for the patient form - noticed we haven't writ
 
 Now the fun part - writing the UI layer with Vue. Although I think TDD is a great fit for business logic, I prefer to write the tests for my components after the fact generally, although this doesn't follow the hardcore TDD mantra.
 
-I like to start by thinking abou how I will manage the state of my component. Let's use the composition API; I think it lends itself well to forms.
-
+I like to start by thinking about how I will manage the state of my component. Let's use the Composition API; I think works great for forms.
 
 ```html
 <script>
@@ -429,7 +523,7 @@ export default {
     return {
       form,
       validatedForm,
-      valid,
+      valid
     }
   }
 }
@@ -520,6 +614,24 @@ describe('FormValidation', () => {
 })
 ```
 
+Since these tests are a little larger, I am making the separation between each step clear. I like to write my tests like this:
+
+```js
+it('...', () => {
+  // Arrange - this is where we set everything up
+  const wrapper = mount(...)
+
+  // Act - do things! 
+  // Call functions
+  // Assign values
+  // Simulate interactions
+  wrapper.find(...).trigger(...)
+
+  // Assert
+  expect(...).toEqual(...)
+})
+```
+
 We don't have any tests to ensure the `<button>` is correctly disabled - see below for more.
 
 ## Improvements and Conclusion
@@ -530,10 +642,10 @@ As it stands, you can enter any string into the weight field and it will be cons
 
 ## Exercises
 
-- add a test to ensure that any non numbers entered into the `weight` field cause the field to become invalid and show a "Weight must be a number" error.
-- add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.
- - submit the form using Vue Test Utils and assert the correct event and payload is emitted.
+- Add a test to ensure that any non numbers entered into the `weight` field cause the field to become invalid and show a "Weight must be a number" error.
+- Add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.
+ - Submit the form using Vue Test Utils and assert the correct event and payload is emitted.
 
-You can find the completed source code (including exercises) in the [GitHub repository](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

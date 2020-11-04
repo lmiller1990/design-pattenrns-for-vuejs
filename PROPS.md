@@ -1,5 +1,9 @@
 # Patterns for Testing Props
 
+The completed source code for this section, including the exercises, can be found in `examples/props`.
+
+______
+
 In this section we explore `props`, and the kinds of tests you might want to consider writing. This leads into a much more fundamental and important topic; drawing a clear line between business logic and UI, also known as *separation of concerns*, and how your tests can help make this distinction clear.
 
 Consider one of the big ideas behind frameworks like Vue and React:
@@ -28,7 +32,7 @@ So, how does this relate to `props`? Well, if you think of a component as a func
 
 ## The Basics
 
-You can declare props in a few ways. We will work with the `<Message>` component in this section.
+You can declare props in a few ways. We will work with the `<message>` component in this section.
 
 ```html
 <template>
@@ -101,11 +105,13 @@ props: {
 }
 ```
 
-Now we will get an error if an invalid prop is passed. How do we test this? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. Unlike our previous test, where we asserted against the `class`, this one has little to do with our UI - we already have a test checking if the `variant` prop is bound to the `<div>` correctly. 
+Now we will get an error if an invalid prop is passed. How do we test this? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. 
+
+Unlike our previous test, where we asserted against the `class`, this one has little to do with our UI - we already have a test checking if the `variant` prop is bound to the `<div>` correctly. 
 
 > TIP: Test props validators in isolation. The test run faster, and since validators are generally pure functions, they are easy to test.
 
-First we need to refactor `<Message>` a little to separate the validator from the component:
+First we need to refactor `<message>` a little to separate the validator from the component:
 
 ```html
 <template>
@@ -144,7 +150,9 @@ import { mount } from '@vue/test-utils'
 import Message, { validateVariant } from './Message.vue'
 
 describe('Message', () => {
-  // omitted for brevity ...
+  it('renders variant correctly when passed', () => {
+    // omitted for brevity ...
+  })
 
   it('validates valid variant prop', () => {
     ;['success', 'warning', 'error'].forEach(variant => {
@@ -158,15 +166,25 @@ describe('Message', () => {
 })
 ```
 
-This might not seem significant, but it's actually a big improvement. We have complete test coverage, and we can be confident the `<Message>` component can only be used with valid a `variant`
+This might not seem significant, but it's actually a big improvement. We have complete test coverage, and we can be confident the `<message>` component can only be used with valid a `variant`
 
 ## Separation of Concerns
 
-You may be wondering; are we *really* testing the `variant` prop here? The answer is no - not really! We added a test for our business logic - our organization only supports three different button types. There is an important distinction here. The first tests, where we use `classes()`, is a UI test; we are verifying that the UI layer is working correctly. The second test, for `variant`, is business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+You may be wondering; are we *really* testing the `variant` prop here? The answer is no - not really! We added a test for our business logic - our organization only supports three different button types. 
 
-If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this test?". In this case, you could absolutely reuse the validator test; this is tied to your business logic. The `classes()` test would have to be rewritten, because React and it's testing libraries have a different API. Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change. 
+There is an important distinction here. The first tests, where we use `classes()`, is a UI test; we are verifying that the UI layer is working correctly. 
 
-I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. Understanding the difference between the two, and how to correctly structure your applications is the difference good engineers and great engineers.
+The second test, for `variant`, is business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+
+If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this test?". 
+
+In this case, you could absolutely reuse the validator test; this is tied to your business logic. The `classes()` test would have to be rewritten, because React and it's testing libraries have a different API. 
+
+Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change. 
+
+I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. 
+
+Understanding the difference between the two, and how to correctly structure your applications is the difference good engineers and great engineers.
 
 ## Another Example
 
@@ -259,15 +277,19 @@ describe('Navbar', () => {
 
 This, of course, passes. I really like the symmetry here, showing all three cases in such a concise manner. 
 
-Let's revisit the idea of separation of concerns; is this a UI or business logic? If we moved framework, could we re-use this test? The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this logic is not really part of our core business logic. Nothing to extract.
+Let's revisit the idea of separation of concerns; is this a UI or business logic? If we moved framework, could we re-use this test? 
+
+The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this logic is not really part of our core business logic. Nothing to extract.
 
 ## The real test: Does it refactor?
 
-We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
+We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. 
+
+We can validate this by refactoring the `<Navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
 
 Let's refactor `<Navbar>`:
 
-```html{2}
+```html
 <template>
   <button>
     {{ `${authenticated ? 'Logout' : 'Login'}` }}
@@ -305,7 +327,9 @@ export default {
 </script>
 ```
 
-Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. The test are now *failing*. The behavior hasn't really changed, though, has it? Some people might argue it *has* - buttons normally don't take you to other pages, but anchor tags do. My personal preference here would be to change my test as follows:
+Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. 
+
+The tests are now *failing*. The behavior hasn't really changed, though, has it? Some people might argue it *has* - buttons normally don't take you to other pages, but anchor tags do. My personal preference here would be to change my test as follows:
 
 ```js
 it('shows login authenticated is true', () => {
@@ -314,12 +338,18 @@ it('shows login authenticated is true', () => {
 })
 ```
 
-By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. In my system, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assert against `html` using `toContain()`, rather than using `find` and `text()`.
+By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
+
+In most systems, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. 
+
+That said, I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assert against `html` using `toContain()`, rather than using `find` and `text()`.
 
 ## Conclusion
 
 This chapter discussed some Vue Test Utils APIs, including `classes()`, `html()`, `find()` and `text()`. We also discussed using a factory function to make similar tests more concise, and the idea of the data driving the UI.
 
 Finally, we dived into the concept of *separation of concerns*, and how it can make your business logic code outlast your framework. Finally, we saw how refactoring code and seeing how the tests pass or fail can potentially reveal tightly coupled code, and some alternative ways to test DOM content. 
+
+You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

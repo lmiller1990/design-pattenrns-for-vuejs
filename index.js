@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import App from './examples/render-functions/app.vue'
+import Message from './examples/props/Message.vue'
 
-const app = createApp(App)
+const app = createApp(Message, { variant: 'success' })
 app.mount('#app')
