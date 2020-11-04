@@ -1,4 +1,4 @@
-## Getting low level with render functions
+## The Power of Raw Render Functions
 
 So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and actually rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
 
@@ -26,7 +26,9 @@ In this section we will build a tab component. The usage will look something lik
 </template>
 ```
 
-Img: tabs-completed
+### Img: Completed Tabs Component
+
+ss: tabs-completed
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -213,7 +215,7 @@ Create a new app using this component as the root component in a browser, and op
 
 ss-render-default-slots
 
-An array of four... complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I marked some of the relevant properties for this section:
+An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I marked some of the relevant properties for this section:
 
 ss-slot-details
 
@@ -262,9 +264,9 @@ ss-sorted-slots
 
 The next goal will be to render the tabs. We will also add some classes to get some nice styling, as well as show which tab is currently selected.
 
-## Adding Atributes to Render Functions
+## Adding Attributes to Render Functions
 
-First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy `h` function aftwards:
+First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy `h` function afterwards:
 
 ```js
 import { h } from 'vue'
@@ -382,9 +384,9 @@ const Tab = {
 const el = h('div', {}, [h(Tab), {}, ['Tab #1']])
 ```
 
-This can get diffcult to read quickly. The main strategy I use to work around this is creating a separate varaible for each VNode, and returning them all at the end of the `render` function (keep reading to see this in action).
+This can get difficult to read quickly. The main strategy I use to work around this is creating a separate variable for each `VNode`, and returning them all at the end of the `render` function (keep reading to see this in action).
 
-## Adding a dynmic class attribute
+## Adding a dynamic class attribute
 
 Now we have a better understanding of `h`, we can add some classes to the `<tab>` components. Each `<tab>` will have a `tab` class, and the active tab will have an `active` class. Update the `render` function:
 
@@ -506,3 +508,35 @@ export const TabContainer = {
 ```
 
 It's possible to return an array of `VNodes` from `render`, which is what we do here. We kept everything nice and readable by creating separate variables for each of the different elements we are rendering - in this case, `tabs` and `content`. 
+
+It works!
+
+ss-tabs-done
+
+## Testing Render Function Components
+
+Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so actually all the tests we've been writing have been using `render` functions under the hook).
+
+```js
+import { mount } from '@vue/test-utils'
+import App from './app.vue'
+
+test('tabs', async () => {
+  const wrapper = mount(App)
+  expect(wrapper.html()).not.toContain('Content #2')
+
+  await wrapper.find('[data-test="2"]').trigger('click')
+
+  expect(wrapper.html()).toContain('Content #2')
+})
+```
+
+I added a `data-test` selector to my `app.vue` test component, to make it clear which tab I am clicking in the test.
+
+## Exercises
+
+- Try refactoring the components to use a `setup` function. This means instead of using a `render` function, you will return a function from `setup` that handles the rendering.
+- Rewrite this example using TypeScript. You will want to use `defineComponent` and the Composition API for maximum type safety. This screenshot illustrates some of the benefits of TypeScript. Combined with declaring `emits`, you can get type safety for both emitted events and props.
+- Attempt to refactor the other examples throughout this book to use render functions instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and the Composition API).
+
+ss-ts

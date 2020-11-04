@@ -1,5 +1,10 @@
 <template>
   <div class="wrapper">
+    <form @submit.prevent="handleSubmit">
+      <input v-model="username" />
+      <button>Add User</button>
+    </form>
+
     <ul>
       <li 
         v-for="user in users"
