@@ -1,14 +1,32 @@
 # Truly Modular Components with v-model
 
+The completed source code for this section, including the exercises, can be found in `examples/reusable-date-time`.
+
+______
+
 In this section we will author a reusable date component. Usage will be like this:
 
 ```html
-<date-time v-model="date" />
+<date-time 
+  v-model="date" 
+  :serialize="..."
+  :deserialize="..."
+/>
 ```
 
-Where `date` can be... whatever you want. Some applications use the native JavaScript `Date` object (don't do this; it's not a fun experience). Older applications will often use [Moment](https://momentjs.com/) and newer ones common opt for [Luxon](https://moment.github.io/luxon/). I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
+The finished component will look like this:
 
-You can find the [completed source code, including exercise, here](https://gist.github.com/lmiller1990/bca97f1a32e5878ea1652a4b594d3ab1).
+### Img: Completed DateTime Component
+
+ss-dt-done
+
+There are three props: `v-model`, `serialize` and `deserialize`. More on what `serialize` and `deserialize` are soon.
+
+The idea is that the `date` value passed to `v-model` can use whichever DateTime library the developer wants to use. We want to allow developers to bring their own DateTime library, instead of mandating a specific one.
+
+Some applications use the native JavaScript `Date` object (don't do this; it's not a very good experience). Older applications will often use [Moment](https://momentjs.com/) and newer ones common opt for [Luxon](https://moment.github.io/luxon/). 
+
+I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
 
 One way to handle this would be to pick a simple format of our own, for example `YYYY-MM-DD`, and then have the user wrap the component and provide their own integration layer. For example a user wanting to use Luxon might wrap `<date-time>` in their own `<date-time-luxon>` component:
 
@@ -40,9 +58,9 @@ export default {
 
 This might work ok - now you can put your `<luxon-date-time>` on npm to share. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
 
-This is not that easy to test, either. You will need to mount the component using something like Vue Test Utils just to test your parsing logic - again, not ideal. Of course we will need some integration tests to make sure it's working correctly, but I don't want to couple my business logic tests (eg, the parsing logic from `updateDate` using pure functions and Jest) to the UI layer tests (using Vue Test Utils).
+Another problem is this is a bit difficult to test. You will need to mount the component using something like Vue Test Utils just to test your parsing logic - again, not ideal. Of course we will need some integration tests to make sure it's working correctly, but I don't want to couple my business logic tests (eg, the parsing logic from `updateDate` using pure functions and Jest) to the UI layer tests (using Vue Test Utils).
 
-The core problem of the "wrapper" solution is you are adding another abstraction, another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. 
+The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. 
 
 Here is the API I am proposing to make `<date-time>` truly agnostic, not needing to know the implementation details of the date library:
 
@@ -54,15 +72,21 @@ Here is the API I am proposing to make `<date-time>` truly agnostic, not needing
 />
 ```
 
-`date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value.
+`date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value. This pattern is generalized as the "strategy" pattern.
 
 A diagram might make this more clear:
 
+### Img: DateTime data flow
+
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/dt-ss-1.png)
+
+In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
+
+If the developer was using Luxon, the workflow would be something like `luxon.DateTime()` -> `{ year: '', month: '', day: '' }` -> `luxon.Datetime()`. The input *and* output is a luxon DateTime - the developer doesn't need to know or care about the internal representation.
 
 ## Foundations of v-model
 
-Before starting the serialize functions, let's write the base for `<date-time>`. It will use `v-model`. This means we receive a `modelValue` prop and update the value by emitting a `update:modelValue` event. To keep things simple, I will just use 3 `<input>` elements for the year, month and day.
+Before implementing the strategy pattern (`serialize` and `deserialize` functions), let's write the base for `<date-time>`. It will use `v-model`. This means we receive a `modelValue` prop and update the value by emitting a `update:modelValue` event. To keep things simple, I will just use 3 `<input>` elements for the year, month and day.
 
 ```html
 <template>
@@ -70,7 +94,7 @@ Before starting the serialize functions, let's write the base for `<date-time>`.
   <input :value="modelValue.month" @input="update($event, 'month')" />
   <input :value="modelValue.day" @input="update($event, 'day')" />
 <pre>
-date is:
+Internal date is:
 {{ modelValue }} 
 </pre>
 </template>
@@ -123,7 +147,7 @@ import { ref } from 'vue'
 import dateTime from './date-time.vue'
 
 export default {
-  components: { DateTime },
+  components: { dateTime },
   setup() {
     const dateLuxon = ref({
       year: '2020',
@@ -139,11 +163,15 @@ export default {
 </script>
 ```
 
+### Img: Rendering the Date Inputs
+
+ss-dt-progress
+
 I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, make reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
 
 ## Deerializing for modelValue
 
-We have established the internal API, or how the `<date-time>` component will manage the value. For notation purposes, if we were to write an interface in TypeScript, it would look like this:
+We have established the internal API. This is how the `<date-time>` component will manage the value. For notation purposes, if we were to write an interface in TypeScript, it would look like this:
 
 ```ts
 interface InternalDateTime {
@@ -153,12 +181,21 @@ interface InternalDateTime {
 }
 ```
 
-We will now work on the `deserialize` prop, which will convert any string object (so a Luxon `DateTime`, a Moment `moment`) into an `InternalDateTime`
-.
+We will now work on the `deserialize` prop, which is a function that will convert any object (so a Luxon `DateTime`, a Moment `moment`) into an `InternalDateTime`. This is the representation the `<date-time>` component uses internally.
 
 ## Deserializing modelValue
 
-Let's take Luxon's `DateTime`. You can create a new one like this:
+The next goal is to write a `deserialize` function. In pseusocode:
+
+```js
+export function deserialize(inputDateTime) {
+  // do whatever needs to be done to convert
+  // the inputDateTime to a JS object with
+  // { year, month, day }
+  return yearMonthDateObject
+```
+
+I will use Luxon's `DateTime` to demonstrate. You can create a new `DateTime` like this:
 
 ```js
 import { DateTime } from 'luxon'
@@ -170,7 +207,7 @@ const date = DateTime.fromObject({
 })
 ```
 
-The goal is to get from our input to `v-model`, in this case a Luxon `DateTime`, to our internal representation, `InternalDateTime`. This conversion is trivial: from `DateTime`, you can just do `date.get()` passing in `year`, `month` or `day`. So our `deserialize` function looks like this:
+The goal is to get from our input from `v-model`, in this case a Luxon `DateTime`, to our internal representation, `InternalDateTime`. This conversion is trivial in the case of Luxon's DateTime. You can just do `date.get()` passing in `year`, `month` or `day`. So our `deserialize` function looks like this:
 
 ```js
 // value is what is passed to `v-model`
@@ -193,7 +230,7 @@ Let's update the usage:
     v-model="dateLuxon" 
     :deserialize="deserialize"
   />
-  {{ dateLuxon }}
+  {{ dateLuxon.toISODate() }}
 </template>
 
 <script>
@@ -236,7 +273,7 @@ Next, update `<date-time>` to use the new `deserialize` prop:
   <input :value="date.month" @input="update($event, 'month')" />
   <input :value="date.day" @input="update($event, 'day')" />
 <pre>
-date is:
+Internal date is:
 {{ date }} 
 </pre>
 </template>
@@ -260,11 +297,19 @@ export default {
     })
 
     const update = ($event, field) => {
-      const { year, month, day } = props.deserialize(props.modelValue)
-      // ...
+      const { year, month, day } = props.modelValue
+      let newValue
+      if (field === 'year') {
+        newValue = { year: $event.target.value, month, day }
+      }
+      if (field === 'month') {
+        newValue = { year, month: $event.target.value, day }
+      }
+      if (field === 'day') {
+        newValue = { year, month, day: $event.target.value }
+      }
+      emit('update:modelValue', newValue)
     }
-
-    // ...
 
     return {
       update,
@@ -275,16 +320,23 @@ export default {
 </script>
 ```
 
-The main changes are we now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. We also need to `deserialize` the `modelValue` in the `update` function when preparing to update `modelValue`. 
+The main changes are:
+
+1. We now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. 
+2. We use `deserialize` on the `modelValue` in the `update` function when preparing to update `modelValue`. 
+
+ss-dt-progress-2
 
 This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
 
 ## Serializing modelValue
 
-We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime` now, not an `InternalDateTime` object. Let's see how we can write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime`. We will see a more complex example with the moment integration.
+We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime` now, not an `InternalDateTime` object, since that is what the developer expects. Remember, the input and output value needs to be of whichever DateTime library the developer is providing. 
+
+Let's write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime` - `{ year, month, day }`. We will see a more complex example with the moment integration.
 
 ```js
-function serialize(value) {
+export function serialize(value) {
   return DateTime.fromObject(value)
 }
 ```
@@ -298,7 +350,7 @@ Again, update the usage.
     :deserialize="deserialize"
     :serialize="serialize"
   />
-  {{ dateLuxon }}
+  {{ dateLuxon.toISODate() }}
 </template>
 
 <script>
@@ -308,7 +360,7 @@ import { DateTime } from 'luxon'
 
 // ...
 
-function serialize(value) {
+export function serialize(value) {
   return DateTime.fromObject(value)
 }
 
@@ -326,11 +378,16 @@ export default {
 </script>
 ```
 
+I added a `:serialize` prop and returned `serialize` from the `setup` function. 
+
 Next, we need to call `serialize` every time we try to update `modelValue`. Update `<date-time>`:
 
 ```html
 <template>
-  <!-- omitted for brevity -->
+  <!-- 
+    Omitted for brevity.
+    Nothing to change here right now.
+  -->
 </template>
 
 <script>
@@ -351,6 +408,7 @@ export default {
   },
 
   setup(props, { emit }) {
+
     // ...
 
     const update = ($event, field) => {
@@ -371,7 +429,11 @@ export default {
 </script>
 ```
 
+All that changed was declaring the `serialize` prop and calling `props.serialize` when emitting the new value.
+
 It works! Kind of - as long as you only enter value numbers. If you enter a `0` for the day, all the inputs show `NaN`. We need some error handling.
+
+ss-dt-error
 
 ## Error Handling
 
@@ -380,7 +442,7 @@ In the case of an error - either we could not serialize or deserialize the value
 Let's update `serialize` to be more defensive:
 
 ```js
-function serialize(value) {
+export function serialize(value) {
   try {
     const obj = DateTime.fromObject(value)
     if (obj.invalid) {
@@ -399,7 +461,7 @@ In the case that we failed to serialize the value, we just return `undefined`. U
 ```js
 export default {
   props: {
-      // ...
+    // ...
   },
 
   setup(props, { emit }) {
@@ -425,8 +487,12 @@ export default {
 }
 ```
 
-Great! Now everything works correctly, and `<date-time>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<date-time>` to work.
+I just added a check - `if (!asObject)` and return early if the `props.serialize` did not return a value.
 
+Now everything works correctly, and `<date-time>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<date-time>` to work.
+
+Adding support for moment is not especially difficult or interesting - it is left as an exerise, and the solution included in the source code.
+ 
 ## Exercises
 
 - We did not add any tests for `serialize` or `deserialize`; they are pure functions, so adding some is trivial. See the source code for some tests.
