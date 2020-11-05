@@ -9,6 +9,8 @@
       {{ col }}
     </div>
   </div>
+  <button @click="undo">Undo</button>
+  <button @click="redo">Redo</button>
 </template>
 
 <script>
@@ -16,11 +18,13 @@ import { useTicTacToe } from './tic-tac-toe.js'
 
 export default {
   setup(props) {
-    const { currentBoard, makeMove } = useTicTacToe() 
+    const { currentBoard, makeMove, undo, redo } = useTicTacToe() 
 
     return {
       currentBoard,
-      makeMove
+      makeMove,
+      undo,
+      redo
     }
   }
 }
