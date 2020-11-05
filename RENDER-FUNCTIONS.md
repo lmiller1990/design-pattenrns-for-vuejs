@@ -1,6 +1,6 @@
 # The Power of Render Functions
 
-The completed source code for this section, including the exercises, can be found in `examples/renderless-password`.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and actually rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 

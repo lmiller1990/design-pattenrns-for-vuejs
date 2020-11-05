@@ -1,6 +1,6 @@
 # Truly Modular Components with v-model
 
-The completed source code for this section, including the exercises, can be found in `examples/reusable-date-time`.
+You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 

@@ -1,6 +1,6 @@
 # Emitting Events
 
-The completed source code for this section, including the exercises, can be found in `examples/events`.
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
