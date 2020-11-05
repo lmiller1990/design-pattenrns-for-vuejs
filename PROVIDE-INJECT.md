@@ -10,7 +10,7 @@ Instead of providing a toy example, we will see a real use case by building a si
 
 ### Img: Completed demo app
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-complete.png)
+![](./images/ss-complete.png)
 
 ## A Simple Store
 
@@ -94,7 +94,7 @@ export default {
 </script>
 ```
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-basic.png)
+![](./images/ss-basic.png)
 
 It works! Good progress - I added a tiny bit of CSS as well, grab that from the source code. 
 
@@ -217,7 +217,7 @@ export default {
 
 Great! The test now passes - again, I added a tiny bit of CSS and a nice title, which you can get in the source code if you like.
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-complete.png)
+![](./images/ss-complete.png)
 
 ## Provide/Inject to Avoid Cross Test Contamination
 

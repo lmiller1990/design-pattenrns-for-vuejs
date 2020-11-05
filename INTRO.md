@@ -40,7 +40,7 @@ Most books that teach you frameworks, languages or testing will be an app or two
 
 We start with some patterns for `props`, as well as a discussion around one of the most fundamental ideas in this book, *separation of concerns*. We proceed to cover a wide variety of design patterns for events, forms, components, renderless components, feature separation with the Composition API, and everything else you'll need to know to create well engineered Vue.js applications.
 
-Most sections end with some exercises to help you improve and practice what you learned. The source code, including all the solutions for the exercises are [included in the source code](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code), so you can check your solutions.
+Most sections end with some exercises to help you improve and practice what you learned. The source code, including all the solutions for the exercises are [included in the source code](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): (https://github.com/lmiller1990/design-patterns-for-vuejs-source-code), so you can check your solutions.
 
 Each section is independent; you don't need to read it in order, so if there is a particular section you are interested in, feel free to skip to it. Try to think of this book as a reference tool; I hope it is something you can come back to for years to come and learn something useful each time.
 

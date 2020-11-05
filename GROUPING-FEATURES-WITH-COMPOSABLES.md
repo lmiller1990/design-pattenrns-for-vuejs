@@ -8,7 +8,7 @@ Vue 3's flagship feature is The Composition API; it's main selling point is to e
 
 ### Img: Completed Game
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tic-tac-toe-done.png)
+![](./images/ss-tic-tac-toe-done.png)
 
 The API we will end with looks like this:
 
@@ -138,7 +138,7 @@ Great! It works:
 
 ### Img: Rendered game board
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-1.png)
+![](./images/ttt-1.png)
 
 ## Computing the Current State
 

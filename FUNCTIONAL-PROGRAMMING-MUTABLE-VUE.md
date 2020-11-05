@@ -240,7 +240,7 @@ export default {
 
 ### Img: Rendered game board
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-1.png)
+![](./images/ttt-1.png)
 
 ## Integrating makeMove
 
@@ -265,7 +265,7 @@ const move = ({ col, row }) => {
 
 That's it! Everything now works in it's functional, loosely coupled, immutable glory.
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-2.png)
+![](./images/ttt-2.png)
 
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 

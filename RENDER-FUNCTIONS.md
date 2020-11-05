@@ -31,7 +31,7 @@ In this section we will build a tab component. The usage will look something lik
 
 ### Img: Completed Tabs Component
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-done.png)
+![](./images/ss-tabs-done.png)
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -205,13 +205,13 @@ Create a new app using the above component as the root component. Open a browser
 
 ### Img: Logging Slots (Array of VNodes)
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-default-slots.png)
+![](./images/ss-render-default-slots.png)
 
 An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I expanded the first one and marked some of the relevant properties for this section:
 
 ### Img: Detailed View of the Tab VNode
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-slot-details.png)
+![](./images/ss-slot-details.png)
 
 The first one is `children`. This is where the slots go. For example in:
 
@@ -256,7 +256,7 @@ Since `type` is a direct reference to the original component (eg, not a copy), w
 
 ### Img: Filtered VNodes
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-sorted-slots.png)
+![](./images/ss-sorted-slots.png)
 
 The next goal will be to render the tabs. We will also add some classes to get some nice styling, as well as show which tab is currently selected.
 
@@ -292,7 +292,7 @@ Finally, we have something rendering:
 
 ### Img: Rendered Tabs
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-render-tabs-basic.png)
+![](./images/ss-render-tabs-basic.png)
 
 You may have noticed I did `h(() => tabs)` instead of just `return tabs`. `h` also accepts a callback - in which case, it will evaluate the callback function when it renders. I recommend always returning `h(() => /* render function */)` for the final value in `render` - if you don't, you may run into subtle caching issues.
 
@@ -449,7 +449,7 @@ It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, ac
 
 ### Img: Dynamic Classes
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-classes.png)
+![](./images/ss-tabs-classes.png)
 
 ## Event Listeners in Render Functions
 
@@ -471,7 +471,7 @@ This is the render function version of `<tab v-on:click="update:activeTabId(tabI
 
 ### Img: Emitting Events in Render Functions
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-active.png)
+![](./images/ss-active.png)
 
 ## Filtering Content
 
@@ -530,7 +530,7 @@ It works!
 
 ### Img: Completed Tabs Component
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-tabs-done.png)
+![](./images/ss-tabs-done.png)
 
 ## Testing Render Function Components
 
@@ -562,6 +562,6 @@ You can find the completed source code in the [GitHub repository under examples/
 
 ### Img: Typesafe Component with Render Function
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ss-ts.png)
+![](./images/ss-ts.png)
 
 \pagebreak

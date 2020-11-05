@@ -13,7 +13,7 @@ In this section we will build the following component, a password strength form:
 
 ### Img: Completed Password Complexity Component
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
+![](./images/renderless-password/ss-done.png)
 
 There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "ernderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
 
@@ -72,7 +72,7 @@ We can destructure the object passed to `slots.default()` in `v-slot`, and are f
 
 ### Img: Rendering with slots.default() and v-slot
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss1.png)
+![](./images/renderless-password/ss1.png)
 
 ## Adding Password and Confirmation Inputs
 
@@ -177,7 +177,7 @@ export default {
 
 ### Img: Rendering Inputs and Debug Info
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss2.png)
+![](./images/renderless-password/ss2.png)
 
 The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
 
@@ -340,7 +340,7 @@ export default {
 
 ### Img: Complexity Indicator
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss3.png)
+![](./images/renderless-password/ss3.png)
 
 I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
 
@@ -429,7 +429,7 @@ Everything works! And we can easily move elements around to change the look and 
 
 ### Img: Completed Password Complexity Component
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/renderless-password/ss-done.png)
+![](./images/renderless-password/ss-done.png)
 
 ## Exercises
 

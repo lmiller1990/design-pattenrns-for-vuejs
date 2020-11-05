@@ -78,7 +78,7 @@ A diagram might make this more clear:
 
 ### Img: DateTime data flow
 
-![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/dt-ss-1.png)
+![](./images/dt-ss-1.png)
 
 In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
 
