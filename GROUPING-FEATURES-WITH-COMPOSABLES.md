@@ -1,5 +1,9 @@
 # Grouping Features with Composables
 
+The completed source code for this section, including the exercises, can be found in `examples/composition`.
+
+______
+
 Vue 3's flagship feature is The Composition API; it's main selling point is to easily group and reuse code by *feature*. In this section we will see some techniques to write testable composables by building a tic tac toe game. 
 
 The API we will end with looks like this:
@@ -212,15 +216,13 @@ This does pass, but also reveals some potential issues. Firstly, we want to test
 
 We have tightly coupled our implementation to Vue. You could not reuse this logic in another framework, like React, for example. This is a relatively simple composable and a coupling I am happy to live with for now, but it's still worth recognizing it and considering the implications this might have in the future, should we decide to move away from Vue.
 
-This might seem unlikely, but we thought the same thing about jQuery, Backbone and Angular.js. For this simple example I think it's fine, but if we start to write signficantly complex business logic, we may want to consider removing the coupling between the composable and the business logic. We will explore how and why you might want to avoid this in the next chapter, "Imperative Shell, Functional Core". 
+While moving away from your UI framework, in this case Vue, might seem unlikely, but we thought the same thing about jQuery, Backbone and Angular.js. For this simple example I think this coupling is acceptable. If we start to write signficantly complex business logic, we may want to consider removing the coupling between the composable and the business logic. In this next chapter, we explore how to reduce coupling between UI and business logic in composables. We also discuss *why* this might be desirable.
 
-Another problem is there is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing the game. This means we need to implement `makeMove` before writing tests to see if the game has been won. We can, and will, work around this by passing in an intiial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
-
-Let's start by letting `useTicTacToe` receive an initial state to facilitate easier testing.
+Back to the current example. There is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing the game. This means we need to implement `makeMove` before writing tests to see if the game has been won, since there is no way to update the board as it stands to test winning or losing scenarios. We can work around this by passing in an intiial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
 
 ## Setting an Initial State
 
-Update `useTicTacToe` to receive an `initialState` argument:
+Update `useTicTacToe` to receive an `initialState` argument to facilitate easier testing:
 
 ```js
 import { ref, readonly, computed } from 'vue'
@@ -290,7 +292,7 @@ describe('makeMove', () => {
 
 There isn't anything too surprising here. After making a move, we have two game states (initial and the current one). The current player is now `x` (since `o` goes first). Finally, the `currentBoard` should be updated.
 
-The implementation is quite simple, too:
+The implementation is quite simple, too. We are using `JSON.parse(JSON.stringify())`, which feels pretty dirty - see below to find out why.
 
 ```js
 export function useTicTacToe(initialState) {
@@ -320,7 +322,9 @@ export function useTicTacToe(initialState) {
 }
 ```
 
-This gets the test to pass. You may have noticed the somewhat dirty `JSON.parse(JSON.stringify(...))` call. I want to get *non reactive* copy of the board - just a plain JavaScript array. Somewhat surprisingly, `[...boards.value[boards.value.length - 1]]` does not work - the new object is still reactive and updates when the source array is mutated. I would like to find a cleaner way to do this, and will update this section when I do.
+This gets the test to pass. As mentioned above we are using the somewhat dirty `JSON.parse(JSON.stringify(...))` to clone the board and lose reactivity. I want to get *non reactive* copy of the board - just a plain JavaScript array. Somewhat surprisingly, `[...boards.value[boards.value.length - 1]]` does not work - the new object is still reactive and updates when the source array is mutated. This means we are mutating the game history in `boards`! Not ideal. 
+
+I would like to find a cleaner way to do this, and will update this section when I do. If you know a better way of getting a non-reactive copy of a `ref`, please let me know.
 
 Either way, this works fine for now. Let's update the usage:
 
@@ -358,7 +362,13 @@ export default {
 
 That's it! Everything now works in it's functional, immutable glory.
 
-The game is now playable - well, you can make moves. There are a number of problems - no way to know if a player has won, and you can make an invalid move (for example, going on a square that is already taken). Fixing these is not very difficult and will be left as an exercise. You can find the solutions in the source code.
+The game is now playable - well, you can make moves. There are a number of problems:
+
+1. No way to know if a player has won. 
+2. You can make an invalid move (for example, going on a square that is already taken). 
+3. We did not implement undo/redo.
+
+Fixing/implementing these is not very difficult and will be left as an exercise. You can find the solutions in the source code. Undo/redo is probably the most interesting one - you should definitely try and implement this yourself before looking at the answers.
 
 ## Conclusion
 
@@ -366,10 +376,10 @@ We saw how you can isolate business logic in a composable, making it testable an
 
 ## Exercises
 
-Some exercises to improve:
-
 1. Write some tests with Vue Test Utils to ensure the UI is working correctly.
-3. Implement `undo` and `redo`
+2. Do not allow moving on a square that is already taken.
+3. Add a check after each move to see if a player has won. Display this somewhere in the UI.
+4. Implement `undo` and `redo`.
 
 The solutions can be found in the source code.
 

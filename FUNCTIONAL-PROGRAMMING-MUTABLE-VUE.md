@@ -1,6 +1,10 @@
 # Functional Core, Imperative Shell - Immutable Logic, Mutable Vue
 
-In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We conciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
+The completed source code for this section, including the exercises, can be found in `examples/composition-functional`.
+
+______
+
+In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We consciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
 
 In this chapter, we will explore an paradigm best characterized as "functional core, imperative shell". We will refactor the Tic Tic Toe logic to be purely functional, avoiding all mutation. This will be decoupled from Vue's reactivity system, which relies on mutation and side effects, something the functional paradigm avoids. 
 
@@ -188,7 +192,7 @@ export function useTicTacToe() {
 }
 ```
 
-I added an empty `move` function, assigning it to `makeMove` in the return value of `useTicTacToe`. We will be implementating that soon. 
+I added an empty `move` function, assigning it to `makeMove` in the return value of `useTicTacToe`. We will be implementing that soon. 
 
 Let's get something rendering:
 
@@ -259,11 +263,11 @@ const move = ({ col, row }) => {
 
 ### Img: Completed Game Board
 
-That's it! Everything now works in it's functional, immutable glory.
+That's it! Everything now works in it's functional, loosely coupled, immutable glory.
 
 ![](https://raw.githubusercontent.com/lmiller1990/design-pattenrns-for-vuejs/master/images/ttt-2.png)
 
-From a user point of view, nothing has changed, and we can verify this by reusing the UI test from the previous section:
+From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 
 ```js
 import { mount } from '@vue/test-utils'
@@ -286,21 +290,21 @@ describe('TicTacToeApp', () => {
 
 ## Reflections and Philosophy
 
-This section explores what I consider to be the difference between really good developers who write highly maintainable, robust code and those who do not; effective sepearation of concerns. 
+This section explores what I consider to be the difference between really good developers who write highly maintainable, robust code and those who do not; effective separation of concerns. 
 
 There are some easy ways to see if you are separating your Vue UI logic from your business logic, or in a more general sense, your imperative shell from your functional core: 
 
 - are you accessing Vue reactivity APIs in your business logic? This usually comes in the form of `.value` for accessing the values of `computed` and `ref`.
-- are you relying
+- are you relying on global or pre-defined state?
 
-This also prompts another question: what and how should we be testing our functional core and imperative shell? In the previous section, we tested both in one go. This worked out fine, however, we still needed to write some UI tests with Vue Test Utils, which kind of duplicated our `useTicTacToe` composable tests.
+This also prompts another question: what and how should we be testing in our functional core and imperative shell? In the previous section, we tested both in one go - they were so tightly coupled together, so this was the natural way to test them. This worked out fine, however, we still needed to write some UI tests with Vue Test Utils (which was left as an exercise), which meant we were testing a lot of logic twice - in the `useTicTacToe` composable tests and the UI tests.
 
-Another problem we encountered when testing the `useTicTacToe` composable in the previous section was *cross test contamination*. This is primarily caused by shared state in tests. This wasn't a problem when testing our functional core, because there is no shared state.
+There is no one true way to write applications. It is also very hard to transition an application from one paradigm to another. I am more and more of the opinion that coupling Vue's reactivity to your composables and business logic is generally not a good idea. 
 
-Of course there is no one way to write applications, but I am more and more of the opinion that testing composables is generally not ideal. Instead, you should extract your logic into a immutable functional core with no shared state and test that. Then, you test your imperative shell, in this case the `useTicTacToe` composable, in the context of the UI - using something like Vue Test Utils.
+Instead, you should extract your logic into a functional core that is immutable and relies on no shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of the UI - using something like Vue Test Utils. These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
 
 ## Exercises
 
-- Trying adding an undo/redo functionality. This should be easy, because we keep track of each previous state in the `boards` array.
+Repeat the exercises from the last chapter - undo/redo, defensive checks to prevent illegal moves, check if a player has won the game and display it on the UI.
 
 \pagebreak
