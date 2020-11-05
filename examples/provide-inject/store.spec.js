@@ -23,6 +23,18 @@ describe('store', () => {
     })
   })
 
+  it('removes a user', () => {
+    const store = new Store({
+      users: [{ name: 'Alice' }]
+    })
+
+    store.removeUser({ name: 'Alice' })
+
+    expect(store.getState()).toEqual({ 
+      users: [] 
+    })
+  })
+
   it('renders a user', async () => {
     const wrapper = mount(Users, {
       global: {

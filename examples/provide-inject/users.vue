@@ -11,13 +11,14 @@
         :key="user"
       >
         {{ user.name }}
+        <button @click="removeUser(user)">Remove</button>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from './store.js'
 
 export default {
@@ -30,10 +31,16 @@ export default {
       username.value = ''
     }
 
+    const removeUser = (user) => {
+      store.removeUser(user)
+    }
+
+
     return {
       username,
       handleSubmit,
-      users: store.getState().users
+      removeUser,
+      users: computed(() => store.getState().users)
     }
   }
 }

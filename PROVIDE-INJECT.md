@@ -1,6 +1,10 @@
 # Dependency Injection with Provide and Inject
 
-In this section we discuss a pair of functions, provide and inject. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to ths Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. As such, `provide` and `inject` were not as common used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
+The completed source code for this section, including the exercises, can be found in `examples/provide-inject`.
+
+______
+
+In this section we discuss a pair of functions, provide and inject. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to this Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. As such, `provide` and `inject` were not as common used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
 
 Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` hook. We will see why `provide` and `inject` are better.
 
@@ -30,7 +34,7 @@ export class Store {
 
 If you haven't seen the `#state` syntax before, this is a private property - one of the newer features to classes in JavaScript. This means `#state` can only be accessed inside the class instance. It's so new, in fact, it's not supported in 
 
-We pass `state` to the constructor to let the user seed the initial state. We will take the disiplined approach and write a test.
+We pass `state` to the constructor to let the user seed the initial state. We will take the disciplined approach and write a test.
 
 ```js
 import { Store } from './store.js'
@@ -77,12 +81,13 @@ And in your component:
 </template>
 
 <script>
+import { computed } from 'vue'
 import { store } from './store.js'
 
 export default {
   setup() {
     return {
-      users: store.getState().users
+      users: computed(() => store.getState().users)
     }
   }
 }
@@ -115,7 +120,7 @@ describe('store', () => {
 })
 ```
 
-Working great... but we do not really want to hard code any users in the store. Let's add a feature to create new users via a form, and them that way.
+Working great! We do not really want to hard code any users in the store, though. Let's add a feature to create new users via a form, and them that way.
 
 ## Adding a users forms
 
@@ -189,7 +194,7 @@ The final test, the UI test, is now failing. We need to implement a form that ca
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { store } from './store.js'
 
 export default {
@@ -203,7 +208,7 @@ export default {
     return {
       username,
       handleSubmit,
-      users: store.getState().users
+      users: computed(() => store.getState().users)
     }
   }
 }
@@ -288,7 +293,7 @@ Instead of importing the store, we can now just call `cosnt  store = inject('sto
 </templat>
 
 <script>
-import { ref, inject } from 'vue'
+import { ref, inject, computed } from 'vue'
 
 export default {
   setup() {
@@ -302,7 +307,7 @@ export default {
     return {
       username,
       handleSubmit,
-      users: store.getState().users
+      users: computed(() => store.getState().users)
     }
   }
 }
@@ -378,7 +383,7 @@ Now update the component:
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from './store.js'
 
 export default {
@@ -394,7 +399,7 @@ export default {
     return {
       username,
       handleSubmit,
-      users: store.getState().users
+      users: computed(() => store.getState().users)
     }
   }
 }
@@ -407,5 +412,8 @@ Now anywhere you need access to the store, just call `useStore`. This is the exa
 
 ## Exercises
 
-- Update the store to have a `removeUser` function. Add a button next to each user - clicking the button should remove them from the store.
-- Write a test to verify this works. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
+The completed source code for this section, including the exercises, can be found in `examples/provide-inject`.
+
+1. Update the store to have a `removeUser` function. Test it in isolation.
+2. Add a button next to each user - clicking the button should remove them from the store. Use the `removeUser` function here.
+3. Write a UI test to verify this works using Vue Test Utils. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
