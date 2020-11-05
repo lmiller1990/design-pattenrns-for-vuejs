@@ -381,6 +381,6 @@ We saw how you can isolate business logic in a composable, making it testable an
 3. Add a check after each move to see if a player has won. Display this somewhere in the UI.
 4. Implement `undo` and `redo`.
 
-The solutions can be found in the source code.
+You can find the completed source code in the [GitHub repository under examples/composition](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

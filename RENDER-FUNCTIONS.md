@@ -1,5 +1,8 @@
 # The Power of Render Functions
 
+The completed source code for this section, including the exercises, can be found in `examples/renderless-password`.
+
+______
 So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and actually rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
 
 Code in `<template>` is compiled to something called *render functions*. A number of things happen during this compilation step. Some of these are:
@@ -555,6 +558,7 @@ I added a `data-test` selector to my `app.vue` test component, to make it clear 
 - Rewrite this example using TypeScript. You will want to use `defineComponent` and the Composition API for maximum type safety. This screenshot illustrates some of the benefits of TypeScript. Combined with declaring `emits`, you can get type safety for both emitted events and props.
 - Attempt to refactor the other examples throughout this book to use render functions instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and the Composition API).
 
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ### Img: Typesafe Component with Render Function
 

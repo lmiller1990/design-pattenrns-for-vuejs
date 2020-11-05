@@ -307,4 +307,6 @@ Instead, you should extract your logic into a functional core that is immutable 
 
 Repeat the exercises from the last chapter - undo/redo, defensive checks to prevent illegal moves, check if a player has won the game and display it on the UI.
 
+You can find the completed source code in the [GitHub repository under examples/composition-functional](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+
 \pagebreak

@@ -500,4 +500,6 @@ Adding support for moment is not especially difficult or interesting - it is lef
 - Add hours, minutes, seconds, and AM/PM support.
 - Write some tests with Vue Test Utils; you can use `setValue` to update the value of the `<input>` elements.
 
+You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+
 \pagebreak
