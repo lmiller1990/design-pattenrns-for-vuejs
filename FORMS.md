@@ -19,15 +19,19 @@ In traditional server rendered apps, you would only get validation after submitt
 
 Finally, we need two levels of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly, and that the user can enter data, see error messages, and correctly submit the form.
 
+\pagebreak
+
 ## The Patient Form
 
-For this example, we are building a form to enter patient data for a hospital application. The form will look like this:
+For this example, we are building a form to enter patient data for a hospital application. The form will look like this when filled out without any errors:
 
-### Img: Invalid Form with Debug Info
-![](./images/form-validation/ss-done-dirty.png)
-
-### Img: Valid Form with Debug Info
-![](./images/form-validation/ss-done-clean.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
+  \caption{Valid form with debug info}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 There are two inputs. The first is the patient name, which is required and can be any text. The second is the patient weight, which can be in imperial or metric units. The constraints are as follows:
 
@@ -35,6 +39,16 @@ There are two inputs. The first is the patient name, which is required and can b
 --- | --- | ---
 min | 66 | 30
 max | 440 | 200
+
+We will need to validate both the name and the weight. The form with errors looks like this:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-dirty.png}
+  \caption{Invalid form with debug info}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 We could define those using an object:
 
@@ -70,6 +84,7 @@ interface ValidationResult {
 ```
 
 This will be the format our two validators (and any future ones) will need to conform to. Now we've settled on our validation API, we can write the tests for `required`.
+\pagebreak
 
 ## The `required` validator
 
@@ -115,6 +130,7 @@ export function required(value) {
 ```
 
 I like to put the invalid case first for my validators - that's just a personal preference.
+\pagebreak
 
 ## The `isBetween` validator
 
@@ -581,9 +597,13 @@ Form State
 
 I added the `<pre>` block for some debugging. Everything works!
 
-### Img: Validation Debug Info
-
-![](./images/form-validation/ss-done-clean.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
+  \caption{Validation debug info}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Some Basic UI Tests
 
