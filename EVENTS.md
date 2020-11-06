@@ -1,6 +1,8 @@
 # Emitting Events
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -299,6 +301,8 @@ Finally, we saw how our tests was focused on inputs and outputs (in this case, t
 
 We touch on events again later on, in the `v-model` chapter - stay tuned.
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

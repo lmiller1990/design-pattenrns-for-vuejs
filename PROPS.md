@@ -1,6 +1,8 @@
 # Patterns for Testing Props
 
-You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -350,6 +352,8 @@ This chapter discussed some Vue Test Utils APIs, including `classes()`, `html()`
 
 Finally, we dived into the concept of *separation of concerns*, and how it can make your business logic code outlast your framework. Finally, we saw how refactoring code and seeing how the tests pass or fail can potentially reveal tightly coupled code, and some alternative ways to test DOM content. 
 
-You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

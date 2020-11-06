@@ -1,6 +1,8 @@
 # Truly Modular Components with v-model
 
-You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -18,7 +20,7 @@ The finished component will look like this:
 
 ### Img: Completed DateTime Component
 
-ss-dt-done
+![](./images/ss-dt-done.png)
 
 There are three props: `v-model`, `serialize` and `deserialize`. More on what `serialize` and `deserialize` are soon.
 
@@ -56,7 +58,7 @@ export default {
 </script>
 ```
 
-This might work ok - now you can put your `<luxon-date-time>` on npm to share. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
+This might work okay - now you can put your `<luxon-date-time>` on npm to share. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
 
 Another problem is this is a bit difficult to test. You will need to mount the component using something like Vue Test Utils just to test your parsing logic - again, not ideal. Of course we will need some integration tests to make sure it's working correctly, but I don't want to couple my business logic tests (eg, the parsing logic from `updateDate` using pure functions and Jest) to the UI layer tests (using Vue Test Utils).
 
@@ -82,7 +84,7 @@ A diagram might make this more clear:
 
 In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
 
-If the developer was using Luxon, the workflow would be something like `luxon.DateTime()` -> `{ year: '', month: '', day: '' }` -> `luxon.Datetime()`. The input *and* output is a luxon DateTime - the developer doesn't need to know or care about the internal representation.
+If the developer was using Luxon, the workflow would be something like `luxon.DateTime()` -> `{ year: '', month: '', day: '' }` -> `luxon.Datetime()`. The input *and* output is a Luxon DateTime - the developer doesn't need to know or care about the internal representation.
 
 ## Foundations of v-model
 
@@ -165,11 +167,11 @@ export default {
 
 ### Img: Rendering the Date Inputs
 
-ss-dt-progress
+![](./images/ss-dt-progress.png)
 
 I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, make reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
 
-## Deerializing for modelValue
+## Deserializing for modelValue
 
 We have established the internal API. This is how the `<date-time>` component will manage the value. For notation purposes, if we were to write an interface in TypeScript, it would look like this:
 
@@ -185,7 +187,7 @@ We will now work on the `deserialize` prop, which is a function that will conver
 
 ## Deserializing modelValue
 
-The next goal is to write a `deserialize` function. In pseusocode:
+The next goal is to write a `deserialize` function. In pseudocode:
 
 ```js
 export function deserialize(inputDateTime) {
@@ -325,7 +327,7 @@ The main changes are:
 1. We now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. 
 2. We use `deserialize` on the `modelValue` in the `update` function when preparing to update `modelValue`. 
 
-ss-dt-progress-2
+![](./images/ss-dt-progress-2.png)
 
 This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
 
@@ -433,7 +435,7 @@ All that changed was declaring the `serialize` prop and calling `props.serialize
 
 It works! Kind of - as long as you only enter value numbers. If you enter a `0` for the day, all the inputs show `NaN`. We need some error handling.
 
-ss-dt-error
+![](./images/ss-dt-error.png)
 
 ## Error Handling
 
@@ -491,7 +493,7 @@ I just added a check - `if (!asObject)` and return early if the `props.serialize
 
 Now everything works correctly, and `<date-time>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<date-time>` to work.
 
-Adding support for moment is not especially difficult or interesting - it is left as an exerise, and the solution included in the source code.
+Adding support for moment is not especially difficult or interesting - it is left as an exercise, and the solution included in the source code.
  
 ## Exercises
 
@@ -500,6 +502,8 @@ Adding support for moment is not especially difficult or interesting - it is lef
 - Add hours, minutes, seconds, and AM/PM support.
 - Write some tests with Vue Test Utils; you can use `setValue` to update the value of the `<input>` elements.
 
-You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

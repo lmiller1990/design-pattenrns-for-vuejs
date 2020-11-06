@@ -1,6 +1,8 @@
 # Writing Testable Forms
 
-You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -263,7 +265,7 @@ export function validateMeasurement(value, { constraints }) {
 }
 ```
 
-Nice! We were able to reuse `required` and `isBetween`. We "composed" a validator using two small ones. Reusability is good. Composability is good.
+Nice! We were able to reuse `required` and `isBetween`. We "composed" a validator using two small ones. Re-usability is good. Composability is good.
 
 ## The Form Object and Full Form Validation
 
@@ -646,6 +648,8 @@ As it stands, you can enter any string into the weight field and it will be cons
 - Add a `@submit.prevent` listener to the `<form>`. When the form is submitted, emit an event with the `patientForm`.
  - Submit the form using Vue Test Utils and assert the correct event and payload is emitted.
 
-You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak

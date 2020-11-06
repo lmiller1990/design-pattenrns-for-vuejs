@@ -4,7 +4,7 @@
 
 Chances are, if you are interested in something as abstract as *design patterns*, you have been coding for a while now, likely with an interested in front-end development. You might have written a few interfaces using jQuery, that seemed pretty good. As time passed, requirements changed, and your once maintainable jQuery code-base has become a mess. 
 
-At this point, you might have looked around for an alternative. Things like React and Vue are often the next step - Components! Encapulation! Unit Tests! You `vue create app` and things are great!
+At this point, you might have looked around for an alternative. Things like React and Vue are often the next step - Components! Encapsulation! Unit Tests! You `vue create app` and things are great!
 
 Again, time passes - requirements change. Things get messy - again. It's a more organized, less crazy kind of messy, but it still doesn't feel *right*. You end up with giant components ("god components"), that are nearing a thousand lines, doing everything from fetching data, validation and everything else you can imagine. Passing 10s of props up and down becomes normal. A "single source of truth" starts to be come "several sources of truth". The lines between your business logic, the problem you are solving and the presentation components starts to blur. Eventually velocity slows, and subtle bugs start to creep in.
 
@@ -24,7 +24,7 @@ Good software design is a philosophy. It's a way of life. Finally, as engineer, 
 
 My goal is to get you in the habit of writing testable code, and how to choose the right abstraction for the problem at hand. The first things you think when you hear a new business requirement or request should be: 
 \newline
-\newline - What design pattern will give me the most flexilibity moving forward? 
+\newline - What design pattern will give me the most flexibility moving forward? 
 \newline - What new requirements could come up, and how will this decision deal with them?
 \newline - How am I going to write my code in a testable, loosely coupled fashion? 
 

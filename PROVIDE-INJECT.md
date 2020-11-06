@@ -1,6 +1,8 @@
 # Dependency Injection with Provide and Inject
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -248,7 +250,7 @@ export default {
 </script>
 ```
 
-We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierachy it appears. `Child.vue` might look like this:
+We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `Child.vue` might look like this:
 
 ```html
 <template>
@@ -416,4 +418,8 @@ Now anywhere you need access to the store, just call `useStore`. This is the exa
 2. Add a button next to each user - clicking the button should remove them from the store. Use the `removeUser` function here.
 3. Write a UI test to verify this works using Vue Test Utils. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+
+\pagebreak

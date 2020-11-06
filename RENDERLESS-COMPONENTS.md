@@ -1,6 +1,8 @@
 # Renderless Components
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
@@ -15,7 +17,7 @@ In this section we will build the following component, a password strength form:
 
 ![](./images/renderless-password/ss-done.png)
 
-There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "ernderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
+There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
 
 This means we will work with a `render` function, the low level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
 
@@ -447,6 +449,8 @@ There are also some improvements you could try making:
 - Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
 - Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+\newline
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \pagebreak
