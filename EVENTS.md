@@ -6,14 +6,15 @@ https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
-Vue's primary mechanical for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierachy, you do so by *emitting events*, with `$emit` (Options API) and `emit` (Composition API).
+Vue's primary mechanical for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierachy, you do so by *emitting events*, with `this.$emit` (Options API) and `ctx.emit` (Composition API).
 
 Let's see some examples on how this works, and some guidelines we can set to keep things clean and understandable.
 
 ## Starting Simple
 
-Here is a very minimal yet perfectly working `<Counter>` component. It's by no means ideal; we will work on improving it by the end of this section.
+Here is a very minimal yet perfectly working `<Counter>` component. It's by no means ideal; we will work on improving it by the end of this section. 
 
+This example starts with the Options API; we will eventually refactor at the Composition API (using the tests we write to ensure we don't break anything).
 
 ```html
 <template>
@@ -36,6 +37,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+A simple counter component.
+\end{center}
 
 There are two buttons; one increments a `count`, the other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
 
@@ -55,8 +59,11 @@ describe('Counter', () => {
   })
 })
 ```
+\begin{center}
+Observing the emitted events with wrapper.emitted().
+\end{center}
 
-I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Vue Test Utils. The output is like this:
+I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Vue Test Utils. If you run the test, the console output is as follows:
 
 ```json
 { 
@@ -65,6 +72,9 @@ I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Vu
   ] 
 }
 ```
+\begin{center}
+A submit event was emitted with one argument: the number 1.
+\end{center}
 
 `emitted` is an object - each event is a key, and it maps to an array with an entry for each time the event was emitted. `emit` can have any amount of arguments; if I had written `$emit('submit', 1, 2, 3,)` the output would be:
 
@@ -75,8 +85,11 @@ I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Vu
   ] 
 }
 ```
+\begin{center}
+A submit event was emitted with three arguments, 1, 2, 3.
+\end{center}
 
-Let's add an assertion, before we get onto the main topic: best practices for events.
+Let's add an assertion, before we get onto the main topic: patterns and practices for emitting events.
 
 ```js
 import { mount } from '@vue/test-utils'
@@ -93,10 +106,13 @@ describe('Counter', () => {
   })
 })
 ```
+\begin{center}
+Making an assertion against the emitted events.
+\end{center}
 
 ## Clean Templates
 
-We discussed previous the ideal of *simple templates*. The same thing applies here; we want to avoid calling `$emit` in the template, where possible. Let's move this to the `<script>` section, where logic belongs:
+We discussed previous the ideal of *simple templates*. The same thing applies here; we want to avoid calling `this.$emit` in the template, where possible. Let's move this to the `<script>` section, where logic belongs:
 
 ```html
 <template>
@@ -122,23 +138,26 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Moving the emit logic from the template to the script.
+\end{center}
 
 Everything still passes. This points to a *good test*. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
 
-> TIP: Avoid emitting events in templates. Move the logic to the script tag.
+I recommend avoid emitting events in templates - or having logic in the `<script>` tag in general, unless it's truly trivial. Instead, move the logic to the script tag where it belongs.
 
 Another thing you may have notices is the *name* of the method we created - `submit`. This is a personal preference, but I recommend having a good convention around naming methods. Here are two I've found useful.
 
 1. Name the method that emits the event the same as the event name. If you are doing `$emit('submit')`, you could name the method that calls this `submit`, too. 
 2. Name methods that emit events `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the user interactions.
 
-The one you choose isn't really important; having a convention is generally a good thing, though.
+The one you choose isn't really important; having a convention is generally a good thing, though. Consistency is king!
 
 ## Declaring emits 
 
-As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. 
+As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. It's a good way to communicate to the reader what the component does. Also, if you are using TypeScript, you will get better autocompetion and type safety.
 
-Failing to do so will give you a warning in the browser console: "Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop". 
+Failing to do so will give you a warning in the browser console: *"Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop"*.
 
 This can make it easier to understand what your component does, both for other developers, and yourself when you come back to your code-base in six months time.
 
@@ -149,6 +168,9 @@ export default {
   emits: ['submit']
 }
 ```
+\begin{center}
+Declaring emits with the inferior array syntax.
+\end{center}
 
 Or the more verbose but explicit object syntax:
 
@@ -159,8 +181,11 @@ export default {
   }
 }
 ```
+\begin{center}
+Declaring emits with the verbose but explicit object syntax.
+\end{center}
 
-If you are using TypeScript, you will get even better type safety, including the types for the payload.
+If you are using TypeScript, you will get even better type safety with this syntax - including the types for the payload!
 
 The object syntax also supports *validation*. As an example, we could validate the payload is a number:
 
@@ -173,12 +198,19 @@ export default {
   },
 }
 ```
+\begin{center}
+Validating the emitted event.
+\end{center}
+
+If the validator returns `false`, the event will not be emitted.
 
 ## More Robust Event Validation
 
 Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely they might seem. 
 
-I also have a strong emphasis on testing, and separation of concerns. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
+Getting burned by a lack of defensive program and making assumptions like "this will never happen in production" is almost a rite of passage - there is a reason more experienced developers tend to be more cautious, write defensive code, and write lots of tests.
+
+I also have a strong emphasis on testing, and separation of concerns, and keeping things simple and modular. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
 
 The first step is to move the validation of of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
 
@@ -205,6 +237,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+A more robust validator with a custom validator function.
+\end{center}
 
 Another convention is emerging: I like to call event validators `xxxValidator`.
 
@@ -221,6 +256,9 @@ export function submitValidator(count) {
   return true
 }
 ```
+\begin{center}
+Defensive programming; failing loudly is good.
+\end{center}
 
 Since `submitValidator` is just a plain old JavaScript function, and a pure one at that, it's output is solely dependant on it's inputs. This means writing tests is trivial:
 
@@ -237,12 +275,15 @@ describe('submitValidator', () => {
   })
 })
 ```
+\begin{center}
+Testing submitValidator in isolation.
+\end{center}
 
 A lot of these problems can be partial mitigated with TypeScript. TypeScript won't give you runtime validation though. If you are using an error logging service (like Sentry), throwing an error like this can give you valuable information for debugging.
 
 ## With the Composition API 
 
-The `<counter>` example used the Options API; but all the topics discussed here translate to the Composition API fine. 
+The `<counter>` example used the Options API. All the topics discussed here translate to the Composition API, too.
 
 A good way to see if you are testing inputs and outputs, as opposed to implementation details, is to refactor your component from the Options API to the Composition API, or vice versa; good tests are resilient to refactor. 
 
@@ -290,6 +331,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+The completed counter component with validation.
+\end{center}
 
 Everything still passes - great news!
 

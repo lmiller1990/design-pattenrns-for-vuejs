@@ -210,6 +210,7 @@ export function isBetween(value, { min, max }) {
 ```
 
 Again, I like to have the validation at the start of the function.
+\pagebreak
 
 ## Building `validateMeasurement` with `isBetween`
 
@@ -268,7 +269,7 @@ I also left a blank line between the body of the test and the assertion. This is
 
 You don't have to write your tests like this. Personally, I find it useful to think in terms of "doing things" (eg, creating some variables, calling some functions) and asserting (where we say "given this scenario, this should happen").
 
-Personal philosophy aside - the implementation, again, is much shorter than the test code. Notice a pattern?
+Personal philosophy aside - the implementation, again, is much shorter than the test code. Notice a pattern? It's common for the test code to be longer than the implementation. It might feel a little strange at first, but it's not a problem and actually expected for complex logic.
 
 ```js
 export function validateMeasurement(value, { constraints }) {
@@ -282,6 +283,7 @@ export function validateMeasurement(value, { constraints }) {
 ```
 
 Nice! We were able to reuse `required` and `isBetween`. We "composed" a validator using two small ones. Re-usability is good. Composability is good.
+\pagebreak
 
 ## The Form Object and Full Form Validation
 
@@ -489,7 +491,7 @@ describe('patientForm', () => {
 })
 ```
 
-The test code is quite long. The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real world system, you would likely get these from an API and pass them down to the `patientForm` function.
+The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real world system, you would likely get these from an API and pass them down to the `patientForm` function.
 
 ```js
 const limits = {
@@ -513,6 +515,7 @@ export function patientForm(patient) {
 ```
 
 This completes the business logic for the patient form - noticed we haven't written and Vue components yet? That's because we are sticking to one of our goals; *separation of concerns*, and isolating the business logic entirely. 
+\pagebreak
 
 ## Writing the UI Layer
 

@@ -1,9 +1,10 @@
 <template>
-  <div :class="variant">Message</div>
+  <div :class="variant">Message! {{ variant }}?</div>
 </template>
 
 <script>
 export function validateVariant(variant) {
+  console.log(variant)
   if (!['success', 'warning', 'error'].includes(variant)) {
     throw Error(`variant is required and must be either 'success', 'warning' or 'error'. You passed: ${variant}`)
   }
@@ -14,7 +15,6 @@ export function validateVariant(variant) {
 export default {
   props: {
     variant: {
-      type: String,
       required: true,
       validator: validateVariant
     }
