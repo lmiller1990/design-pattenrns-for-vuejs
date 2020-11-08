@@ -10,9 +10,13 @@ In this section we discuss a pair of functions, provide and inject. These facili
 
 Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` hook. We will see why `provide` and `inject` are better.
 
-### Img: Completed demo app
-
-![](./images/ss-complete.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-complete.png}
+  \caption{Completed demo app}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## A Simple Store
 
@@ -33,8 +37,13 @@ export class Store {
   }
 }
 ```
+\begin{center}
+A simple store with private state and a readonly accessor.
+\end{center}
 
-If you haven't seen the `#state` syntax before, this is a private property - one of the newer features to classes in JavaScript. This means `#state` can only be accessed inside the class instance. It's so new, in fact, it's not supported in 
+If you haven't seen the `#state` syntax before, this is a private property - one of the newer features to classes in JavaScript. At the time of writing this, it only works in Chrome natively. You can omit the `#` if you like - it will still work just fine. 
+
+The `#` means that the property can only be accessed inside the class instance. So `this.#state` works for methods declared inside the `Store` class, but `new Store({ count: 1 }).#state.count` is not allowed. Instead, we will access the state in a readonly manner using `getState()`.
 
 We pass `state` to the constructor to let the user seed the initial state. We will take the disciplined approach and write a test.
 
@@ -51,6 +60,9 @@ describe('store', () => {
   })
 })
 ```
+\begin{center}
+The tests verifies everything is working correctly.
+\end{center}
 
 ## Usage via import
 
@@ -67,8 +79,11 @@ export const store = new Store({
   users: [{ name: 'Alice' }]
 })
 ```
+\begin{center}
+Exporting the store as a "global singleton" with some initial state.
+\end{center}
 
-And in your component:
+Next, import it into your component and iterate over the users:
 
 ```html
 <template>
@@ -95,8 +110,16 @@ export default {
 }
 </script>
 ```
+\begin{center}
+accessing the state via the the imported store.
+\end{center}
 
-![](./images/ss-basic.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-basic.png}
+  \caption{Displaying a user from the store state.}
+  \label{fig}
+\end{figure}
 
 It works! Good progress - I added a tiny bit of CSS as well, grab that from the source code. 
 
@@ -121,6 +144,9 @@ describe('store', () => {
   })
 })
 ```
+\begin{center}
+UI test with Vue Test Utils.
+\end{center}
 
 Working great! We do not really want to hard code any users in the store, though. Let's add a feature to create new users via a form, and them that way.
 
@@ -145,6 +171,9 @@ export const store = new Store({
   users: []
 })
 ```
+\begin{center}
+addUser can access the private state because it is declared in the Store class.
+\end{center}
 
 I also removed the initial user, Alice, from the store. Update the tests - we add one for `addUser` in isolation.
 
@@ -176,8 +205,11 @@ describe('store', () => {
   })
 })
 ```
+\begin{center}
+Testing addUser in isolation - no component, no mounting.
+\end{center}
 
-The final test, the UI test, is now failing. We need to implement a form that calls `addUser`:
+The UI test is now failing. We need to implement a form that calls `addUser`:
 
 ```html
 <template>
@@ -216,10 +248,18 @@ export default {
 }
 </script>
 ```
+\begin{center}
+A form to create new users.
+\end{center}
 
 Great! The test now passes - again, I added a tiny bit of CSS and a nice title, which you can get in the source code if you like.
 
-![](./images/ss-complete.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-complete.png}
+  \caption{Completed app}
+  \label{fig}
+\end{figure}
 
 ## Provide/Inject to Avoid Cross Test Contamination
 
@@ -229,7 +269,12 @@ Ideally, tests should run in isolation. We can't isolate the store if we are imp
 
 This diagram, taken from this official documentation, explains it well:
 
-![](https://v3.vuejs.org/images/components_provide.png?__WB_REVISION__=f7110a1bae2d0744997012ca656d8fa1)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-provde-inject.png}
+  \caption{Provide/Inject diagram. Credit: Vue documentation.}
+  \label{fig}
+\end{figure}
 
 Let's say you have a component, `Parent.vue`, that looks like something this:
 
@@ -250,7 +295,7 @@ export default {
 </script>
 ```
 
-We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `Child.vue` might look like this:
+We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `child.vue` might look like this:
 
 ```html
 <template>
@@ -279,15 +324,17 @@ import { createApp } from 'vue'
 import { store } from './examples/provide-inject/store.js'
 import Users from './examples/provide-inject/users.vue'
 
-
 const app = createApp(Users)
 app.provide('store', store)
 app.mount('#app')
 ```
+\begin{center}
+Using provide to make the store available in all the components.
+\end{center}
 
-While you can call `provide` in a `setup` function, you can also call it on `app`. This will make your value available to all the components. 
+You can call `provide` in a component's `setup` function. This makes the provided value available to all that component's children (and their children, etc). You can also call provide on `app`. This will make your value available to all the components, which is what we want to do in this example.
 
-Instead of importing the store, we can now just call `cosnt  store = inject('store')`:
+Instead of importing the store, we can now just call `const store = inject('store')`:
 
 ```html
 <template>
@@ -315,6 +362,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Using inject to access the store.
+\end{center}
 
 ## Provide in Vue Test Utils
 
@@ -352,6 +402,9 @@ describe('store', () => {
   })
 })
 ```
+\begin{center}
+Using the global.provide mounting option.
+\end{center}
 
 Everything is passing again. We now can avoid cross test contamination - it's easy to provide a new store instance using `global.provide`.
 
@@ -376,6 +429,9 @@ export function useStore() {
   return inject('store')
 }
 ```
+\begin{center}
+A useStore "composable".
+\end{center}
 
 Now update the component:
 
@@ -407,6 +463,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Using the useStore composable.
+\end{center}
 
 All the test are still passing, so we can be confident everything still works.
 

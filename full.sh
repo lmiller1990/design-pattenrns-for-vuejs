@@ -1,7 +1,7 @@
 cat \
   CONTENTS.md \
   INTRO.md \
-  RENDER-FUNCTIONS.md \
+  PROVIDE-INJECT.md  \
   | pandoc \
   --highlight-style tango \
   --pdf-engine pdflatex \
