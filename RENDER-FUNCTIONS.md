@@ -30,10 +30,17 @@ In this section we will build a tab component. The usage will look something lik
   </tab-container>
 </template>
 ```
+\begin{center}
+Final markup for the tabs component.
+\end{center}
 
-### Img: Completed Tabs Component
-
-![](./images/ss-tabs-done.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
+  \caption{Completed Tabs Component}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -60,6 +67,9 @@ This example shows a great use case for render functions. Without them, you migh
   </tab-container>
 </template>
 ```
+\begin{center}
+Alterntive, less flexible syntax.
+\end{center}
 
 As far as general development goes, I think the former is much cleaner and lends itself to a better development experience. 
 
@@ -100,6 +110,9 @@ export const Tab = {
   }
 }
 ```
+\begin{center}
+Tab and TabContent components using a render function instead of a template.
+\end{center}
 
 We do a deep dive on `h` soon - don't worry if you don't understand that fully right now.
 
@@ -128,6 +141,9 @@ export const Tab = withTabId({
   }
 })
 ```
+\begin{center}
+The withTabId function reduces duplication.
+\end{center}
 
 This technique is very useful when making component libraries where many components use similar props.
 
@@ -146,6 +162,9 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Creating the TabContainer component and logging the default slot.
+\end{center}
 
 If you prefer Composition API, you could also do this with `setup`:
 
@@ -160,6 +179,9 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Accessing slots with the Composition API.
+\end{center}
 
 I will be using the Options API and a `render` function for this example. 
 
@@ -200,20 +222,31 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Combining the render function components in a template.
+\end{center}
 
 In this example, `this.$slots.default()` would contain *four* slots (technically, we can say four `VNodes`). Two `<tab>` components and two `<tab-content>` components. To make this more clear we will do some "console driven" development. 
 
 Create a new app using the above component as the root component. Open a browser and open up the console. You should see something like this:
 
-### Img: Logging Slots (Array of VNodes)
-
-![](./images/ss-render-default-slots.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-render-default-slots.png}
+  \caption{Logging Slots (Array of VNodes)}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I expanded the first one and marked some of the relevant properties for this section:
 
-### Img: Detailed View of the Tab VNode
-
-![](./images/ss-slot-details.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-slot-details.png}
+  \caption{Detailed View of the Tab VNode}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 The first one is `children`. This is where the slots go. For example in:
 
@@ -253,12 +286,19 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Separating the different slots using filter.
+\end{center}
 
 Since `type` is a direct reference to the original component (eg, not a copy), we can use `===` (strict equality) to filter the slots.
 
-### Img: Filtered VNodes
-
-![](./images/ss-sorted-slots.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-sorted-slots.png}
+  \caption{Filtered VNodes}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 The next goal will be to render the tabs. We will also add some classes to get some nice styling, as well as show which tab is currently selected.
 
@@ -289,16 +329,27 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Rendering the tabs using h.
+\end{center}
 
 Finally, we have something rendering:
 
-### Img: Rendered Tabs
-
-![](./images/ss-render-tabs-basic.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-render-tabs-basic.png}
+  \caption{Rendered Tabs}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 You may have noticed I did `h(() => tabs)` instead of just `return tabs`. `h` also accepts a callback - in which case, it will evaluate the callback function when it renders. I recommend always returning `h(() => /* render function */)` for the final value in `render` - if you don't, you may run into subtle caching issues.
 
-You can also return an array - this is known as a *fragment*.
+You can also return an array from `render` - this is known as a *fragment*, where there is no root node.
+
+If this looks confusing, don't worry - here comes the `h` crash course.
+
+## What is `h`? A Crash Course
 
 A more complex example of a component with a `render` function that returns an array of render functions, consisting of both regular HTML elements and a custom component.
 
@@ -321,10 +372,9 @@ const Comp = {
   }
 }
 ```
-
-If this looks confusing, don't worry - see the `h` crash course below.
-
-## What is `h`? A Crash Course
+\begin{center}
+A more complex example of a render function with h.
+\end{center}
 
 We are using `h` to render our tabs - `h(tab)` - where `tab` is a `VNode`, which in turn has a render function that returns `h`. What is `h`? It is derived from the term "hyperscript", which in turn owes its roots to `HTML` - specifically the `H`, which is stands for *hyper*. `h` is shorter, and easier to type. It can be thought of as "a JavaScript function that creates HTML structures`.
 
@@ -333,12 +383,18 @@ It has quite a few overloads - ways to use it. For example, a minimal usage woul
 ```js
 const el = h('div')
 ```
+\begin{center}
+A minimal VNode representing a div.
+\end{center}
 
 This will create a single `<div>` - not very useful. The second argument can be attributes, represented by an object.
 
 ```js
 const el = h('div', { class: 'tab', foo: 'bar' })`
 ```
+\begin{center}
+The second argument to h is an object containing attributes.
+\end{center}
 
 The attributes object can take an attribute - standard or not. This would render:
 
@@ -351,6 +407,9 @@ The third and final argument is children, usually an array:
 ```js
 const el = h('div', { class: 'tab', foo: 'bar' }, ['Content'])`
 ```
+\begin{center}
+The third argument is the children.
+\end{center}
 
 Which renders:
 
@@ -378,6 +437,9 @@ const el = h(
   ]
 )
 ```
+\begin{center}
+Children can be plain text or VNodes.
+\end{center}
 
 I spread it out to make it more readable. `render` functions using `h` can get messy - you need to be displined. Some tips will follow relating to this. Ths above call to `h` gives us:
 
@@ -398,6 +460,9 @@ const Tab = {
 
 const el = h('div', {}, [h(Tab), {}, ['Tab #1']])
 ```
+\begin{center}
+Passing a custom component, Tab, as a child.
+\end{center}
 
 This can get difficult to read quickly. The main strategy I use to work around this is creating a separate variable for each `VNode`, and returning them all at the end of the `render` function (keep reading to see this in action).
 
@@ -435,6 +500,9 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Passing an dynamic "active" prop.
+\end{center}
 
 Does this look familiar?
 
@@ -446,12 +514,19 @@ Does this look familiar?
   }
 }
 ```
+\begin{center}
+A dynamic class binding.
+\end{center}
 
 It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, active: tabId === activeTabId }"` in a render function. Here's how it looks in a browser (I added some CSS - grab the CSS from `examples/render-functions/app.vue`):
 
-### Img: Dynamic Classes
-
-![](./images/ss-tabs-classes.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-tabs-classes.png}
+  \caption{Dynamic Classes}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Event Listeners in Render Functions
 
@@ -468,12 +543,19 @@ The active tab needs to update when the user clicks a tab. Let's implement that.
   }
 }
 ```
+\begin{center}
+onClick listener implemented a the render function
+\end{center}
 
 This is the render function version of `<tab v-on:click="update:activeTabId(tabId)" />`. `on:click` becomes `onClick`. Events need to be prepended with `on`. This is enough to update the active tab (I added some debugging information):
 
-### Img: Emitting Events in Render Functions
-
-![](./images/ss-active.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-active.png}
+  \caption{Emitting Events in Render Functions}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Filtering Content
 
@@ -485,8 +567,11 @@ const content = $slots.find(slot =>
   slot.props.tabId === this.activeTabId
 )
 ```
+\begin{center}
+Finding the active content among the $slots.
+\end{center}
 
-Finally, we need to change the return. Instead of just rendering the tabs, we will render the content as well. Here is the completed `render` function:
+Finally, we need to change what is returened. Instead of just rendering the tabs, we will render the content as well. Here is the completed `render` function:
 
 ```js
 export const TabContainer = {
@@ -525,14 +610,22 @@ export const TabContainer = {
   }
 }
 ```
+\begin{center}
+Completed render function for TabContainer.
+\end{center}
 
 It's possible to return an array of `VNodes` from `render`, which is what we do here. We kept everything nice and readable by creating separate variables for each of the different elements we are rendering - in this case, `tabs` and `content`. 
 
 It works!
 
-### Img: Completed Tabs Component
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
+  \caption{Completed Tabs Component}
+  \label{fig}
+\end{figure}
+\pagebreak
 
-![](./images/ss-tabs-done.png)
 
 ## Testing Render Function Components
 
@@ -551,6 +644,9 @@ test('tabs', async () => {
   expect(wrapper.html()).toContain('Content #2')
 })
 ```
+\begin{center}
+Testing render function components is the same as template components.
+\end{center}
 
 I added a `data-test` selector to my `app.vue` test component, to make it clear which tab I am clicking in the test.
 
@@ -564,8 +660,11 @@ You can find the completed source code in the [GitHub repository under examples/
 \newline
 https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
-### Img: Typesafe Component with Render Function
-
-![](./images/ss-ts.png)
-
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-ts.png}
+  \caption{Typesafe Component with Render Function}
+  \label{fig}
+\end{figure}
 \pagebreak
+

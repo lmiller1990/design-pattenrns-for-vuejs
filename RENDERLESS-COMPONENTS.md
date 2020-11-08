@@ -13,11 +13,16 @@ One example is you have some complex logic that needs to be reused in two totall
 
 In this section we will build the following component, a password strength form:
 
-### Img: Completed Password Complexity Component
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
+  \caption{Completed Password Complexity Component}
+  \label{fig}
+\end{figure}
+\pagebreak
+![]()
 
-![](./images/renderless-password/ss-done.png)
-
-There is a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
+There are a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
 
 This means we will work with a `render` function, the low level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
 
@@ -72,9 +77,13 @@ export default {
 
 We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting, but it illustrates the idea of exposing properties via `v-slot`.
 
-### Img: Rendering with slots.default() and v-slot
-
-![](./images/renderless-password/ss1.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss1.png}
+  \caption{Rendering with slots.default() and v-slot}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Adding Password and Confirmation Inputs
 
@@ -177,9 +186,13 @@ export default {
 </script>
 ```
 
-### Img: Rendering Inputs and Debug Info
-
-![](./images/renderless-password/ss2.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss2.png}
+  \caption{Rendering Inputs and Debug Info}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
 
@@ -340,9 +353,13 @@ export default {
 </style>
 ```
 
-### Img: Complexity Indicator
-
-![](./images/renderless-password/ss3.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss3.png}
+  \caption{Complexity Indicator}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
 
@@ -429,9 +446,13 @@ Update the usage to include a `<button>` that binds to `valid`:
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
-### Img: Completed Password Complexity Component
-
-![](./images/renderless-password/ss-done.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
+  \caption{Completed Password Complexity Component}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Exercises
 
