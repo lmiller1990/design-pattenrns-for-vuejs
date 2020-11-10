@@ -8,9 +8,12 @@ ______
 
 Vue 3's flagship feature is The Composition API; it's main selling point is to easily group and reuse code by *feature*. In this section we will see some techniques to write testable composables by building a tic tac toe game, including undo and redo.
 
-### Img: Completed Game
-
-![](./images/ss-tic-tac-toe-done.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-tic-tac-toe-done.png}
+  \caption{Completed Game}
+  \label{fig}
+\end{figure}
 
 The API we will end with looks like this:
 
@@ -26,6 +29,9 @@ export default {
   }
 }
 ```
+\begin{center}
+Final API.
+\end{center}
 
 `currentBoard` is a `computed` property that looks like this:
 
@@ -36,6 +42,9 @@ export default {
   ['-', 'o', '-']
 ]
 ```
+\begin{center}
+Example game board represented as multi-dmensional array.
+\end{center}
 
 `makeMove` is a function that takes two arguments: `col` and `row`. Given this board:
 
@@ -72,6 +81,9 @@ const initialBoard = [
   ['-', '-', '-']
 ]
 ```
+\begin{center}
+Initial board.
+\end{center}
 
 Before diving too far into the game logic, let's get something rendering. Remember we want to keep a history of the game? This means instead of mutating the game state, we should just create a new game state for each and push it into an array. We also need the board to be reactive, so Vue will update the UI. We can use `ref` for this. Update the code:
 
@@ -92,6 +104,9 @@ export function useTicTacToe() {
   }
 }
 ```
+\begin{center}
+The start of a useTicTacToe composable.
+\end{center}
 
 I made the board `readonly`; I don't want to update the game state direct in the component, but via a method we will write soon in the composable.
 
@@ -135,12 +150,18 @@ export default {
 }
 </style>
 ```
+\begin{center}
+Testing out the new useTicTacToe composable.
+\end{center}
 
 Great! It works:
 
-### Img: Rendered game board
-
-![](./images/ttt-1.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ttt-1.png}
+  \caption{Rendered game board}
+  \label{fig}
+\end{figure}
 
 ## Computing the Current State
 
@@ -164,6 +185,9 @@ export function useTicTacToe() {
   }
 }
 ```
+\begin{center}
+Getting the latest game state with a computed property.
+\end{center}
 
 Update the component to use the new `currentBoard` computed property:
 
@@ -194,6 +218,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Using the currentBoard computed property. 
+\end{center}
 
 Everything is still working correctly. Let's make sure everything continues to work correctly by writing some tests.
 
@@ -217,12 +244,17 @@ describe('useTicTacToe', () => {
   })
 })
 ```
+\begin{center}
+Testing the initial game state.
+\end{center}
 
 This does pass, but also reveals some potential issues. Firstly, we want to test our business logic (the game logic, in this case). We had to use `.value` in the test, though, to access the current state of the game. We need `.value` since `currentBoard` is a `computed` property - part of Vue's reactivity system. In other words, the UI layer. 
 
 We have tightly coupled our implementation to Vue. You could not reuse this logic in another framework, like React, for example. This is a relatively simple composable and a coupling I am happy to live with for now, but it's still worth recognizing it and considering the implications this might have in the future, should we decide to move away from Vue.
 
-While moving away from your UI framework, in this case Vue, might seem unlikely, but we thought the same thing about jQuery, Backbone and Angular.js. For this simple example I think this coupling is acceptable. If we start to write significantly complex business logic, we may want to consider removing the coupling between the composable and the business logic. In this next chapter, we explore how to reduce coupling between UI and business logic in composables. We also discuss *why* this might be desirable.
+While moving away from your UI framework, in this case Vue, might seem unlikely, but we thought the same thing about jQuery, Backbone and Angular.js. For this simple example I think this coupling is acceptable. 
+
+If we start to write significantly complex business logic, we may want to consider removing the coupling between the composable and the business logic. In this next chapter, we explore how to reduce coupling between UI and business logic in composables. We also discuss *why* this might be desirable.
 
 Back to the current example. There is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing the game. This means we need to implement `makeMove` before writing tests to see if the game has been won, since there is no way to update the board as it stands to test winning or losing scenarios. We can work around this by passing in an initial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
 
@@ -248,6 +280,9 @@ export function useTicTacToe(initialState) {
   }
 }
 ```
+\begin{center}
+Accept an initialState to facilitate testing.
+\end{center}
 
 Add a test to ensure we can seed an initial state:
 
@@ -270,6 +305,9 @@ describe('useTicTacToe', () => {
   })
 })
 ```
+\begin{center}
+A test for initial state.
+\end{center}
 
 Notice we pass in `[initialState]` as an array - we are representing the state as an array to preserve the history. This allows us to seed a fully completed game, which will be useful when writing the logic to see if a player has won.
 
@@ -295,6 +333,9 @@ describe('makeMove', () => {
   })
 })
 ```
+\begin{center}
+Testing makeMove.
+\end{center}
 
 There isn't anything too surprising here. After making a move, we have two game states (initial and the current one). The current player is now `x` (since `o` goes first). Finally, the `currentBoard` should be updated.
 
@@ -327,6 +368,9 @@ export function useTicTacToe(initialState) {
   }
 }
 ```
+\begin{center}
+Implementing makeMove.
+\end{center}
 
 This gets the test to pass. As mentioned above we are using the somewhat dirty `JSON.parse(JSON.stringify(...))` to clone the board and lose reactivity. I want to get *non reactive* copy of the board - just a plain JavaScript array. Somewhat surprisingly, `[...boards.value[boards.value.length - 1]]` does not work - the new object is still reactive and updates when the source array is mutated. This means we are mutating the game history in `boards`! Not ideal. 
 
@@ -364,7 +408,12 @@ export default {
 </script>
 ```
 
-### Img: Completed game board
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-tic-tac-toe-done.png}
+  \caption{Completed Game}
+  \label{fig}
+\end{figure}
 
 That's it! Everything now works in it's functional, immutable glory.
 

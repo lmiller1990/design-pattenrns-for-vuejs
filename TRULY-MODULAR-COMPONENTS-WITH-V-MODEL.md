@@ -15,12 +15,18 @@ In this section we will author a reusable date component. Usage will be like thi
   :deserialize="..."
 />
 ```
+\begin{center}
+The goal - a <datetime> component that works with any DateTime library via the strategy pattern.
+\end{center}
 
 The finished component will look like this:
 
-### Img: Completed DateTime Component
-
-![](./images/ss-dt-done.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-dt-done.png}
+  \caption{Completed DateTime Component}
+  \label{fig}
+\end{figure}
 
 There are three props: `v-model`, `serialize` and `deserialize`. More on what `serialize` and `deserialize` are soon.
 
@@ -57,8 +63,11 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Wrapping `<datetime>` to provide Luxon integration.
+\end{center}
 
-This might work okay - now you can put your `<luxon-date-time>` on npm to share. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
+This might work okay - now you can put your `<luxon-date-time>` on npm to share, listing `luxon` as a `peerDependency` in `package.json`. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
 
 Another problem is this is a bit difficult to test. You will need to mount the component using something like Vue Test Utils just to test your parsing logic - again, not ideal. Of course we will need some integration tests to make sure it's working correctly, but I don't want to couple my business logic tests (eg, the parsing logic from `updateDate` using pure functions and Jest) to the UI layer tests (using Vue Test Utils).
 
@@ -73,14 +82,20 @@ Here is the API I am proposing to make `<date-time>` truly agnostic, not needing
   :deserialize="deserialize"
 />
 ```
+\begin{center}
+<datetime> with serialize and deserialize props.
+\end{center}
 
 `date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value. This pattern is generalized as the "strategy" pattern.
 
 A diagram might make this more clear:
 
-### Img: DateTime data flow
-
-![](./images/dt-ss-1.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/dt-ss-1.png}
+  \caption{DateTime data flow}
+  \label{fig}
+\end{figure}
 
 In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
 
@@ -135,6 +150,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Implementing v-model for the datetime.
+\end{center}
 
 Usage is like this:
 
@@ -165,9 +183,12 @@ export default {
 </script>
 ```
 
-### Img: Rendering the Date Inputs
-
-![](./images/ss-dt-progress.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-dt-progress.png}
+  \caption{Rendering the Date Inputs}
+  \label{fig}
+\end{figure}
 
 I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, make reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
 
@@ -327,7 +348,13 @@ The main changes are:
 1. We now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. 
 2. We use `deserialize` on the `modelValue` in the `update` function when preparing to update `modelValue`. 
 
-![](./images/ss-dt-progress-2.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-dt-progress-2.png}
+  \caption{Using the serialize prop.}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
 
@@ -435,7 +462,13 @@ All that changed was declaring the `serialize` prop and calling `props.serialize
 
 It works! Kind of - as long as you only enter value numbers. If you enter a `0` for the day, all the inputs show `NaN`. We need some error handling.
 
-![](./images/ss-dt-error.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ss-dt-error.png}
+  \caption{Serializing/Deserializing without error handling.}
+  \label{fig}
+\end{figure}
+\pagebreak
 
 ## Error Handling
 

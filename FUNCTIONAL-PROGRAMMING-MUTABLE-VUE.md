@@ -20,6 +20,9 @@ function makeMove({ row, col }) {
   boards.value.push(newBoard)
 }
 ```
+\begin{center}
+Original makeMove implemented using mutation.
+\end{center}
 
 On line 3, we mutation the `newBoard` variable. We then mutates `boards` on line 4, by pushing a new value in. In addition to this mutation, we are also using two global variables: `boards` and `currentPlayer`. If we want to approach in a functional manner, the function needs to have the following signature:
 
@@ -28,6 +31,9 @@ type Board = string[][]
 
 function makeMove(board, col, row, counter): Board
 ```
+\begin{center}
+The new makeMove will return an updated board.
+\end{center}
 
 In other words, `makeMove` needs to receive all required arguments to create a new board, and should return a new board. This makes it pure; the return value is determined exclusively by the inputs.
 
@@ -51,6 +57,9 @@ export default {
   }
 }
 ```
+\begin{center}
+Final API does not change - only the implementation details.
+\end{center}
 
 ## Core Logic - The Functional Core
 
@@ -71,6 +80,9 @@ export function createGame(initialState) {
   return [...initialState]
 }
 ```
+\begin{center}
+So far, no mutation.
+\end{center}
 
 While we could have just done `createGame` without passing any arguments, this makes it easy to seed an initial state for testing. Also, we avoid relying on a global variable.
 
@@ -88,6 +100,9 @@ describe('useTicTacToe', () => {
   })
 })
 ```
+\begin{center}
+A simple for the initial game state.
+\end{center}
 
 ## Immutable `makeMove`
 
@@ -99,6 +114,9 @@ export function makeMove(board, { col, row, counter }) {
   // return copy with updated cell
 }
 ```
+\begin{center}
+The new makeMove function (without implementation).
+\end{center}
 
 I decided to have two arguments: the first is the `board`, which I consider the "main" argument. I decided to implement `col`, `row` and `counter` as an object, since I consider those to be "options", which will change depending on the move the player makes.
 
@@ -122,6 +140,9 @@ describe('makeMove', () => {
   })
 })
 ```
+\begin{center}
+A test to guide us.
+\end{center}
 
 Let's start with a verbose implementation. Since we do not want to mutate anything, we are going to create a copy of the game state. Then we will `map` each row. In each row, we will `map` each column, and when we find the row and column the user has chosen, we will update the cell.
 
@@ -147,6 +168,9 @@ export function makeMove(board, { col, row, counter }) {
   })
 }
 ```
+\begin{center}
+A verbose and heavily commented makeMove.
+\end{center}
 
 The test passes! I left some comments to make it clear what's going on. If you haven't seen this type of code before, it can be a little difficult to understand - it was for me. Once I got used to using tools like `map` and `reduce` instead of a for loop and mutation, I started to find this style of code more concise, and also less prone to bugs.
 
@@ -163,6 +187,9 @@ export function makeMove(board, { col, row, counter }) {
   )
 }
 ```
+\begin{center}
+Functional code can be very concise. Careful - readability can suffer.
+\end{center}
 
 We avoided making a new variable by just returning the result of `board.map`. We also remove the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. The test still passes, so we are good. I think both implementations are fine; pick the one that you like best.
 
@@ -193,6 +220,9 @@ export function useTicTacToe() {
   }
 }
 ```
+\begin{center}
+The composable integrates the functional core with Vue's reactivity system - the "imperative shell" around the functional core.
+\end{center}
 
 I added an empty `move` function, assigning it to `makeMove` in the return value of `useTicTacToe`. We will be implementing that soon. 
 
@@ -239,10 +269,16 @@ export default {
 }
 </style>
 ```
+\begin{center}
+Testing out the implementation.
+\end{center}
 
-### Img: Rendered game board
-
-![](./images/ttt-1.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ttt-1.png}
+  \caption{Rendered game board}
+  \label{fig}
+\end{figure}
 
 ## Integrating makeMove
 
@@ -262,12 +298,18 @@ const move = ({ col, row }) => {
   counter.value = counter.value === 'o' ? 'x' : 'o'
 }
 ```
-
-### Img: Completed Game Board
+\begin{center}
+move is just a wrapper around the functional `makeMove`.
+\end{center}
 
 That's it! Everything now works in it's functional, loosely coupled, immutable glory.
 
-![](./images/ttt-2.png)
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/ttt-2.png}
+  \caption{Rendered game board}
+  \label{fig}
+\end{figure}
 
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 
@@ -289,6 +331,9 @@ describe('TicTacToeApp', () => {
   })
 })
 ```
+\begin{center}
+The UI test from previous section, ensuring the behavior has not changed.
+\end{center}
 
 ## Reflections and Philosophy
 

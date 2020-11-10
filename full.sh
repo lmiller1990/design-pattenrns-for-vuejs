@@ -1,7 +1,7 @@
 cat \
   CONTENTS.md \
   INTRO.md \
-  PROVIDE-INJECT.md  \
+  FUNCTIONAL-PROGRAMMING-MUTABLE-VUE.md \
   | pandoc \
   --highlight-style tango \
   --pdf-engine pdflatex \
