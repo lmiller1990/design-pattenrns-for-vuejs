@@ -195,7 +195,7 @@ We avoided making a new variable by just returning the result of `board.map`. We
 
 ## Vue Integration - Imperative Shell
 
-All of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless; all the values required are received as arguments. We do need some state somewhere, as well as some mutation to actually do anything; that comes in the form of Vue's reactivity.
+All of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless; all the values required are received as arguments. We do need some state somewhere, as well as some mutation to do anything; that comes in the form of Vue's reactivity.
 
 Let's start with the composable, `useTicTacToe()`, and get something rendering:
 

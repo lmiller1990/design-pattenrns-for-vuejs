@@ -5,9 +5,9 @@ You can find the completed source code in the [GitHub repository under examples/
 https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
-So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and actually rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
+So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
 
-Code in `<template>` is compiled to something called *render functions*. A number of things happen during this compilation step. Some of these are:
+Code in `<template>` is compiled to something called *render functions*. Several things happen during this compilation step. Some of these are:
 
 - Directives such as `v-if` and `v-for` are converted to regular JavaScript (`if` and `for` or `map`, for example).
 - Optimizations.
@@ -264,7 +264,7 @@ Now we know how to identify which component a `VNode` is using - the `type` prop
 
 ## Filtering default slots
 
-The `type` property is actually a *direct reference* to the component the `VNode` is using. This means we can match using an object and strict equality. If this sounds a bit abstract, let's see it in action and sort the slots into `tabs` and `contents`:
+The `type` property is a *direct reference* to the component the `VNode` is using. This means we can match using an object and strict equality. If this sounds a bit abstract, let's see it in action and sort the slots into `tabs` and `contents`:
 
 ```js
 export const TabContainer = {
@@ -629,7 +629,7 @@ It works!
 
 ## Testing Render Function Components
 
-Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so actually all the tests we've been writing have been using `render` functions under the hook).
+Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hook).
 
 ```js
 import { mount } from '@vue/test-utils'

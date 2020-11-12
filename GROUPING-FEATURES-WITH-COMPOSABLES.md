@@ -165,7 +165,7 @@ Great! It works:
 
 ## Computing the Current State
 
-Currently the component is hard coded to use `boards[0]`. What we really want to do is use the last element, which is the latest game state. We can use a `computed` property for this. Update the composable:
+Currently the component is hard coded to use `boards[0]`. What we want to do is use the last element, which is the latest game state. We can use a `computed` property for this. Update the composable:
 
 ```js
 import { ref, readonly, computed } from 'vue'
@@ -417,13 +417,13 @@ export default {
 
 That's it! Everything now works in it's functional, immutable glory.
 
-The game is now playable - well, you can make moves. There are a number of problems:
+The game is now playable - well, you can make moves. There are several problems:
 
 1. No way to know if a player has won. 
 2. You can make an invalid move (for example, going on a square that is already taken). 
 3. We did not implement undo/redo.
 
-Fixing/implementing these is not very difficult and will be left as an exercise. You can find the solutions in the source code. Undo/redo is probably the most interesting one - you should definitely try and implement this yourself before looking at the answers.
+Fixing/implementing these is not very difficult and will be left as an exercise. You can find the solutions in the source code. Undo/redo is probably the most interesting one - you should try and implement this yourself before looking at the answers.
 
 ## Conclusion
 

@@ -1,7 +1,7 @@
 cat \
   CONTENTS.md \
   INTRO.md \
-  FUNCTIONAL-PROGRAMMING-MUTABLE-VUE.md \
+  RENDERLESS-COMPONENTS.md \
   | pandoc \
   --highlight-style tango \
   --pdf-engine pdflatex \

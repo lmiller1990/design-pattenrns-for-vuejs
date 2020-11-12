@@ -9,7 +9,7 @@ ______
 
 The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility.
 
-One example is you have some complex logic that needs to be reused in two totally different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
+One example is you have some complex logic that needs to be reused in two different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
 
 In this section we will build the following component, a password strength form:
 
@@ -19,19 +19,17 @@ In this section we will build the following component, a password strength form:
   \caption{Completed Password Complexity Component}
   \label{fig}
 \end{figure}
-\pagebreak
-![]()
 
 There are a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
 
-This means we will work with a `render` function, the low level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
+This means we will work with a `render` function, the low-level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
 
 We would like to support the following features:
 
 - A `matching` variable that returns true if the password and confirmation match.
-- Support a `minComplexity` prop; by default the minimum complexity is 0 and maximum complexity is 3. This is represented by the yellow bar above the submit button in the screenshot above.
+- Support a `minComplexity` prop; by default, the minimum complexity is 0 and the maximum complexity is 3. This is represented by the yellow bar above the submit button in the screenshot above.
 - support a custom complexity algorithm (eg, require specific characters or numbers in the password).
-- Expose a `valid` value which is true when the password and confirmation match, and the password meets the minimum complexity.
+- Expose a `valid` value which is true when the password and confirmation match and the password meets the minimum complexity.
 
 Let's get started.
 
@@ -48,8 +46,11 @@ export default {
   }
 }
 ```
+\begin{center}
+Renderless functions return slots.default() in setup or render.
+\end{center}
 
-This is the how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. 
+This is how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. 
 
 Let's see this in action but using the component in a regular `vue` file. Mine is called `app.vue`; find the completed version in the source code.
 
@@ -74,6 +75,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Trying out the renderless-password.
+\end{center}
 
 We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting, but it illustrates the idea of exposing properties via `v-slot`.
 
@@ -83,22 +87,14 @@ We can destructure the object passed to `slots.default()` in `v-slot`, and are f
   \caption{Rendering with slots.default() and v-slot}
   \label{fig}
 \end{figure}
-\pagebreak
 
 ## Adding Password and Confirmation Inputs
 
-The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, which the developer is free to use as they see fit.
+The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, to see if the password and confirmation are the same. 
 
-There are several ways we could handle this. Let's see what is probably the most idiomatic, in my opinion. The first thing we need to do is update `renderless-password.js` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
+First, update `renderless-password.js` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
 
 ```js
-export function isMatching(password, confirmation) {
-  if (!password || !confirmation) {
-    return false
-  }
-  return password === confirmation
-}
-
 import { computed } from 'vue'
 
 export function isMatching(password, confirmation) {
@@ -129,12 +125,15 @@ export default {
   }
 }
 ```
+\begin{center}
+Checking if password and confirmation match.
+\end{center}
 
-You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep is separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. You could declare it inside of `setup`, if you prefer that style.
+You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep it separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. You could declare it inside of `setup` if you prefer that style.
 
-I also removed `complexity: 5`; we will come back to this, but we aren't using it right now.
+I also removed `complexity: 5` from `slots.default()`; we will come back to this, but we aren't using it right now.
 
-One thing that might be a little surprising if you need to pass `matching.value` to `slots.default()`. This is because I would like to let the developer destructure `matching` by doing `v-slot={ matching }"` as opposed to `v-slot="{ matching: matching.value }"`; the former feels more clean to me.
+One thing that might be a little surprising if you need to pass `matching.value` to `slots.default()`. This is because I would like to let the developer destructure `matching` by doing `v-slot={ matching }"` as opposed to `v-slot="{ matching: matching.value }"`; the former feels cleaner to me.
 
 Let's try it out:
 
@@ -185,6 +184,13 @@ export default {
 }
 </script>
 ```
+\begin{center}
+password and confirmation are saved in a reactive object.
+\end{center}
+
+The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
+
+I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code. It looks like this:
 
 \begin{figure}[H]
   \centering
@@ -192,30 +198,27 @@ export default {
   \caption{Rendering Inputs and Debug Info}
   \label{fig}
 \end{figure}
-\pagebreak
 
-The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
+This works great! The complexity and business logic is nicely abstracted away in `renderless-password`. The developer can use the logic to style the component to suit their application and use case.
 
-I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code.
-
-This works great. It also feels very intuitive to me. The complexity and business logic is nicely abstracted away, and the developer can use and style the component as they see fit.
-
-Let's keep going and add the a customizable `complexity` feature, to rate whether a password is sufficiently complex.
+Let's keep going and add a customizable `complexity` feature, to rate whether a password is sufficiently complex.
 
 ## Adding Password Complexity
 
-For now we will implement something a very naive complexity check. Most developers will want to customize this anyway, but this makes for a good example none the less. For now the algorithm will be purely based on length:
+For now, we will implement a very naive complexity check. Most developers will want to customize this. For this example, we will keep it simple and choose an algorithm that will rate complexity based on the length of the password:
 
 - high: length >= 10
 - mid: length >= 7
 - low: length >= 5
 
-As with `isMatching`, we will make a `calcComplexity` function that is a pure function. Decoupled and easily testable.
+As with `isMatching`, we will make a `calcComplexity` a pure function. Decoupled, deterministic, and easily testable.
 
 ```js
 import { computed } from 'vue'
 
-// ...
+export function isMatching() {
+  // ...
+}
 
 export function calcComplexity(val) {
   if (!val) {
@@ -253,8 +256,11 @@ export default {
   }
 }
 ```
+\begin{center}
+Adding a simple calcComplexity function.
+\end{center}
 
-Nothing too exciting - we have will need to support a custom complexity function in the future, but other than that, everything is very similar to what we did with `matching`.
+Everything is very similar to what we did with the `isMatching` function and `matching` computed property. We will add support for a custom complexity function in the future passed via a prop. 
 
 Let's try it out:
 
@@ -352,20 +358,15 @@ export default {
 }
 </style>
 ```
+\begin{center}
+Styling the form based using a computed style.
+\end{center}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss3.png}
-  \caption{Complexity Indicator}
-  \label{fig}
-\end{figure}
-\pagebreak
+I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have consciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
 
-I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have conciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
+The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid`, or `low`) is returned is not enough. To fully test this component, I'll need to assert against the DOM. 
 
-The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid` or `low`) is returned is not enough. To full test this component, I'll need to make an assertion against the DOM. 
-
-You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is actually applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass).
+You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass).
 
 By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
 
@@ -377,6 +378,18 @@ test('applies correct class based on complexity', async () => {
   expect(wrapper.find('.complexity.high').exists()).toBe(true)
 })
 ```
+\begin{center}
+Testing the correct complexity class is included.
+\end{center}
+
+The test application now looks like this:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss3.png}
+  \caption{Complexity Indicator}
+  \label{fig}
+\end{figure}
 
 ## Computing Form Validity 
 
@@ -385,7 +398,13 @@ Let's add the final feature: a button that is only enabled when a `valid` proper
 ```js
 import { computed } from 'vue'
 
-// ...
+export isMatching() {
+  // ...
+}
+
+export calcComplexity() {
+  // ...
+}
 
 export default {
   props: {
@@ -394,7 +413,7 @@ export default {
       default: 3
     },
 
-    // ...
+    // ... other props ...
   },
 
   setup(props, { slots }) {
@@ -414,8 +433,11 @@ export default {
   }
 }
 ```
+\begin{center}
+Validating the form with a valid computed property, derived from matching and complexity.
+\end{center}
 
-I added a `valid` computed property, based on the result of `complexity` and `matching`. You could make a separate function for this, if you wanted to test it in isolation. If I was going to distribute this npm, I probably would; alternatively we can test this implicitly by binding `valid` to a button's `disabled` attribute, like we are about to do, and then assert against the DOM that the attribute is set correctly.
+I added a `valid` computed property, based on the result of `complexity` and `matching`. You could make a separate function for this if you wanted to test it in isolation. If I was going to distribute this npm, I probably would; alternatively, we can test this implicitly by binding `valid` to a button's `disabled` attribute, like we are about to do, and then assert against the DOM that the attribute is set correctly.
 
 Update the usage to include a `<button>` that binds to `valid`:
 
@@ -431,7 +453,7 @@ Update the usage to include a `<button>` that binds to `valid`:
     }"
   >
     <div class="wrapper">
-      <! -- ... omitted for brevity .. --> 
+      <! -- ... omitted for brevity ... --> 
       <div class="field">
         <button :disabled="!valid">Submit</button>
       </div>
@@ -443,6 +465,9 @@ Update the usage to include a `<button>` that binds to `valid`:
   </renderless-password>
 </template>
 ```
+\begin{center}
+Destructuring valid and binding to it.
+\end{center}
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
@@ -452,16 +477,15 @@ Everything works! And we can easily move elements around to change the look and 
   \caption{Completed Password Complexity Component}
   \label{fig}
 \end{figure}
-\pagebreak
 
 ## Exercises
 
-This section intentionally omitted writing tests in order to focus on the concepts. Several techniques regarding tests were mentioned. As practice, try to write the following tests (find the solutions in the source code):
+This section intentionally omitted writing tests to focus on the concepts. Several techniques regarding tests were mentioned. For practice, try to write the following tests (find the solutions in the source code):
 
 - Some tests using Vue Test Utils to assert the correct complexity class is assigned.
 - Test that the button is appropriately disabled.
 
-You could also write some business logic tests, to make sure we didn't miss any edge cases:
+You could also write some tests for the business logic, to make sure we didn't miss any edge cases:
 
 - Test the `calcComplexity` and `isMatching` functions in isolation.
 

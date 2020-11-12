@@ -20,7 +20,7 @@ Instead of providing a toy example, we will see a real use case by building a si
 
 ## A Simple Store
 
-Let's quickly define a dead simple store. We won't have a complex API like Vuex - just a class with some methods. Let's start off with a reactive state, and expose it in readonly fashion via a `getState` function.
+Let's quickly define a dead simple store. We won't have a complex API like Vuex - just a class with some methods. Let's start with a reactive state, and expose it in readonly fashion via a `getState` function.
 
 ```js
 import { reactive, readonly } from 'vue'
@@ -148,7 +148,7 @@ describe('store', () => {
 UI test with Vue Test Utils.
 \end{center}
 
-Working great! We do not really want to hard code any users in the store, though. Let's add a feature to create new users via a form, and them that way.
+Working great! We do not want to hard code any users in the store, though. Let's add a feature to create new users via a form, and them that way.
 
 ## Adding a users forms
 
@@ -469,7 +469,7 @@ Using the useStore composable.
 
 All the test are still passing, so we can be confident everything still works.
 
-Now anywhere you need access to the store, just call `useStore`. This is the exact same API Vuex uses. It's a common practice to make global singletons available via a useXXX function, which uses `provide` and `inject` under the hood.
+Now anywhere you need access to the store, just call `useStore`. This is the same API Vuex uses. It's a common practice to make global singletons available via a useXXX function, which uses `provide` and `inject` under the hood.
 
 ## Exercises
 

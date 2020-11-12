@@ -30,13 +30,13 @@ The finished component will look like this:
 
 There are three props: `v-model`, `serialize` and `deserialize`. More on what `serialize` and `deserialize` are soon.
 
-The idea is that the `date` value passed to `v-model` can use whichever DateTime library the developer wants to use. We want to allow developers to bring their own DateTime library, instead of mandating a specific one.
+The idea is that the `date` value passed to `v-model` can use whichever DateTime library the developer wants to use. We want to allow developers to choose their a DateTime library, instead of mandating a specific one.
 
 Some applications use the native JavaScript `Date` object (don't do this; it's not a very good experience). Older applications will often use [Moment](https://momentjs.com/) and newer ones common opt for [Luxon](https://moment.github.io/luxon/). 
 
 I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
 
-One way to handle this would be to pick a simple format of our own, for example `YYYY-MM-DD`, and then have the user wrap the component and provide their own integration layer. For example a user wanting to use Luxon might wrap `<date-time>` in their own `<date-time-luxon>` component:
+One way to handle this would be to pick a simple format of our own, for example `YYYY-MM-DD`, and then have the user wrap the component and provide a custom integration layer. For example a user wanting to use Luxon might wrap `<date-time>` in their own `<date-time-luxon>` component:
 
 ```html
 <template>

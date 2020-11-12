@@ -234,6 +234,15 @@ Testing all the cases for the validator.
 
 Simply making the `validateVariant` a separate function that is exported might seem like a small change, but it's actually a big improvement. By doing so, we were able to write tests for `validateVariant` with ease. We can be confident the `<message>` component can only be used with valid a `variant`.
 
+If the developer passes an invalid prop, they get a nice clear message in the console:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/props-error.png}
+  \caption{Error! Passed variant is invalid.}
+  \label{fig}
+\end{figure}
+
 ## Separation of Concerns
 
 We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against the `classes()`. The second is for the validator. It tests business logic. 

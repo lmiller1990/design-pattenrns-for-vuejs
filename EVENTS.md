@@ -6,19 +6,19 @@ https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
-Vue's primary mechanical for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierachy, you do so by *emitting events*, with `this.$emit` (Options API) and `ctx.emit` (Composition API).
+Vue's primary mechanic for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierarchy, you do so by *emitting events*. This is done by calling `this.$emit()` (Options API) or `ctx.emit()` (Composition API).
 
 Let's see some examples on how this works, and some guidelines we can set to keep things clean and understandable.
 
 ## Starting Simple
 
-Here is a very minimal yet perfectly working `<Counter>` component. It's by no means ideal; we will work on improving it by the end of this section. 
+Here is a very minimal yet perfectly working `<counter>` component. It is not ideal; we will work on improving it during this section. 
 
 This example starts with the Options API; we will eventually refactor at the Composition API (using the tests we write to ensure we don't break anything).
 
 ```html
 <template>
-  <button id="increment" @click="increment" />
+  <button id="increment" @click="count += 1" />
   <button id="submit" @click="$emit('submit', count)" />
 </template>
 
@@ -28,11 +28,6 @@ export default {
     return {
       count: 0
     }
-  },
-  methods: {
-    increment() {
-      this.count += 1
-    }
   }
 }
 </script>
@@ -41,7 +36,7 @@ export default {
 A simple counter component.
 \end{center}
 
-There are two buttons; one increments a `count`, the other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
+There are two buttons. One increments the `count` value by 1. The other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
 
 As with the other examples, this one uses Vue Test Utils, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
 
@@ -90,6 +85,7 @@ A submit event was emitted with three arguments, 1, 2, 3.
 \end{center}
 
 Let's add an assertion, before we get onto the main topic: patterns and practices for emitting events.
+\pagebreak
 
 ```js
 import { mount } from '@vue/test-utils'
@@ -112,7 +108,7 @@ Making an assertion against the emitted events.
 
 ## Clean Templates
 
-We discussed previous the ideal of *simple templates*. The same thing applies here; we want to avoid calling `this.$emit` in the template, where possible. Let's move this to the `<script>` section, where logic belongs:
+Templates can often get chaotic among passing props, listening for events and using directives. For this reason, wherever possible, we want to keep our templates simple by moving logic into the `<script>` tag. One way we can do this is to avoid doing `count += 1` and `$emit()` in `<template>`. Let's make this change in the `<counter>` component, moving the logic from `<template>` into the `<script>` tag by creating two new methods:
 
 ```html
 <template>
@@ -142,26 +138,26 @@ export default {
 Moving the emit logic from the template to the script.
 \end{center}
 
-Everything still passes. This points to a *good test*. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
+Running this test confirms that everything is still working. This is good. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
 
-I recommend avoid emitting events in templates - or having logic in the `<script>` tag in general, unless it's truly trivial. Instead, move the logic to the script tag where it belongs.
+I recommend you avoid putting any logic into `<template>`. Move everything into `<script>`. `count += 1` might seem simple enough to inline in `<template>`. That said, I personally value consistency over saving a few key strokes, and for this reason I put all the logic inside `<script>`.
 
-Another thing you may have notices is the *name* of the method we created - `submit`. This is a personal preference, but I recommend having a good convention around naming methods. Here are two I've found useful.
+Another thing you may have notices is the *name* of the method we created - `submit`. This is another personal preference, but I recommend having a good convention around naming methods. Here are two I've found useful.
 
 1. Name the method that emits the event the same as the event name. If you are doing `$emit('submit')`, you could name the method that calls this `submit`, too. 
-2. Name methods that emit events `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the user interactions.
+2. Name methods call `$this.emit()` or `ctx.emit()` using the convention `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the interactions and emitting events.
 
-The one you choose isn't really important; having a convention is generally a good thing, though. Consistency is king!
+Which of these you choose isn't really important; you could even pick another convention you like better. Having a convention is generally a good thing, though. Consistency is king!
 
 ## Declaring emits 
 
-As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. It's a good way to communicate to the reader what the component does. Also, if you are using TypeScript, you will get better autocompetion and type safety.
+As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. It's a good way to communicate to the reader what the component does. Also, if you are using TypeScript, you will get better autocompletion and type safety.
 
 Failing to do so will give you a warning in the browser console: *"Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop"*.
 
-This can make it easier to understand what your component does, both for other developers, and yourself when you come back to your code-base in six months time.
+By declaring the events a component emits, it can make it easier for other developers (or yourself in six months time) to understand what your component does and how to use it.
 
-You can do this in the same way you declare props; using the array of strings syntax:
+You can declare events in the same way you declare props; using the array syntax:
 
 ```js
 export default {
@@ -185,9 +181,9 @@ export default {
 Declaring emits with the verbose but explicit object syntax.
 \end{center}
 
-If you are using TypeScript, you will get even better type safety with this syntax - including the types for the payload!
+If you are using TypeScript, you will get even better type safety with this syntax - including the types in the payload!
 
-The object syntax also supports *validation*. As an example, we could validate the payload is a number:
+The object syntax also supports *validation*. As an example, we could validate the payload for an imaginary `submit` event is a number:
 
 ```js
 export default {
@@ -206,13 +202,13 @@ If the validator returns `false`, the event will not be emitted.
 
 ## More Robust Event Validation
 
-Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely they might seem. 
+Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely the scenario might seem. 
 
-Getting burned by a lack of defensive program and making assumptions like "this will never happen in production" is almost a rite of passage - there is a reason more experienced developers tend to be more cautious, write defensive code, and write lots of tests.
+Getting burned by a lack of defensive programming and making assumptions like "this will never happen in production" is something everyone has experienced. It's almost a rite of passage. There is a reason more experienced developers tend to be more cautious, write defensive code, and write lots of tests.
 
-I also have a strong emphasis on testing, and separation of concerns, and keeping things simple and modular. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
+I also have a strong emphasis on testing, separation of concerns, and keeping things simple and modular. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
 
-The first step is to move the validation of of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
+The first step is to move the validation out of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
 
 ```html
 <script>
@@ -260,7 +256,7 @@ export function submitValidator(count) {
 Defensive programming; failing loudly is good.
 \end{center}
 
-Since `submitValidator` is just a plain old JavaScript function, and a pure one at that, it's output is solely dependant on it's inputs. This means writing tests is trivial:
+`submitValidator` is just a plain old JavaScript function. It's also a pure function - it's output is solely dependant on it's inputs. This means writing tests is trivial:
 
 ```js
 describe('submitValidator', () => {
@@ -279,7 +275,7 @@ describe('submitValidator', () => {
 Testing submitValidator in isolation.
 \end{center}
 
-A lot of these problems can be partial mitigated with TypeScript. TypeScript won't give you runtime validation though. If you are using an error logging service (like Sentry), throwing an error like this can give you valuable information for debugging.
+A lot of these type specific validations can be partially mitigated with TypeScript. TypeScript won't give you runtime validation, though. If you are using an error logging service (like Sentry), throwing an error like this can give you valuable information for debugging.
 
 ## With the Composition API 
 

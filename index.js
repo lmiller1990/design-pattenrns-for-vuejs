@@ -1,8 +1,5 @@
 import { createApp } from 'vue'
-// import App from './examples/renderless-password/App.vue'
-import App from './examples/provide-inject/users.vue'
-import { store } from './examples/provide-inject/store.js'
+import Message from './examples/props/message.vue'
 
-const app = createApp(App)
-app.provide('store', store)
+const app = createApp(Message, { variant: 'asdf' })
 app.mount('#app')
