@@ -14,7 +14,7 @@ Consider one of the big ideas behind frameworks like Vue and React:
 Your user interface is a function of your data.
 \end{center}
 
-This idea comes in many forms; another is "data driven interfaces". Basically, your UI should be a function of your data. Given X data, your UI should be Y. In computer science, this is referred to as *determinism*. Another name for this a *pure* system. Take the `sum` function. It is a *pure* function:
+This idea comes in many forms; another is "data driven interfaces". Basically, your user interface (UI) should be determined by the data present. Given X data, your UI should be Y. In computer science, this is referred to as *determinism*. Take this `sum` function for example:
 
 ```js
 function sum(a, b) {
@@ -25,7 +25,7 @@ function sum(a, b) {
 A simple sum function. It's a pure function.
 \end{center}
 
-Given the same value for `a` and `b`, you always get same result. The result is pre-determined. It's *deterministic*. An example of an impure function would be this:
+When called with the same value for `a` and `b`, you always get same result. The result is pre-determined. It's *deterministic*. An example of an impure function would be this:
 
 ```js
 async function fetchUserData(userId) {
@@ -33,16 +33,16 @@ async function fetchUserData(userId) {
 }
 ```
 \begin{center}
-A impure function - it has a side effect. Not ideal, but a necessary evil to get things done.
+A impure function - it has a side effect. Not ideal, but a necessary get things done.
 \end{center}
 
-This is impure because it relies on an external resource: depending on what is in the database, we may get a different result. It's *unpredictable*.
+This is *impure* because it relies on an external resource: depending on what is in the database, we may get a different result. It's *unpredictable*.
 
-So, how does this relate to `props`? Well, if you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, your UI will be deterministic, and since you control the `props`, it's easy to test. 
+So, how does this relate to `props`? Well, if you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
 
 ## The Basics
 
-You can declare props in a few ways. We will work with the `<message>` component in this section.
+You can declare props in a few ways. We will work with the `<message>` component for this example. You can find it under `examples/props/message.vue`.
 
 ```html
 <template>
@@ -51,10 +51,8 @@ You can declare props in a few ways. We will work with the `<message>` component
 
 <script>
 export default {
-  const Message = {
-    // can be 'success', 'warning', 'error'
-    props: ['variant']
-  }
+  // can be 'success', 'warning', 'error'
+  props: ['variant']
 }
 </script>
 ```
@@ -62,13 +60,15 @@ export default {
 Declaring a variant prop with the inferior array syntax.
 \end{center}
 
-I'd recommend avoiding the array of strings syntax. Using the object syntax makes it more understandable. 
+In this example we declare props using the array syntax: `props: ['variant']`. I recommend avoiding the array syntax. Using the object syntax gives the reader more insight into the type of values `variant` can take:
 
 ```js
-props: {
-  variant: {
-    type: String,
-    required: true
+export default {
+  props: {
+    variant: {
+      type: String,
+      required: true
+    }
   }
 }
 ```
@@ -90,13 +90,33 @@ props: {
 A strongly typed variant prop using TypeScript.
 \end{center}
 
-Let's start writing a test. We've specified the `variant` prop is `required`. We should test what happens if they don't provide it, too, though, just be sure. Karma favors defensive programmers.
+In this example, we are working with regular JavaScript, so we cannot specify specific strings for the `variant` props. There are some other patterns we can use, though.
 
-We want to test *inputs* and *outputs* - the `variant` prop is our input, and what is renders is the output. The first test is easy:
+We have specified the `variant` prop is `required`, and we would like to enforce a specific subset of string values that it can receive. Vue allows us to validate props using a `validator` key. It works like this:
+
+```js
+export default {
+  props: {
+    variant: {
+      validator: (val) => {
+        // if we return true, the prop is valid.
+        // if we  return false, a runtime warning will be shown.
+      }
+    }
+  }
+} 
+```
+\begin{center}
+Prop validators are functions; if they do not return true, Vue will show a warning in the console.
+\end{center}
+
+Prop validators are like the `sum` function we talked about earlier. They are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 
+
+Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Vue Test Utils and the `classes()` method:
 
 ```js
 import { mount } from '@vue/test-utils'
-import Message from './Message.vue'
+import Message from './message.vue'
 
 describe('Message', () => {
   it('renders variant correctly when passed', () => {
@@ -114,27 +134,29 @@ describe('Message', () => {
 Testing the prop is applied to the class.
 \end{center}
 
-The next is a little tricky - there is no real graceful way to fail, since we don't have a `default` value for the `variant` prop. What we really want to do is raise an error. For this we can use a `validator`.
+This verifies everything works as expected when a valid `variant` prop is passed to `<message>`. What about when an invalid `variant` is passed? We want to prohibit using the `<message>` component with a valid `variant`. This is a good use case for a `validator`.
 
 ## Adding a Validator
 
 Let's update the `variant` prop to have a simple validator:
 
-```html
-props: {
-  variant: {
-    type: String,
-    required: true,
-    validator: (variant) => {
-      if (!['success', 'warning', 'error'].includes(variant)) {
-        throw Error(
-          `variant is required and must` + 
-          `be either 'success', 'warning' or 'error'.` +
-          `You passed: ${variant}`
-        )
-      }
+```js
+export default {
+  props: {
+    variant: {
+      type: String,
+      required: true,
+      validator: (variant) => {
+        if (!['success', 'warning', 'error'].includes(variant)) {
+          throw Error(
+            `variant is required and must` + 
+            `be either 'success', 'warning' or 'error'.` +
+            `You passed: ${variant}`
+          )
+        }
 
-      return true
+        return true
+      }
     }
   }
 }
@@ -143,15 +165,13 @@ props: {
 If the variant is not valid, we throw an error.
 \end{center}
 
-Now we will get an error if an invalid prop is passed. An alternative would be just to return `false` instead of throwing an error - this will just give you a warning in the console. Personally, I like to my apps to fail loudly when they aren't working properly. 
+Now we will get an error if an invalid prop is passed. An alternative would be just to return `false` instead of throwing an error - this will just give you a warning in the console via `console.warn`. Personally, I like loud and clear errors when a component isn't used correctly, so I chose to throw an error.
 
-How do we test this? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. 
-
-Unlike our previous test, where we asserted against the `class`, this one has little to do with our UI - we already have a test checking if the `variant` prop is bound to the `<div>` correctly. 
+How do we test the validator? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. 
 
 I prefer to test prop validators in isolation. The test run faster, and since validators are generally pure functions, they are easy to test.
 
-First we need to refactor `<message>` a little to separate the validator from the component:
+To allow testing the validator is isolation, we need to refactor `<message>` a little to separate the validator from the component:
 
 ```html
 <template>
@@ -186,11 +206,11 @@ export default {
 Exporting the validator separately to the component.
 \end{center}
 
-Great, `validateVariant` is now exported and easily testable:
+Great, `validateVariant` is now exported separately and easy to test:
 
 ```js
 import { mount } from '@vue/test-utils'
-import Message, { validateVariant } from './Message.vue'
+import Message, { validateVariant } from './message.vue'
 
 describe('Message', () => {
   it('renders variant correctly when passed', () => {
@@ -212,29 +232,29 @@ describe('Message', () => {
 Testing all the cases for the validator.
 \end{center}
 
-This might not seem significant, but it's actually a big improvement. We have complete test coverage, and we can be confident the `<message>` component can only be used with valid a `variant`.
+Simply making the `validateVariant` a separate function that is exported might seem like a small change, but it's actually a big improvement. By doing so, we were able to write tests for `validateVariant` with ease. We can be confident the `<message>` component can only be used with valid a `variant`.
 
 ## Separation of Concerns
 
-You may be wondering; are we *really* testing the `variant` prop here? The answer is no - not really! We added a test for our business logic - our organization only supports three different button types. 
+We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against the `classes()`. The second is for the validator. It tests business logic. 
 
-There is an important distinction here. The first tests, where we use `classes()`, is a UI test; we are verifying that the UI layer is working correctly. 
+To make this more clear, imagine your company specializes in component libraries. You design system specifies support for three message variants: success, warning and error. In this example, we are working on our Vue integration. In the future, you might build React and Angular integration, too. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
 
-The second test, for `variant`, is business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+This distinction is important. When we use Vue Test Utils methods (such as `mount()` and `classes()`) we are verifying that the UI layer is working correctly. The test for `validateVariant` is for our business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
 
 If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this test?". 
 
-In this case, you could absolutely reuse the validator test; this is tied to your business logic. The `classes()` test would have to be rewritten, because React and it's testing libraries have a different API. 
+In this case, you could absolutely reuse the validator test; this is tied to your business logic. The `classes()` test would have to be rewritten, because React and it's testing libraries that have a different API. 
 
-Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change. 
+Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change significantly.
 
-I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. 
+I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. Rewriting the UI means rewriting the business logic.
 
 Understanding the difference between the two, and how to correctly structure your applications is the difference good engineers and great engineers.
 
 ## Another Example
 
-Let's see another example of testing props. This examples uses the `<navbar>` component, which looks like this:
+Let's see another example of testing props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
 
 ```html
 <template>
@@ -257,12 +277,15 @@ export default {
 The navbar component. It has one prop, authenticated. It is false by default.
 \end{center}
 
-Before even seeing the test, it is clear we need *two* tests to cover all the use cases. The reason this is immediately clear is the `authenticated` prop is a `Boolean`, which only has two possible values. The test isn't especially interesting (but the discussion that follows is!):
+Before even seeing the test, it is clear we need *two* tests to cover all the use cases. The reason this is immediately clear is the `authenticated` prop is a `Boolean`, which only has two possible values. The test is not especially interesting (but the discussion that follows is!):
 
 ```js
+import { mount } from '@vue/test-utils'
+import Navbar from './navbar.vue'
+
 describe('navbar', () => {
   it('shows logout when authenticated is true', () => {
-    const wrapper = mount(navbar, {
+    const wrapper = mount(Navbar, {
       props: {
         authenticated: true
       }
@@ -272,14 +295,14 @@ describe('navbar', () => {
   })
 
   it('shows login by default', () => {
-    const wrapper = mount(navbar)
+    const wrapper = mount(Navbar)
 
     expect(wrapper.find('button').text()).toBe('Login')
   })
 })
 ```
 \begin{center}
-Testing the navbar's behavior for all value of authenticated.
+Testing the navbar behavior for all value of authenticated.
 \end{center}
 
 The only thing that changes based on the value of `authenticated` is the button text. Since the `default` value is `false`, we don't need to pass it as in `props` in the second test.
@@ -309,16 +332,16 @@ describe('navbar', () => {
 Concise tests with the factory pattern.
 \end{center}
 
-If you haven't seen it, the *factory* pattern is where you define a function that returns a new instance of something else - usually a class or another function - when called. I named it `navbarFactory` to make it's purpose clear. Real life factories make boxes and shoes. This factory makes `<navbar`> components. Go figure.
+If you haven't seen it before, the *factory* pattern is where you define a function that returns a new instance of something else - usually a class or another function - when called. I named it `navbarFactory` to make it's purpose clear. Real life factories make boxes and shoes. This factory makes `<navbar`> components. Go figure.
 
-Anyway - I like this version of the test better. I also removed the newline between the mounting the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some newlines. This is just my personal approach. What's important is you are writing tests.
+I like this version of the test better. I also removed the new line between the mounting the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space. This is just my personal approach. What's important is you are writing tests.
 
 Although we technically have covered all the cases, I like to add the third case: where `authenticated` is explicitly set to `false`.
 
 ```js
 describe('navbar', () => {
   function navbarFactory(props) {
-    return mount(navbar, {
+    return mount(Navbar, {
       props
     })
   }
@@ -343,13 +366,13 @@ Adding a third test to be explicit.
 
 This, of course, passes. I really like the symmetry the three tests exhibit, showing all three cases in such a concise manner. 
 
-Let's revisit the idea of separation of concerns; is this a UI or business logic? If we moved framework, could we re-use this test? 
+Let's revisit the idea of separation of concerns; is this a UI or business logic test? If we moved framework, could we re-use this test? 
 
 The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this logic is not really part of our core business logic. Nothing to extract.
 
 ## The real test: Does it refactor?
 
-We can do a little sanity check and make sure our tests are not testing implementation details (how things work) but rather, *what things do*, also knows as "inputs and outputs". Remember, our UI is a function of our data - we should be testing that the correct UI is rendered based on the data, and not caring too much about how the logic is actually implemented. 
+We can do a little sanity check and make sure our tests are not testing implementation details. Implementation details refers to *how* something works. When testing, we don't care about the specifics of how something works. Instead, we care about *what it does*, and if it does it correctly. Remember, - we should be testing that we get the expected output based on given inputs. In this case, we want to test that the correct text is rendered based on the data, and not caring too much about how the logic is actually implemented. 
 
 We can validate this by refactoring the `<navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
 
@@ -410,14 +433,14 @@ it('shows login authenticated is true', () => {
 })
 ```
 \begin{center}
-Asserting against the render HTML, not a specific element.
+Asserting against the rendered HTML, not a specific element.
 \end{center}
 
-By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag, which I consider an implementation detail. I understand some people might disagree with this point - `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
+By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag. I understand some people might disagree with this refactor, because `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
 
 In most systems, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. In a more realistic test, you would probably simulate a click event on the element. Whether it's a button or an anchor tag, the same thing should happen - the user is logged out.
 
-This analysis might not be true for every scenario. I think each system is different, and you should do what makes the most sense for your business and application. My preference is to assert against `html` using `toContain()`, rather than using `find` and `text()`.
+This might not be true for every scenario. I think each system is different, and you should do what makes the most sense for your business and application. My preference is usually to assert against `html()` using `toContain()`, rather than using `find()` and `text()`.
 
 ## Conclusion
 
