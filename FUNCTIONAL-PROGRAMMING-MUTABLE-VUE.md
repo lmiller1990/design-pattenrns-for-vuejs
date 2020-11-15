@@ -44,6 +44,19 @@ In other words, `makeMove` needs to receive all required arguments to create a n
 
 This begs the question: if we cannot mutate anything, how do we get anything done? The answer is that the business logic is the *functional core*. We will then write a thin layer, the *imperative shell*, which wraps the functional core, or the business logic, in Vue's reactivity APIs. All mutation will occur in the imperative shell. 
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/functional-core-imperative-shell.jpg}
+  \caption{Functional Core, Imperative Shel}
+  \label{fig}
+\end{figure}
+
+In this diagram the solid white circles represents the "functional core". These are a collection of pure functions that are written in plain JavaScript - no reactivity and no global variables.
+
+The thin layer surrounding the solid circles represents the "imperative shell". In this system, it is the `useTicTacToe` composable - a thin layer written using Vue's reactivity system, marrying the functional business logic and the UI layer.
+
+The solid rectangles on the right represent interactions between the system and the outside world - things like user input, updating the DOM, the response to a HTTP request to a third party system or a push notification.
+
 By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Vue Test Utils - a library designed for this very purpose - to test Vue components.
 
 The final API is going to be the same:
