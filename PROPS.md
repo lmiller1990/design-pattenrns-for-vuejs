@@ -247,13 +247,19 @@ If the developer passes an invalid prop, they get a nice clear message in the co
 
 We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against the `classes()`. The second is for the validator. It tests business logic. 
 
-To make this more clear, imagine your company specializes in component libraries. You design system specifies support for three message variants: success, warning and error. In this example, we are working on our Vue integration. In the future, you might build React and Angular integration, too. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
+To make this more clear, imagine your company specializes in design systems. You have some designers who probably use Figma or Sketch to design things like buttons and messages. 
 
-This distinction is important. When we use Vue Test Utils methods (such as `mount()` and `classes()`) we are verifying that the UI layer is working correctly. The test for `validateVariant` is for our business logic. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+They have decided to support for three message variants: success, warning and error. You are a front-end developer. In this example, you are working on the Vue integration - you will write Vue components that apply specific classes, which use the CSS you receive from the designers. 
 
-If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this test?". 
+In the future, you also need to build React and Angular components using the same CSS and guidelines. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
 
-In this case, you could absolutely reuse the validator test; this is tied to your business logic. The `classes()` test would have to be rewritten, because React and it's testing libraries that have a different API. 
+This distinction is important. When we use Vue Test Utils methods (such as `mount()` and `classes()`) we are verifying that the Vue UI layer is working correctly. The test for `validateVariant` is for our business logic. These differences are sometimes called *concerns*. One piece of code is concerned with the UI. The other is concerned with the business logic. 
+
+Separating them is good. It makes your code easier to test and maintain. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+
+If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this code and test?". 
+
+In this case, you could reuse the validator and it's test when you write the React integration. The validator is concerned with the business logic, and doesn't know anything about the UI framework. Vue or React, we will only support three message variants: success, warning and error. The component and component test (where we assert using `classes()`) would have to be rewritten using a React component and React testing library.
 
 Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change significantly.
 
@@ -263,7 +269,7 @@ Understanding the difference between the two, and how to correctly structure you
 
 ## Another Example
 
-Let's see another example of testing props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
+Enough philosophy for now. Let's see another example of testing props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
 
 ```html
 <template>
@@ -343,7 +349,7 @@ Concise tests with the factory pattern.
 
 If you haven't seen it before, the *factory* pattern is where you define a function that returns a new instance of something else - usually a class or another function - when called. I named it `navbarFactory` to make it's purpose clear. Real life factories make boxes and shoes. This factory makes `<navbar`> components. Go figure.
 
-I like this version of the test better. I also removed the new line between the mounting the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space. This is just my personal approach. What's important is you are writing tests.
+I like this version of the test better. I also removed the new line between the mounting the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space - I think it makes it more readable. This is just my personal approach. The important thing is not your code style, but that you are writing tests.
 
 Although we technically have covered all the cases, I like to add the third case: where `authenticated` is explicitly set to `false`.
 
@@ -375,13 +381,13 @@ Adding a third test to be explicit.
 
 This, of course, passes. I really like the symmetry the three tests exhibit, showing all three cases in such a concise manner. 
 
-Let's revisit the idea of separation of concerns; is this a UI or business logic test? If we moved framework, could we re-use this test? 
+Let's revisit the idea of separation of concerns; is this a UI test or business logic test? If we moved framework, could we re-use this test? 
 
-The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this logic is not really part of our core business logic. Nothing to extract.
+The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this is not really part of our core business logic. Nothing to extract.
 
 ## The real test: Does it refactor?
 
-We can do a little sanity check and make sure our tests are not testing implementation details. Implementation details refers to *how* something works. When testing, we don't care about the specifics of how something works. Instead, we care about *what it does*, and if it does it correctly. Remember, - we should be testing that we get the expected output based on given inputs. In this case, we want to test that the correct text is rendered based on the data, and not caring too much about how the logic is actually implemented. 
+We can do a little sanity check and make sure our tests are not testing implementation details. Implementation details refers to *how* something works. When testing, we don't care about the specifics of how something works. Instead, we care about *what it does*, and if it does it correctly. Remember, we should be testing that we get the expected output based on given inputs. In this case, we want to test that the correct text is rendered based on the data, and not caring too much about how the logic is actually implemented. 
 
 We can validate this by refactoring the `<navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
 
@@ -445,11 +451,11 @@ it('shows login authenticated is true', () => {
 Asserting against the rendered HTML, not a specific element.
 \end{center}
 
-By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag. I understand some people might disagree with this refactor, because `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
+By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag. I understand some people might disagree with this. Technically, `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
 
 In most systems, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. In a more realistic test, you would probably simulate a click event on the element. Whether it's a button or an anchor tag, the same thing should happen - the user is logged out.
 
-This might not be true for every scenario. I think each system is different, and you should do what makes the most sense for your business and application. My preference is usually to assert against `html()` using `toContain()`, rather than using `find()` and `text()`.
+This might not be true for every scenario. I think each system is different, and you should do what makes the most sense for your business and application. My preference is usually to assert against `html()` using `toContain()`, rather than using `find()` and `text()`, but there are cases where this is not the case. There are some examples in later sections illustrating this.
 
 ## Conclusion
 

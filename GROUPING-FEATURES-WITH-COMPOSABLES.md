@@ -66,7 +66,7 @@ Calling `makeMove({ row: 0, col: 1 })` would yield the following board (where `o
 ]
 ```
 
-While we won't do it here, I'd like to have a "history" feature, so we can replay the game and see how things progressed. We will keep this in mind as we develop. Implementing this will be an exercise, and the solution will be included in the final source code.
+While we won't do it here, I'd like to have a "history" feature, so we can replay the game and see how things progressed. We will keep this in mind as we develop. Implementing this will be an exercise, and the solution is included in the final source code.
 
 Finally, we want to consider two potential use cases for the composable. One is to allow many different components to update or access the same game of tic tac toe. Another is to support having many simultaneous games of tic tac toe running at once.
 
@@ -250,11 +250,7 @@ Testing the initial game state.
 
 This does pass, but also reveals some potential issues. Firstly, we want to test our business logic (the game logic, in this case). We had to use `.value` in the test, though, to access the current state of the game. We need `.value` since `currentBoard` is a `computed` property - part of Vue's reactivity system. In other words, the UI layer. 
 
-We have tightly coupled our implementation to Vue. You could not reuse this logic in another framework, like React, for example. This is a relatively simple composable and a coupling I am happy to live with for now, but it's still worth recognizing it and considering the implications this might have in the future, should we decide to move away from Vue.
-
-While moving away from your UI framework, in this case Vue, might seem unlikely, but we thought the same thing about jQuery, Backbone and Angular.js. For this simple example I think this coupling is acceptable. 
-
-If we start to write significantly complex business logic, we may want to consider removing the coupling between the composable and the business logic. In this next chapter, we explore how to reduce coupling between UI and business logic in composables. We also discuss *why* this might be desirable.
+We have tightly coupled our implementation to Vue. You could not reuse this logic in another framework, like React, for example. This is a relatively simple composable and a coupling I am happy to live this coupling with for now, but it's still worth recognizing it and considering the implications this might have in the future. The next chapter will discuss an alternative way to design this composable, and avoid the coupling entirely, We also discuss *why* this might be desirable. 
 
 Back to the current example. There is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing the game. This means we need to implement `makeMove` before writing tests to see if the game has been won, since there is no way to update the board as it stands to test winning or losing scenarios. We can work around this by passing in an initial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
 
@@ -353,7 +349,9 @@ export function useTicTacToe(initialState) {
   const currentPlayer = ref('o')
 
   function makeMove({ row, col }) {
-    const newBoard = JSON.parse(JSON.stringify(boards.value))[boards.value.length - 1]
+    const newBoard = JSON.parse(
+      JSON.stringify(boards.value)
+    )[boards.value.length - 1]
     newBoard[row][col] = currentPlayer.value
     currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
     boards.value.push(newBoard)

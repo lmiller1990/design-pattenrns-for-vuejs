@@ -471,6 +471,7 @@ All the test are still passing, so we can be confident everything still works.
 
 Now anywhere you need access to the store, just call `useStore`. This is the same API Vuex uses. It's a common practice to make global singletons available via a useXXX function, which uses `provide` and `inject` under the hood.
 
+\pagebreak
 ## Exercises
 
 1. Update the store to have a `removeUser` function. Test it in isolation.

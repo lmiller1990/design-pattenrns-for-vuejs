@@ -568,7 +568,7 @@ const content = $slots.find(slot =>
 )
 ```
 \begin{center}
-Finding the active content among the $slots.
+Finding the active content among the slots.
 \end{center}
 
 Finally, we need to change what is returened. Instead of just rendering the tabs, we will render the content as well. Here is the completed `render` function:

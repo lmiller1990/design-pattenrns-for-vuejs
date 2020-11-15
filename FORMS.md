@@ -12,12 +12,12 @@ What exactly is a *good* form?
 
 We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We also need to think about validation. 
 
-In traditional server-rendered apps, you would only get validation after submitting the form - not a great user experience. Vue makes client-side validation trivial. We will make use of this and implement two levels of validation:
+In traditional server-rendered apps, you would only get validation after submitting the form - not a great user experience. Vue allows us to deliver a great user experience by implementing highly dynamic, client-side validation. We will make use of this and implement two levels of validation:
 
 1. Field validation - if a user enters incorrect in invalid data in a single field, we will show an error immediately.
 2. Form validation - the submit button should only be enabled when the entire form is correctly filled out.
 
-Finally, we need two levels of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly and that the user can enter data, see error messages, and correctly submit the form.
+Finally, we need two types of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly and that the user can enter data, see error messages, and correctly submit the form.
 
 \pagebreak
 
@@ -549,7 +549,7 @@ export function patientForm(patient) {
 Implementing patientForm.
 \end{center}
 
-This completes the business logic for the patient form - noticed we haven't written and Vue components yet? That's because we are sticking to one of our goals; *separation of concerns*, and isolating the business logic entirely. 
+This completes the business logic for the patient form - noticed we haven't written and Vue components yet? That's because we are adhering to one of our goals; *separation of concerns*, and isolating the business logic entirely. 
 
 ## Writing the UI Layer
 

@@ -1,4 +1,4 @@
-# Truly Modular Components with v-model
+# Modular Components, v-model, and the Strategy Pattern
 
 You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline

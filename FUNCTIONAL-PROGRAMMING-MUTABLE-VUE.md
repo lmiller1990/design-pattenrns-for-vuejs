@@ -47,7 +47,7 @@ This begs the question: if we cannot mutate anything, how do we get anything don
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./images/functional-core-imperative-shell.jpg}
-  \caption{Functional Core, Imperative Shel}
+  \caption{Functional Core, Imperative Shell. Image Credit: mokagio (Twitter)}
   \label{fig}
 \end{figure}
 
