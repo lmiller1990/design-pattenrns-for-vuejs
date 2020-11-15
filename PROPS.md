@@ -33,12 +33,12 @@ async function fetchUserData(userId) {
 }
 ```
 \begin{center}
-A impure function - it has a side effect. Not ideal, but a necessary get things done.
+A impure function - it has a side effect. Not ideal, but necessary for most systems to do anything useful.
 \end{center}
 
-This is *impure* because it relies on an external resource: depending on what is in the database, we may get a different result. It's *unpredictable*.
+This is *not* a pure function because it relies on an external resource - in this case an API and a database. Depending on what is in the database when it is called, we might get a different result. It's *unpredictable*.
 
-So, how does this relate to `props`? Well, if you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
+How does this relate to `props`? If you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
 
 ## The Basics
 
@@ -90,7 +90,7 @@ props: {
 A strongly typed variant prop using TypeScript.
 \end{center}
 
-In this example, we are working with regular JavaScript, so we cannot specify specific strings for the `variant` props. There are some other patterns we can use, though.
+In our `<message>` example, we are working with regular JavaScript, so we cannot specify specific strings for the `variant` props like you can in TypeScript. There are some other patterns we can use, though.
 
 We have specified the `variant` prop is `required`, and we would like to enforce a specific subset of string values that it can receive. Vue allows us to validate props using a `validator` key. It works like this:
 
@@ -107,7 +107,7 @@ export default {
 } 
 ```
 \begin{center}
-Prop validators are functions; if they do not return true, Vue will show a warning in the console.
+Prop validators are functions. If they return false, Vue will show a warning in the console.
 \end{center}
 
 Prop validators are like the `sum` function we talked about earlier. They are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 

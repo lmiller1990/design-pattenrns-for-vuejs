@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import Message from './examples/props/message.vue'
+import App from './examples/composition-functional/tic-tac-toe-app.vue'
 
-const app = createApp(Message, { variant: 'asdf' })
+const app = createApp(App)
 app.mount('#app')

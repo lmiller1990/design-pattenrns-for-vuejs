@@ -374,9 +374,16 @@ Implementing makeMove.
 
 This gets the test to pass. As mentioned above we are using the somewhat dirty `JSON.parse(JSON.stringify(...))` to clone the board and lose reactivity. I want to get *non reactive* copy of the board - just a plain JavaScript array. Somewhat surprisingly, `[...boards.value[boards.value.length - 1]]` does not work - the new object is still reactive and updates when the source array is mutated. This means we are mutating the game history in `boards`! Not ideal. 
 
-I would like to find a cleaner way to do this, and will update this section when I do. If you know a better way of getting a non-reactive copy of a `ref`, please let me know.
+What you would need to do is this:
 
-Either way, this works fine for now. Let's update the usage:
+```js
+const newState = [...boards.value[boards.value.length - 1]]
+const newRow = [...newState[row]];
+```
+
+This works - `newRow` is now a plain, non-reactive JavaScript array. I don't think it's immediately what is going on, however - you need to know Vue really well to understand why it's necessary. On the other hand, I think the `JSON.parse(JSON.stringify(...))` technique is actually a little more obvious - most developers have seen this at some point or another.
+
+You can pick whichever you like best. Let's continue by updating the usage:
 
 ```html
 <template>

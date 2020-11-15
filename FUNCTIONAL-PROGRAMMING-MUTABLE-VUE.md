@@ -28,11 +28,16 @@ On line 3, we mutation the `newBoard` variable. We then mutates `boards` on line
 
 ```ts
 type Board = string[][]
+type Options {
+  col: number
+  row: number
+  counter: 'o' | 'x'
+}
 
-function makeMove(board, col, row, counter): Board
+function makeMove(board: Board, { col, row, counter }: Options): Board
 ```
 \begin{center}
-The new makeMove will return an updated board.
+The new makeMove will return an updated board based on it's arguments.
 \end{center}
 
 In other words, `makeMove` needs to receive all required arguments to create a new board, and should return a new board. This makes it pure; the return value is determined exclusively by the inputs.
@@ -148,11 +153,8 @@ Let's start with a verbose implementation. Since we do not want to mutate anythi
 
 ```js
 export function makeMove(board, { col, row, counter }) {
-  //  make a copy. Don't mutation the arguments!
-  const copy = [...board]
-
-  // loop each row with map.
-  return copy.map((theRow, rowIdx) => {
+  // loop each row with map. 
+  return board.map((theRow, rowIdx) => {
     
     // for each row, loop each column with map.
     return theRow.map((cell, colIdx) => {
@@ -181,8 +183,8 @@ export function makeMove(board, { col, row, counter }) {
   return board.map((theRow, rowIdx) =>
     theRow.map((cell, colIdx) => 
       rowIdx === row && colIdx === col
-      ? counter
-      : cell
+        ? counter
+        : cell
     )
   )
 }
@@ -195,7 +197,7 @@ We avoided making a new variable by just returning the result of `board.map`. We
 
 ## Vue Integration - Imperative Shell
 
-All of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless; all the values required are received as arguments. We do need some state somewhere, as well as some mutation to do anything; that comes in the form of Vue's reactivity.
+Most of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless. All the values required are received as arguments. We do need some persisted state somewhere, as well as some mutation to do anything; that comes in the form of Vue's reactivity - the *imperative shell*.
 
 Let's start with the composable, `useTicTacToe()`, and get something rendering:
 
@@ -302,7 +304,7 @@ const move = ({ col, row }) => {
 move is just a wrapper around the functional `makeMove`.
 \end{center}
 
-That's it! Everything now works in it's functional, loosely coupled, immutable glory.
+Everything now works in it's functional, loosely coupled, immutable glory.
 
 \begin{figure}[H]
   \centering
@@ -315,7 +317,7 @@ From a user point of view, nothing has changed, and we can verify this by reusin
 
 ```js
 import { mount } from '@vue/test-utils'
-import { createGame  } from './tic-tac-toe.js'
+import TicTacToeApp from './tic-tac-toe-app.vue'
 
 describe('TicTacToeApp', () => {
   it('plays a game', async () => {
@@ -334,6 +336,84 @@ describe('TicTacToeApp', () => {
 \begin{center}
 The UI test from previous section, ensuring the behavior has not changed.
 \end{center}
+
+## Pushing Business Logic into the Functional Core
+
+There is one last improvement we can make. We currently wrap the stateless `makeMove` function:
+
+```js
+const move = ({ col, row }) => {
+  const newBoard = makeMove(
+    currentBoard.value,
+    {
+      col,
+      row,
+      counter: counter.value
+    }
+  )
+  boards.value.push(newBoard)
+  counter.value = counter.value === 'o' ? 'x' : 'o'
+}
+```
+
+Ideally all the business logic should be in the functional core. This includes changing the counter after each move. I think this is part of the core gameplay - not the UI. For this reason I would like to push `counter.value = counter.value === 'o' ? 'x' : 'o'` into the functional core.
+
+Update `makeMove` to change the counter after updating the board, and return an object representing the new board as well as the updated counter:
+
+```js
+export function makeMove(board, { col, row, counter }) {
+  const newBoard = board.map((theRow, rowIdx) =>
+    // ...
+  )
+  const newCounter = counter === 'o' ? 'x' : 'o'
+
+  return {
+    newBoard,
+    newCounter
+  }
+}
+```
+
+Now `makeMove` handles updating the counter, as well as the board. Update `move` to use the new return value:
+
+```js
+const move = ({ col, row }) => {
+  const { newBoard, newCounter } = makeMove(
+    currentBoard.value,
+    {
+      col,
+      row,
+      counter: counter.value
+    }
+  )
+  boards.value.push(newBoard)
+  counter.value = newCounter
+}
+``` 
+
+Finally, since we changed the return value, the `makeMove` test needs an update (the UI test using Vue Test Utils still passes, since the actual behavior from the user's point of view has not changed):
+
+```js
+describe('makeMove', () => {
+  it('returns a new updated board and counter', () => {
+    const board = createGame(initialBoard)
+    const { newBoard, newCounter } = makeMove(board, {
+      row: 0, 
+      col: 0, 
+      counter: 'o'
+    })
+
+    expect(newCounter).toBe('x')
+    expect(newBoard).toEqual([
+      ['o', '-', '-'],
+      ['-', '-', '-'],
+      ['-', '-', '-']
+    ])
+  })
+})
+```
+
+All the tests are now passing. I think this refactor is a good one; we pushed the business logic into the functional core, where it belongs.
 
 ## Reflections and Philosophy
 
