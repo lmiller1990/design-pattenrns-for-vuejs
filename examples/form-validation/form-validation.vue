@@ -21,7 +21,7 @@
         </select>
       </div>
       <div class="field">
-        <button :disabled="!valid">Submit</button>
+        <button :disabled="!valid || submitted">Submit</button>
       </div>
     </form>
     <div>
@@ -39,7 +39,8 @@ Form State
 </template>
 
 <script>
-import { reactive, computed, ref } from 'vue'
+import axios from 'axios'
+import { reactive, computed, ref, watch } from 'vue'
 import { patientForm, isFormValid } from './form.js'
 
 export default {
@@ -52,12 +53,51 @@ export default {
       }
     })
 
+    const serverValidation = reactive({
+      name: { valid: true },
+      weight: { valid: true }
+    })
+
+    const submitted = ref(false)
+    watch(form, () => {
+      submitted.value = false
+    })
+
     const validatedForm = computed(() => {
+      if (submitted.value) {
+        return serverValidation
+      }
       return patientForm(form)
     })
 
-    const submit = () => {
-      emit('submit', { patient: form })
+    const submit = async () => {
+      class ApiError extends Error {
+        constructor(message) {
+          super(message)
+          this.response = {
+            status: 400,
+            data: [
+              { field: 'name', error: 'Name already exists' }
+            ]
+          }
+        }
+      }
+
+      try {
+        submitted.value = true
+        const delay = () => new Promise(res => setTimeout(res, 1000))
+        await delay()
+        throw new ApiError()
+      } catch (e) {
+        if (e.response.status === 400) {
+          for (const { field, error } of e.response.data) {
+            serverValidation[field] = {
+              valid: false,
+              message: error
+            }
+          }
+        }
+      } 
     }
 
     const valid = computed(() => isFormValid(validatedForm.value))
@@ -65,6 +105,7 @@ export default {
     return {
       form,
       validatedForm,
+      submitted,
       submit,
       valid,
     }
