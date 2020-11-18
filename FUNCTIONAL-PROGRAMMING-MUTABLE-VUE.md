@@ -8,15 +8,17 @@ ______
 
 In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We consciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
 
-In this chapter, we will explore an paradigm best characterized as "functional core, imperative shell". We will refactor the Tic Tic Toe logic to be purely functional, avoiding all mutation. This will be decoupled from Vue's reactivity system, which relies on mutation and side effects, something the functional paradigm avoids. 
+In this chapter, we will explore an paradigm best characterized as "functional core, imperative shell". We will come back to this name and explain what it means soon.
 
-*Immutability* is the name of the game here. In our previous implementation, `makeMove` looks like this:
+The goal is to refactor the Tic Tic Toe logic to be more in line with the functional programming paradigm - this means pure functions and no mutation. Since we are avoiding mutation, this mean we will decoupled the logic from Vue's reactivity system, which relies on mutation and side effects.
+
+Let's start with `makeMove`, which is full of mutation. In our previous implementation, `makeMove` looks like this:
 
 ```js
 function makeMove({ row, col }) {
   const newBoard = [...boards.value[boards.value.length - 1]]
   newBoard[row][col] = currentPlayer.value
-  currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
+  currentPlayer.value  = currentPlayer.value === 'o' ?  x' : 'o'
   boards.value.push(newBoard)
 }
 ```
@@ -24,7 +26,7 @@ function makeMove({ row, col }) {
 Original makeMove implemented using mutation.
 \end{center}
 
-On line 3, we mutation the `newBoard` variable. We then mutates `boards` on line 4, by pushing a new value in. In addition to this mutation, we are also using two global variables: `boards` and `currentPlayer`. If we want to approach in a functional manner, the function needs to have the following signature:
+On line 3, we mutation the `newBoard` variable. We then mutate `boards` on line 4, by pushing a new value in. We are also using two global variables: `boards` and `currentPlayer`. If we want to approach this in a functional manner, the function needs include all the required data as arguments, and not rely on global variables. If we rely on global variables, the function will no longer be deterministic (we won't be able to know the return value without knowing the value of the global variables. This means `makeMove` needs to have the following signature:
 
 ```ts
 type Board = string[][]
@@ -42,7 +44,11 @@ The new makeMove will return an updated board based on it's arguments.
 
 In other words, `makeMove` needs to receive all required arguments to create a new board, and should return a new board. This makes it pure; the return value is determined exclusively by the inputs.
 
-This begs the question: if we cannot mutate anything, how do we get anything done? The answer is that the business logic is the *functional core*. We will then write a thin layer, the *imperative shell*, which wraps the functional core, or the business logic, in Vue's reactivity APIs. All mutation will occur in the imperative shell. 
+You may be wondering: if we cannot mutate anything, how do we get anything done? How will we update the UI?
+
+## Functional Core, Imperative Shell
+
+The answer is that while we only avoid mutation in the business logic. This is the "functional core" part of the paradigm. All side effects, mutation and unpredictable actions, such as updating the DOM and listening for user input will be handled in a thin layer. This thin layer is the  *imperative shell* part of the paradigm. The imperative shell wraps the functional core (the business logic) with Vue's reactivity APIs. All mutation will occur in the imperative shell. 
 
 \begin{figure}[H]
   \centering
@@ -51,13 +57,13 @@ This begs the question: if we cannot mutate anything, how do we get anything don
   \label{fig}
 \end{figure}
 
-In this diagram the solid white circles represents the "functional core". These are a collection of pure functions that are written in plain JavaScript - no reactivity and no global variables.
+In this diagram the solid white circles represents the "functional core". These are a collection of pure functions that are written in plain JavaScript - no reactivity and no global variables. This includes methods like the new `makeMove` function we are about to write.
 
 The thin layer surrounding the solid circles represents the "imperative shell". In this system, it is the `useTicTacToe` composable - a thin layer written using Vue's reactivity system, marrying the functional business logic and the UI layer.
 
 The solid rectangles on the right represent interactions between the system and the outside world - things like user input, updating the DOM, the response to a HTTP request to a third party system or a push notification.
 
-By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Vue Test Utils - a library designed for this very purpose - to test Vue components.
+By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Vue Test Utils - a library designed for this very purpose - to test Vue components. We won't need too many tests, since all the complexity and edge cases will be covered in the functional core tests.
 
 The final API is going to be the same:
 
@@ -79,7 +85,7 @@ export default {
 Final API does not change - only the implementation details.
 \end{center}
 
-## Core Logic - The Functional Core
+## Business Logic - The Functional Core
 
 Let's start with the functional core, starting with a `createGame` function:
 
@@ -142,7 +148,7 @@ Before going any further, a test will be useful. I'm going to write a verbose im
 
 ```js
 describe('makeMove', () => {
-  it('returns a new updaed board', () => {
+  it('returns a new updated board', () => {
     const board = createGame()
     const updatedBoard = makeMove(board, {
       row: 0, 
@@ -162,7 +168,7 @@ describe('makeMove', () => {
 A test to guide us.
 \end{center}
 
-Let's start with a verbose implementation. Since we do not want to mutate anything, we are going to create a copy of the game state. Then we will `map` each row. In each row, we will `map` each column, and when we find the row and column the user has chosen, we will update the cell.
+Let's start with a verbose implementation. We will use `map` to iterate over each row. For each row, we will `map` each column. If we encounter the row and column the user has chosen, we will update the cell. Otherwise, we just return the current cell.
 
 ```js
 export function makeMove(board, { col, row, counter }) {
@@ -187,9 +193,9 @@ export function makeMove(board, { col, row, counter }) {
 A verbose and heavily commented makeMove.
 \end{center}
 
-The test passes! I left some comments to make it clear what's going on. If you haven't seen this type of code before, it can be a little difficult to understand - it was for me. Once I got used to using tools like `map` and `reduce` instead of a for loop and mutation, I started to find this style of code more concise, and also less prone to bugs.
+The test passes! I left some comments to make it clear what's going on. If you haven't seen this type of code before, it can be a little difficult to understand - it was for me. Once I got used to using tools like `map` and `reduce` instead of a for loop and mutation, I started to find this style of code more concise, and more importantly, less prone to bugs.
 
-We can make this a lot more concise! This is optional; there is some merit to verbose, explicit code too. Let's see the concise version, and you can make a decision which one you think is more readable.
+We can make this a lot more concise! This is optional; there is some merit to verbose, explicit code too. Let's see the concise version. You can make a decision which one you think is more readable.
 
 ```js
 export function makeMove(board, { col, row, counter }) {
@@ -206,11 +212,11 @@ export function makeMove(board, { col, row, counter }) {
 Functional code can be very concise. Careful - readability can suffer.
 \end{center}
 
-We avoided making a new variable by just returning the result of `board.map`. We also remove the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. The test still passes, so we are good. I think both implementations are fine; pick the one that you like best.
+We avoided making a new variable by returning the result of `board.map`. We also removed the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. The test still passes, so we can be confident the refactor was successfully. I think both implementations are fine; pick the one that you like best.
 
 ## Vue Integration - Imperative Shell
 
-Most of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless. All the values required are received as arguments. We do need some persisted state somewhere, as well as some mutation to do anything; that comes in the form of Vue's reactivity - the *imperative shell*.
+Most of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless. All the values required are received as arguments. We do need some persisted state somewhere, as well as some mutation to update the DOM; that comes in the form of Vue's reactivity - the *imperative shell*.
 
 Let's start with the composable, `useTicTacToe()`, and get something rendering:
 
@@ -369,7 +375,7 @@ const move = ({ col, row }) => {
 }
 ```
 
-Ideally all the business logic should be in the functional core. This includes changing the counter after each move. I think this is part of the core gameplay - not the UI. For this reason I would like to push `counter.value = counter.value === 'o' ? 'x' : 'o'` into the functional core.
+Ideally all the business logic should be in the functional core. This includes changing the counter after each move. I think this is part of the core gameplay - not the UI. For this reason I would like to move `counter.value === 'o' ? 'x' : 'o'` into the functional core.
 
 Update `makeMove` to change the counter after updating the board, and return an object representing the new board as well as the updated counter:
 
@@ -404,7 +410,7 @@ const move = ({ col, row }) => {
 }
 ``` 
 
-Finally, since we changed the return value, the `makeMove` test needs an update (the UI test using Vue Test Utils still passes, since the actual behavior from the user's point of view has not changed):
+Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Vue Test Utils still passes, since the actual behavior from the user's point of view has not changed):
 
 ```js
 describe('makeMove', () => {
@@ -430,18 +436,20 @@ All the tests are now passing. I think this refactor is a good one; we pushed th
 
 ## Reflections and Philosophy
 
-This section explores what I consider to be the difference between really good developers who write highly maintainable, robust code and those who do not; effective separation of concerns. 
+This section explores concepts that I think separates greate developers from everyone else. Separation of concerns is really about understanding what a function should do, and where to draw the lines between the different parts of a system.
 
 There are some easy ways to see if you are separating your Vue UI logic from your business logic, or in a more general sense, your imperative shell from your functional core: 
 
 - are you accessing Vue reactivity APIs in your business logic? This usually comes in the form of `.value` for accessing the values of `computed` and `ref`.
 - are you relying on global or pre-defined state?
 
-This also prompts another question: what and how should we be testing in our functional core and imperative shell? In the previous section, we tested both in one go - they were so tightly coupled together, so this was the natural way to test them. This worked out fine, however, we still needed to write some UI tests with Vue Test Utils (which was left as an exercise), which meant we were testing a lot of logic twice - in the `useTicTacToe` composable tests and the UI tests.
+This also prompts another question: what and how should we be testing in our functional core and imperative shell? In the previous section, we tested both in one go - they were so tightly coupled together, so this was the natural way to test them. This worked out fine for that very simple composable, but can quickly become complex. I like to have lots of tests around my business logic. If you write them like we did here - pure functions - they are very easy to test, and the tests run really quickly.
 
-There is no one true way to write applications. It is also very hard to transition an application from one paradigm to another. I am more and more of the opinion that coupling Vue's reactivity to your composables and business logic is generally not a good idea. 
+When testing the imperative shell (in this case the Vue UI layer using Vue Test Utils) I like to focus on more high level tests from a user point of view - clicking on buttons and asserting the correct text and DOM elements are rendered. The imperative shell doesn't (and shouldn't) know about how the functional core works - these tests focus on asserting the behavior of the application from the user's perspective.
 
-Instead, you should extract your logic into a functional core that is immutable and relies on no shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of the UI - using something like Vue Test Utils. These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
+There is no one true way to write applications. It is also very hard to transition an application from a mutation heavy paradigm to the style discussed in this chapter.. I am more and more of the opinion that coupling Vue's reactivity to your composables and business logic is generally not a good idea - this simple separate makes things a whole lot more easy to reason about, test, and has very little downside (maybe a bit more code, but I don't see this is a big deal).
+
+I think you should extract your logic into a functional core that is immutable and does not rely on shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of this chapter - an test is using something like Vue Test Utils (or a similar UI testing framework). These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
 
 ## Exercises
 
