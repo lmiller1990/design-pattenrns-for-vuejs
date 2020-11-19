@@ -109,7 +109,6 @@ export default {
     password: {
       type: String
     },
-
     confirmation: {
       type: String
     }
@@ -188,7 +187,7 @@ export default {
 password and confirmation are saved in a reactive object.
 \end{center}
 
-The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used `ref`; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
+The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used two `ref`s; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
 
 I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code. It looks like this:
 
@@ -225,13 +224,13 @@ export function calcComplexity(val) {
     return 0
   }
 
-  if (val.length > 10) {
+  if (val.length >= 10) {
     return 3
   }
-  if (val.length > 7) {
+  if (val.length >= 7) {
     return 2
   }
-  if (val.length > 5) {
+  if (val.length >= 5) {
     return 1
   }
 
@@ -382,7 +381,7 @@ test('applies correct class based on complexity', async () => {
 Testing the correct complexity class is included.
 \end{center}
 
-The test application now looks like this:
+The application now looks like this:
 
 \begin{figure}[H]
   \centering
@@ -412,7 +411,6 @@ export default {
       type: Number,
       default: 3
     },
-
     // ... other props ...
   },
 
