@@ -6,9 +6,9 @@ https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
-In this section we discuss a pair of functions, provide and inject. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to this Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. As such, `provide` and `inject` were not as common used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
+In this section we discuss a pair of functions, `provide` and `inject`. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to this Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. For this reason, `provide` and `inject` were not as commonly used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
 
-Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` hook. We will see why `provide` and `inject` are better.
+Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` function, for example simply importing and exporting a global singleton. We will see why `provide` and `inject` are a better way of sharing a global variable.
 
 \begin{figure}[H]
   \centering
@@ -80,7 +80,7 @@ export const store = new Store({
 })
 ```
 \begin{center}
-Exporting the store as a "global singleton" with some initial state.
+Exporting the store as a global singleton with some initial state.
 \end{center}
 
 Next, import it into your component and iterate over the users:
@@ -148,11 +148,11 @@ describe('store', () => {
 UI test with Vue Test Utils.
 \end{center}
 
-Working great! We do not want to hard code any users in the store, though. Let's add a feature to create new users via a form, and them that way.
+Working great! We do not want to hard code any users in the store, though. This highlights one of the downsides of a global singleton - no easy way to initialize or update the state for testing purposes. Let's add a feature to create new users via a form, and them that way.
 
 ## Adding a users forms
 
-To add a user, we will first add a `addUser` function to the store:
+To add a user, we will first create a `addUser` function to the store:
 
 ```js
 import { reactive, readonly } from 'vue'
@@ -175,7 +175,7 @@ export const store = new Store({
 addUser can access the private state because it is declared in the Store class.
 \end{center}
 
-I also removed the initial user, Alice, from the store. Update the tests - we add one for `addUser` in isolation.
+I also removed the initial user, Alice, from the store. Update the tests - we can test `addUser` in isolation.
 
 ```js
 describe('store', () => {
@@ -265,7 +265,7 @@ Great! The test now passes - again, I added a tiny bit of CSS and a nice title, 
 
 Everything looks to be working on the surface, but we will eventually run into a problem as our application grows: shared state across tests. We have a *single* store instance for all of our tests - when we mutate the state, this change will impact all the other tests, too.
 
-Ideally, tests should run in isolation. We can't isolate the store if we are importing the same global singleton into each of our tests. This is where `provide` and `inject` come in handy.
+Ideally each test should run in isolation. We can't isolate the store if we are importing the same global singleton into each of our tests. This is where `provide` and `inject` come in handy.
 
 This diagram, taken from this official documentation, explains it well:
 
@@ -295,7 +295,7 @@ export default {
 </script>
 ```
 
-We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `child.vue` might look like this:
+We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `Child.vue` might look like this:
 
 ```html
 <template>
@@ -338,7 +338,7 @@ Instead of importing the store, we can now just call `const store = inject('stor
 
 ```html
 <template>
-  <!-- .. -->
+  <!-- ... -->
 </templat>
 
 <script>
@@ -430,7 +430,7 @@ export function useStore() {
 }
 ```
 \begin{center}
-A useStore "composable".
+A useStore composable.
 \end{center}
 
 Now update the component:

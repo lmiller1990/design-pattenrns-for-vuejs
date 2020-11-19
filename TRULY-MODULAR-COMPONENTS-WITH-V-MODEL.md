@@ -67,11 +67,9 @@ export default {
 Wrapping `<datetime>` to provide Luxon integration.
 \end{center}
 
-This might work okay - now you can put your `<luxon-date-time>` on npm to share, listing `luxon` as a `peerDependency` in `package.json`. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue` or have a different opinion on the API `<date-time-luxon>` should support. Can we be more flexible ? What about moment? Do we need to make a `<moment-date-time>` component too? 
+This might work okay - now you can put your `<luxon-date-time>` on npm to share, listing `luxon` as a `peerDependency` in `package.json`. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue`, or have a different opinion on the API `<date-time-luxon>` should expose. Can we be more flexible? What about moment? Do we need to make a `<moment-date-time>` component too? 
 
-Another problem is this is a bit difficult to test. You will need to mount the component using something like Vue Test Utils just to test your parsing logic - again, not ideal. Of course we will need some integration tests to make sure it's working correctly, but I don't want to couple my business logic tests (eg, the parsing logic from `updateDate` using pure functions and Jest) to the UI layer tests (using Vue Test Utils).
-
-The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. 
+The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. The `<date-time>` component doesn't need to know the specifics of the DateTime object it is dealing with.
 
 Here is the API I am proposing to make `<date-time>` truly agnostic, not needing to know the implementation details of the date library:
 
@@ -86,7 +84,11 @@ Here is the API I am proposing to make `<date-time>` truly agnostic, not needing
 <datetime> with serialize and deserialize props.
 \end{center}
 
-`date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value. This pattern is generalized as the "strategy" pattern.
+`date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value, which will be some kind of DateTime object. This pattern is generalized as the "strategy" pattern. A textbook definition is as follows:
+
+> In computer programming, the strategy pattern (also known as the policy pattern) is a behavioral software design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of algorithms to use (https://en.wikipedia.org/wiki/Strategy_pattern). The strategy lets the algorithm vary independently from clients that use it.
+
+The key part is the last sentence. We push the onus of selecting the algorithm onto the developer.
 
 A diagram might make this more clear:
 
@@ -103,7 +105,7 @@ If the developer was using Luxon, the workflow would be something like `luxon.Da
 
 ## Foundations of v-model
 
-Before implementing the strategy pattern (`serialize` and `deserialize` functions), let's write the base for `<date-time>`. It will use `v-model`. This means we receive a `modelValue` prop and update the value by emitting a `update:modelValue` event. To keep things simple, I will just use 3 `<input>` elements for the year, month and day.
+Before implementing the strategy pattern (in this example, the `serialize` and `deserialize` functions), let's write the base for `<date-time>`. It will use `v-model`. This means we receive a `modelValue` prop and update the value by emitting a `update:modelValue` event. To keep things simple, I will just use 3 `<input>` elements for the year, month and day.
 
 ```html
 <template>
@@ -190,7 +192,7 @@ export default {
   \label{fig}
 \end{figure}
 
-I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, make reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
+I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, made reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
 
 ## Deserializing for modelValue
 
@@ -204,7 +206,7 @@ interface InternalDateTime {
 }
 ```
 
-We will now work on the `deserialize` prop, which is a function that will convert any object (so a Luxon `DateTime`, a Moment `moment`) into an `InternalDateTime`. This is the representation the `<date-time>` component uses internally.
+We will now work on the `deserialize` prop, which is a function that will convert any object (so a Luxon `DateTime` object, or Moment `Moment` object) into an `InternalDateTime`. This is the representation the `<date-time>` component uses internally.
 
 ## Deserializing modelValue
 
@@ -356,13 +358,15 @@ The main changes are:
 \end{figure}
 \pagebreak
 
+Now would generally be a good time to write a test for the `deserialize` function. Notice I exported it independently of the Vue component, and it does not use the Vue reactivity system. This is intentional. It's a pure function, so it's very easy to test. For brevity, the tests are not shown, but you can find them in the GitHub repository. 
+
 This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
 
 ## Serializing modelValue
 
-We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime` now, not an `InternalDateTime` object, since that is what the developer expects. Remember, the input and output value needs to be of whichever DateTime library the developer is providing. 
+We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime` now, not an `InternalDateTime` object, since that is what the developer expects. Remember, the input and output value needs to be of whichever DateTime library the developer has provided. 
 
-Let's write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime` - `{ year, month, day }`. We will see a more complex example with the moment integration.
+Let's write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime` - `{ year, month, day }`. We will see a more complex example with the Moment integration.
 
 ```js
 export function serialize(value) {
@@ -526,12 +530,24 @@ I just added a check - `if (!asObject)` and return early if the `props.serialize
 
 Now everything works correctly, and `<date-time>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<date-time>` to work.
 
-Adding support for moment is not especially difficult or interesting - it is left as an exercise, and the solution included in the source code.
+Adding support for Moment is not especially difficult or interesting - it is left as an exercise, and the solution included in the source code.
+
+## Deploying
+
+The goal here was to create a highly reusable `<date-time>` component. If I was going to release this on npm, there is a few things I'd do.
+
+1. Remove `serialize` and `deserialize` from the `<date-time>` component and put them into another file. Perhaps one called `strategies.js`.
+2. Write a number of strategies for popular DateTime libraries (Luxon, Moment etc).
+3. Build and bundle the component and strategies separately. 
+
+This will allow developers using tools like webpack or rollup to take advantage of "tree shaking". When they build their final bundle for production, it will only include the `<date-time>` component and the strategy they are using. It will also allow the developer to provide their own more opinionated strategy.
+
+To make the component even more reusable, we could consider writing it as a renderless component, like the one described in chapter 5.
  
 ## Exercises
 
 - We did not add any tests for `serialize` or `deserialize`; they are pure functions, so adding some is trivial. See the source code for some tests.
-- Add support for another date library, like moment. Support for moment is implemented in the source code.
+- Add support for another date library, like Moment. Support for Moment is implemented in the source code.
 - Add hours, minutes, seconds, and AM/PM support.
 - Write some tests with Vue Test Utils; you can use `setValue` to update the value of the `<input>` elements.
 

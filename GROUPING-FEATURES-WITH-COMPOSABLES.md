@@ -20,7 +20,12 @@ The API we will end with looks like this:
 ```js
 export default {
   setup() {
-    const { currentBoard, makeMove } = useTicTacToe()
+    const { 
+      currentBoard, 
+      makeMove,
+      undo,
+      redo
+    } = useTicTacToe()
 
     return {
       makeMove,
@@ -66,9 +71,7 @@ Calling `makeMove({ row: 0, col: 1 })` would yield the following board (where `o
 ]
 ```
 
-While we won't do it here, I'd like to have a "history" feature, so we can replay the game and see how things progressed. We will keep this in mind as we develop. Implementing this will be an exercise, and the solution is included in the final source code.
-
-Finally, we want to consider two potential use cases for the composable. One is to allow many different components to update or access the same game of tic tac toe. Another is to support having many simultaneous games of tic tac toe running at once.
+We will also support undo and redo, so you can go back and see see how the game progressed. Implementing this will be an exercise, and the solution is included in the final source code.
 
 ## Defining the Initial Board
 
@@ -85,7 +88,7 @@ const initialBoard = [
 Initial board.
 \end{center}
 
-Before diving too far into the game logic, let's get something rendering. Remember we want to keep a history of the game? This means instead of mutating the game state, we should just create a new game state for each and push it into an array. We also need the board to be reactive, so Vue will update the UI. We can use `ref` for this. Update the code:
+Before diving too far into the game logic, let's get something rendering. Remember we want to keep a history of the game for undo/redo? This means instead of overriding the current game state each move, we should just create a new game state and push it into an array. Each entry will represent a move in the game. We also need the board to be reactive, so Vue will update the UI. We can use `ref` for this. Update the code:
 
 ```js
 import { ref, readonly } from 'vue'
@@ -248,11 +251,7 @@ describe('useTicTacToe', () => {
 Testing the initial game state.
 \end{center}
 
-This does pass, but also reveals some potential issues. Firstly, we want to test our business logic (the game logic, in this case). We had to use `.value` in the test, though, to access the current state of the game. We need `.value` since `currentBoard` is a `computed` property - part of Vue's reactivity system. In other words, the UI layer. 
-
-We have tightly coupled our implementation to Vue. You could not reuse this logic in another framework, like React, for example. This is a relatively simple composable and a coupling I am happy to live this coupling with for now, but it's still worth recognizing it and considering the implications this might have in the future. The next chapter will discuss an alternative way to design this composable, and avoid the coupling entirely, We also discuss *why* this might be desirable. 
-
-Back to the current example. There is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing the game. This means we need to implement `makeMove` before writing tests to see if the game has been won, since there is no way to update the board as it stands to test winning or losing scenarios. We can work around this by passing in an initial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
+It passes! Great. As it stands, there is no easy way to pre-set the game state - we currently cannot test a scenario where many moves have been played, without actually playing though the game. This means we need to implement `makeMove` before writing tests to see if the game has been won, since there is no way to update the board as it stands to test winning or losing scenarios. This is not ideal. Instead, let's pass in an initial state to `useTicTacToe`, for example `useTicTacToe(initialState)`.
 
 ## Setting an Initial State
 
@@ -307,8 +306,6 @@ A test for initial state.
 
 Notice we pass in `[initialState]` as an array - we are representing the state as an array to preserve the history. This allows us to seed a fully completed game, which will be useful when writing the logic to see if a player has won.
 
-With this refactor, we can seed the initial state. This will be especially useful for testing different scenarios and asserting whether the game has been won or not.
-
 ## Making a Move
 
 The final feature we will add is the ability for a player to make a move. We need to keep track of the current player, and then update the board by pushing the next game state into `boards`. Let's start with a test:
@@ -335,7 +332,17 @@ Testing makeMove.
 
 There isn't anything too surprising here. After making a move, we have two game states (initial and the current one). The current player is now `x` (since `o` goes first). Finally, the `currentBoard` should be updated.
 
-The implementation is quite simple, too. We are using `JSON.parse(JSON.stringify())`, which feels pretty dirty - see below to find out why.
+One thing you should look out for is code like this:
+
+```js
+game.makeMove({ row: 0, col: 0 })
+```
+
+When a function is called without returning anything, it usually means it has a side-effect - for example, mutating some global state. In this case, that is exactly what is happening - `makeMove` mutates the global `board` variable. It's considered global because it is not passed into `makeMove` as an argument. This means the function is not pure - there is no way to know the new state of the game after `makeMove` is called without knowing the previous state.
+
+Another thing I'd like to highlight is that we are accessing `.value` three times - `game.boards.value`, `game.currentPlayer.value` and `game.currentBoard.value`. `.value` is part of Vue's reactivity system. Our tests have revealed we've coupled our business logic (the tic tac toe logic) to our UI layer (in this case, Vue). This is not necessarily bad, but it's something you should always be concious of doing. The next chapter discusses this topic in more depth and suggests an alternative structure to avoid this coupling.
+
+Back to the `makeMove` - now we have a test, let's see the implementation. The implementation is quite simple. We are using `JSON.parse(JSON.stringify())`, which feels pretty dirty - see below to find out why.
 
 ```js
 export function useTicTacToe(initialState) {
@@ -379,7 +386,7 @@ const newState = [...boards.value[boards.value.length - 1]]
 const newRow = [...newState[row]];
 ```
 
-This works - `newRow` is now a plain, non-reactive JavaScript array. I don't think it's immediately what is going on, however - you need to know Vue really well to understand why it's necessary. On the other hand, I think the `JSON.parse(JSON.stringify(...))` technique is actually a little more obvious - most developers have seen this at some point or another.
+This works - `newRow` is now a plain, non-reactive JavaScript array. I don't think it's immediately obvious what is going on, however - you need to know Vue and the reactivity system really well to understand why it's necessary. On the other hand, I think the `JSON.parse(JSON.stringify(...))` technique is actually a little more obvious - most developers have seen this classic way to clone an object at some point or another.
 
 You can pick whichever you like best. Let's continue by updating the usage:
 
@@ -420,15 +427,13 @@ export default {
   \label{fig}
 \end{figure}
 
-That's it! Everything now works in it's functional, immutable glory.
-
-The game is now playable - well, you can make moves. There are several problems:
+That's it! Everything now works. The game is now playable - well, you can make moves. There are several problems:
 
 1. No way to know if a player has won. 
 2. You can make an invalid move (for example, going on a square that is already taken). 
-3. We did not implement undo/redo.
+3. Did not implement undo/redo.
 
-Fixing/implementing these is not very difficult and will be left as an exercise. You can find the solutions in the source code. Undo/redo is probably the most interesting one - you should try and implement this yourself before looking at the answers.
+Fixing/implementing these is not very difficult and will be left as an exercise. You can find the solutions in the source code. Undo/redo is probably the most interesting one - you should try and implement this yourself before looking at the solutions.
 
 ## Conclusion
 
