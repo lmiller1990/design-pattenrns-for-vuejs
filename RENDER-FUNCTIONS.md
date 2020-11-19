@@ -376,9 +376,9 @@ const Comp = {
 A more complex example of a render function with h.
 \end{center}
 
-We are using `h` to render our tabs - `h(tab)` - where `tab` is a `VNode`, which in turn has a render function that returns `h`. What is `h`? It is derived from the term "hyperscript", which in turn owes its roots to `HTML` - specifically the `H`, which is stands for *hyper*. `h` is shorter, and easier to type. It can be thought of as "a JavaScript function that creates HTML structures`.
+We are using `h` to render our tabs - `h(tab)` - where `tab` is a `VNode`, which in turn has a render function that returns `h`. What is `h`? It is derived from the term "hyperscript", which in turn owes its roots to `HTML` - specifically the `H`, which is stands for *hyper*. `h` is shorter, and easier to type. It can be thought of as "a JavaScript function that creates HTML structures".
 
-It has quite a few overloads - ways to use it. For example, a minimal usage would be:
+It has quite a few overloads. For example, a minimal usage would be:
 
 ```js
 const el = h('div')
@@ -414,7 +414,7 @@ The third argument is the children.
 Which renders:
 
 ```html
-<div class="tab" foo="bar>
+<div class="tab" foo="bar">
   Content
 </div>
 ```
@@ -444,7 +444,7 @@ Children can be plain text or VNodes.
 I spread it out to make it more readable. `render` functions using `h` can get messy - you need to be displined. Some tips will follow relating to this. Ths above call to `h` gives us:
 
 ```html
-<div class="tab" foo="bar>
+<div class="tab" foo="bar">
   <span>Hello world!</span>
 </div>
 ```
@@ -629,7 +629,7 @@ It works!
 
 ## Testing Render Function Components
 
-Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hook).
+Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hood).
 
 ```js
 import { mount } from '@vue/test-utils'
