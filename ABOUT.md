@@ -10,7 +10,7 @@ Lachlan's website: https://lachlan-miller.me.
 Lachlan's YouTube channel: https://www.youtube.com/c/LachlanMiller.
 Lachlan's Udemy Profile: https://www.udemy.com/instructor/profile/basic-information/.
 
-## About the Book
+# About the Book
 
 This book is written using Vue.js 3, the latest version of Vue.js. It is aimed at developers who are comfortable with JavaScript and Vue.js. It focuses on ideas and patterns rather than specific APIs. Separation of concerns, pure functions and writing for testability and re-usability are some of the primary motifs.
 
