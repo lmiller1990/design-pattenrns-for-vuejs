@@ -476,6 +476,17 @@ Everything works! And we can easily move elements around to change the look and 
   \label{fig}
 \end{figure}
 
+Just for fun, I tried making an alternative UI. All I had to do was move around some markup:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{./images/renderless-password/ss-alt.png}
+  \caption{Completed Password Complexity Component}
+  \label{fig}
+\end{figure}
+
+See what else you can come up with. I think there is a lot of room for innovation with the renderless component pattern. There is at least one project using this pattern, Headless UI - check it out for more inspiration: https://headlessui.dev/.
+
 ## Exercises
 
 This section intentionally omitted writing tests to focus on the concepts. Several techniques regarding tests were mentioned. For practice, try to write the following tests (find the solutions in the source code):
