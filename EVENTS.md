@@ -18,8 +18,8 @@ This example starts with the Options API; we will eventually refactor at the Com
 
 ```html
 <template>
-  <button id="increment" @click="count += 1" />
-  <button id="submit" @click="$emit('submit', count)" />
+  <button role="increment" @click="count += 1" />
+  <button role="submit" @click="$emit('submit', count)" />
 </template>
 
 <script>
@@ -38,27 +38,26 @@ A simple counter component.
 
 There are two buttons. One increments the `count` value by 1. The other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
 
-As with the other examples, this one uses Vue Test Utils, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
+As with the other examples, this one uses Testing Library, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
 
 ```js
-import { mount } from '@vue/test-utils'
-import Counter from './counter.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
+import Counter, { submitValidator } from './counter.vue'
 
 describe('Counter', () => {
   it('emits an event with the current count', async () => {
-    const wrapper = mount(Counter) 
-    await wrapper.find('#increment').trigger('click')
-    await wrapper.find('#submit').trigger('click')
-
-    console.log(wrapper.emitted())
+    const { emitted } = render(Counter) 
+    await fireEvent.click(screen.getByRole('increment'))
+    await fireEvent.click(screen.getByRole('submit'))
+    console.log(emitted())
   })
 })
 ```
 \begin{center}
-Observing the emitted events with wrapper.emitted().
+Observing the emitted events with emitted().
 \end{center}
 
-I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Vue Test Utils. If you run the test, the console output is as follows:
+I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
 
 ```json
 { 
@@ -88,17 +87,17 @@ Let's add an assertion, before we get onto the main topic: patterns and practice
 \pagebreak
 
 ```js
-import { mount } from '@vue/test-utils'
-import Counter from './counter.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
+import Counter, { submitValidator } from './counter.vue'
 
 describe('Counter', () => {
   it('emits an event with the current count', async () => {
-    const wrapper = mount(Counter) 
+    const { emitted } = render(Counter) 
 
-    await wrapper.find('#increment').trigger('click')
-    await wrapper.find('#submit').trigger('click')
+    await fireEvent.click(screen.getByRole('increment'))
+    await fireEvent.click(screen.getByRole('submit'))
 
-    expect(wrapper.emitted().submit[0]).toEqual([1])
+    expect(emitted().submit[0]).toEqual([1])
   })
 })
 ```
@@ -112,8 +111,8 @@ Templates can often get chaotic among passing props, listening for events and us
 
 ```html
 <template>
-  <button id="increment" @click="increment" />
-  <button id="submit" @click="submit" />
+  <button role="increment" @click="increment" />
+  <button role="submit" @click="submit" />
 </template>
 
 <script>
@@ -287,8 +286,8 @@ Let's see the refactor:
 
 ```html
 <template>
-  <button id="increment" @click="increment" />
-  <button id="submit" @click="submit" />
+  <button role="increment" @click="increment" />
+  <button role="submit" @click="submit" />
 </template>
 
 <script>
