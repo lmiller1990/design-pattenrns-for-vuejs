@@ -112,21 +112,21 @@ Prop validators are functions. If they return false, Vue will show a warning in 
 
 Prop validators are like the `sum` function we talked about earlier. They are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 
 
-Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Vue Test Utils and the `classes()` method:
+Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Testing Library and the `classList` attribute:
 
 ```js
-import { mount } from '@vue/test-utils'
-import Message from './message.vue'
+import { render, screen } from '@testing-library/vue'
+import Message, { validateVariant } from './Message.vue'
 
 describe('Message', () => {
   it('renders variant correctly when passed', () => {
-    const wrapper = mount(Message, {
+    const { container } = render(Message, {
       props: {
         variant: 'success'
       }
     })
 
-    expect(wrapper.classes()).toContain('success')
+    expect(container.firstChild.classList).toContain('success')
   })
 })
 ```
@@ -209,7 +209,7 @@ Exporting the validator separately to the component.
 Great, `validateVariant` is now exported separately and easy to test:
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen } from '@testing-library/vue'
 import Message, { validateVariant } from './message.vue'
 
 describe('Message', () => {
@@ -253,7 +253,7 @@ They have decided to support for three message variants: success, warning and er
 
 In the future, you also need to build React and Angular components using the same CSS and guidelines. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
 
-This distinction is important. When we use Vue Test Utils methods (such as `mount()` and `classes()`) we are verifying that the Vue UI layer is working correctly. The test for `validateVariant` is for our business logic. These differences are sometimes called *concerns*. One piece of code is concerned with the UI. The other is concerned with the business logic. 
+This distinction is important. When we use Testing Library methods (such as `render`) and DOM APIs (like `classList`) we are verifying that the Vue UI layer is working correctly. The test for `validateVariant` is for our business logic. These differences are sometimes called *concerns*. One piece of code is concerned with the UI. The other is concerned with the business logic. 
 
 Separating them is good. It makes your code easier to test and maintain. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
 
@@ -295,24 +295,24 @@ The navbar component. It has one prop, authenticated. It is false by default.
 Before even seeing the test, it is clear we need *two* tests to cover all the use cases. The reason this is immediately clear is the `authenticated` prop is a `Boolean`, which only has two possible values. The test is not especially interesting (but the discussion that follows is!):
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen } from '@testing-library/vue'
 import Navbar from './navbar.vue'
 
 describe('navbar', () => {
   it('shows logout when authenticated is true', () => {
-    const wrapper = mount(Navbar, {
+    render(Navbar, {
       props: {
         authenticated: true
       }
     })
 
-    expect(wrapper.find('button').text()).toBe('Logout')
+    screen.getByText('Logout')
   })
 
   it('shows login by default', () => {
-    const wrapper = mount(Navbar)
+    render(Navbar)
 
-    expect(wrapper.find('button').text()).toBe('Login')
+    screen.getByText('Login')
   })
 })
 ```
@@ -322,41 +322,41 @@ Testing the navbar behavior for all value of authenticated.
 
 The only thing that changes based on the value of `authenticated` is the button text. Since the `default` value is `false`, we don't need to pass it as in `props` in the second test.
 
-What if we refactored this using the factory pattern?
+We can refactor a little with a `renderNavbar` function:
 
 ```js
-describe('navbar', () => {
-  function navbarFactory(props) {
-    return mount(navbar, {
+describe('Navbar', () => {
+  function renderNavbar(props) {
+    render(Navbar, {
       props
     })
   }
 
   it('shows login authenticated is true', () => {
-    const wrapper = navbarFactory({ authenticated: true })
-    expect(wrapper.find('button').text()).toBe('Logout')
+    renderNavbar({ authenticated: true })
+    screen.getByText('Logout')
   })
 
   it('shows logout by default', () => {
-    const wrapper = navbarFactory()
-    expect(wrapper.find('button').text()).toBe('Login')
+    renderNavbar()
+    screen.getByText('Login')
   })
 })
 ```
 \begin{center}
-Concise tests with the factory pattern.
+More concise tests.
 \end{center}
 
-If you haven't seen it before, the *factory* pattern is where you define a function that returns a new instance of something else - usually a class or another function - when called. I named it `navbarFactory` to make it's purpose clear. Real life factories make boxes and shoes. This factory makes `<navbar`> components. Go figure.
+I like this version of the test better. It might seem a little superficial for such a simple test, but as your components become more complex, having a function to abstract away some of the complexity can make your tests more readable. 
 
-I like this version of the test better. I also removed the new line between the mounting the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space - I think it makes it more readable. This is just my personal approach. The important thing is not your code style, but that you are writing tests.
+I also removed the new line between the rendering the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space - I think it makes it more readable. This is just my personal approach. The important thing is not your code style, but that you are writing tests.
 
 Although we technically have covered all the cases, I like to add the third case: where `authenticated` is explicitly set to `false`.
 
 ```js
 describe('navbar', () => {
-  function navbarFactory(props) {
-    return mount(Navbar, {
+  function renderNavbar(props) {
+    render(Navbar, {
       props
     })
   }
@@ -370,8 +370,8 @@ describe('navbar', () => {
   })
 
   it('shows login when authenticated is false', () => {
-    const wrapper = navbarFactory({ authenticated: false })
-    expect(wrapper.find('button').text()).toBe('Login')
+    renderNavbar({ authenticated: false })
+    screen.getByText('Login')
   })
 })
 ```
@@ -383,7 +383,7 @@ This, of course, passes. I really like the symmetry the three tests exhibit, sho
 
 Let's revisit the idea of separation of concerns; is this a UI test or business logic test? If we moved framework, could we re-use this test? 
 
-The answer is *no* - we'd need to write a new test (to work with React + it's testing ecosystem). This is fine - it just means this is not really part of our core business logic. Nothing to extract.
+The answer is *no* - we'd need to write a new test (to work with React and it's Testing Library integration). This is fine - it just means this part of our codebase is part of the UI layer, not our core business logic. Nothing to extract.
 
 ## The real test: Does it refactor?
 
@@ -437,29 +437,11 @@ export default {
 Using an anchor tag instead of a button.
 \end{center}
 
-Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. 
-
-The tests are now *failing*. The behavior hasn't really changed, though, has it? Some people might argue it *has* - buttons normally don't take you to other pages, but anchor tags do. My personal preference here would be to change my test as follows:
-
-```js
-it('shows login authenticated is true', () => {
-  const wrapper = navbarFactory({ authenticated: true })
-  expect(wrapper.html()).toContain('Logout')
-})
-```
-\begin{center}
-Asserting against the rendered HTML, not a specific element.
-\end{center}
-
-By using `html()` and `toContain()`, we are focusing on what text is rendered - not the specific tag. I understand some people might disagree with this. Technically, `<button>` and `<a>` *do* have different behaviors - but from a user point of view, this is not often the case. 
-
-In most systems, the user doesn't really mind if they click a `<button>` with `Login` or a `<a>` with `Login` - they just want to log in. In a more realistic test, you would probably simulate a click event on the element. Whether it's a button or an anchor tag, the same thing should happen - the user is logged out.
-
-This might not be true for every scenario. I think each system is different, and you should do what makes the most sense for your business and application. My preference is usually to assert against `html()` using `toContain()`, rather than using `find()` and `text()`, but there are cases where this is not the case. There are some examples in later sections illustrating this.
+Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. It still passes. Great news! Our tests survived two refactors - this means we are testing the behavior, not the implementation details, which is good.
 
 ## Conclusion
 
-This chapter discussed some Vue Test Utils APIs, including `classes()`, `html()`, `find()` and `text()`. We also discussed using a factory function to make similar tests more concise, and the idea of the data driving the UI.
+This chapter discussed some Testing Library APIs and techniques to test your Vue components. We also discussed using a factory function to make similar tests more concise, and the idea of the data driving the UI.
 
 Finally, we dived into the concept of *separation of concerns*, and how it can make your business logic code outlast your framework. Finally, we saw how refactoring code and seeing how the tests pass or fail can potentially reveal tightly coupled code, and some alternative ways to test DOM content. 
 
