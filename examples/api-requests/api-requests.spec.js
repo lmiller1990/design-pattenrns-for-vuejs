@@ -2,7 +2,7 @@ import { store } from './store.js'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import App from './app.vue'
+import Login from './login.vue'
 
 let postedData = []
 const server = setupServer(
@@ -21,7 +21,7 @@ describe('login', () => {
   afterAll(() => server.close())
 
   it('successfully authenticates', async () => {
-    render(App, { store })
+    render(Login, { store })
     await fireEvent.update(
       screen.getByRole('username'), 'Lachlan')
     await fireEvent.update(
@@ -42,7 +42,7 @@ describe('login', () => {
       })
     )
 
-    render(App, { store })
+    render(Login, { store })
     await fireEvent.update(
       screen.getByRole('username'), 'Lachlan')
     await fireEvent.update(
