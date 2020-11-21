@@ -323,7 +323,7 @@ The axios test is slightly better - it mocks one layer lower:
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./images/api-axios.png}
-  \caption{Mocking Vuex}
+  \caption{Mocking Axios}
   \label{fig}
 \end{figure}
 
