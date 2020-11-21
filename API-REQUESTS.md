@@ -246,6 +246,9 @@ export default {
 }
 </script>
 ```
+\begin{center}
+Converting the component to use the Component API.
+\end{center}
 
 Everything still passes - another indication we are testing the behavior of the component, as opposed to the implementation details.
 
@@ -281,16 +284,19 @@ describe('login', () => {
   })
 })
 ```
+\begin{center}
+Mocking Vuex. 
+\end{center}
 
-Since we are mocking the Vuex store now, we have bypassed `axios` entirely. The lure of this style of test is a double edged sword. There is generally less code. You can also directly set the `state` however you like - in the snippet above, `dispatch` doesn't actually update the state.
+Since we are mocking the Vuex store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also directly set the `state` however you like - in the snippet above, `dispatch` doesn't actually update the state.
 
-Again, the test didn't require much changing - we are no longer passing a `store` to `render` (since we are not even using a store, we mocked it out entirely). The assertions against `mockDispatch` also became an assertion that a `login` action was dispatched, as opposed to a HTTP call to the correct endpoint.
+Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a store, we mocked it out entirely). We don't have `mockPost` any more - instead we have `mockDispatch`. The assertion against `mockDispatch` became an assertion that a `login` action was dispatched with the correct payload, as opposed to a HTTP call to the correct endpoint.
 
-The real problem is this: if you delete the `login` action from the `store.js` - the test will *continue to pass*. This is scary - the tests are all green, which should give you confidence everything is working correctly, when, in fact, your entire application is completely broken.
+There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken.
 
 This is not the case with the test using a real Vuex store - breaking the store correctly breaks the tests. There is only one thing worse than a code-base with no tests - a code-base with *bad* tests. At least if you have not tests, you have no confidence, which generally means you spend more time testing by hand. Tests that give false confidence are actually worse - they lure you into a false sense of security. Everything seems okay, when really it is not.
 
-## Mock Less - mock the last dependency in the chain
+## Mock Less - mock the lowest dependency in the chain
 
 The problem with the above example is we are mocking too far up the chain. Good tests are as production like as possible. This is the best way to have confidence in your test suite. This diagram shows the dependency chain in the `<login>` component:
 
@@ -340,11 +346,11 @@ jest.mock('axios', () => ({
 Boilerplate code to mock axios.
 \end{center}
 
-... in every test.
+... in every test. And we'd have more confidence, further down the dependency chain.
 
 ## Mock Service Worker
 
-A new library has come into the scene relatively recently - Mock Service Worker, or `msw` for short. This does exactly what is discussed above - it operates one level lower than `axios`, mocking the actual network request!How `msw` works will not be explained here, but you can learn more on the [website](https://mswjs.io/): https://mswjs.io/. One of the cool features is that you can use it both for tests in a Node.js environment, and in a browser for local development.
+A new library has come into the scene relatively recently - Mock Service Worker, or `msw` for short. This does exactly what is discussed above - it operates one level lower than `axios`, mocking the actual network request! How `msw` works will not be explained here, but you can learn more on the [website](https://mswjs.io/): https://mswjs.io/. One of the cool features is that you can use it both for tests in a Node.js environment and in a browser for local development.
 
 Let's try it out. Basic usage is like this:
 
@@ -362,6 +368,9 @@ const server = setupServer(
   })
 )
 ```
+\begin{center}
+A basic server with msw.
+\end{center}
 
 The nice thing is we are not mocking `axios` anymore. You could change you application to use `fetch` instead - and you wouldn't need to change you tests at all, because we are now mocking at a layer lower than before.
 
@@ -400,13 +409,16 @@ describe('login', () => {
   })
 })
 ```
+\begin{center}
+Using msw instead of mocking axios.
+\end{center}
 
 You can have even less boilerplate by setting up the server in another file and importing it automatically, as suggested [in the documentation](https://mswjs.io/docs/getting-started/integrate/node): https://mswjs.io/docs/getting-started/integrate/node. Then you won't need to copy this code into all your tests - you just test as if you are in production with a real server that responds how you expect it to.
 
 One thing we are not doing in this test that we were doing previously is asserting the expected payload is sent to the server. If you want to do that, you can just keep track of the posted data with an array, for example:
 
 ```js
-let postedData = []
+const postedData = []
 const server = setupServer(
   rest.post('/login', (req, res, ctx) => {
     postedData.push(req.body)
@@ -418,6 +430,9 @@ const server = setupServer(
   })
 )
 ```
+\begin{center}
+Keeping track of posted data.
+\end{center}
 
 Now you can just assert that `postedData[0]` contains the expected payload. You could reset it in the `beforeEach` hook, if testing the body of the post request is something that is valuable to you.
 
@@ -454,6 +469,9 @@ describe('login', () => {
   })
 })
 ```
+\begin{center}
+A test for a failed request.
+\end{center}
 
 It's easy to extend the mock server on a test by test basis. Writing these two tests using `jest.mock` to mock `axios` would be very messy!
 
@@ -469,3 +487,4 @@ Tests `msw` is not enough - you still need to test your application against a re
 
 - Trying using `msw` in a browser. You can use the same mock endpoint handlers for both your tests and development.
 - Explore `msw` more and see what other interesting features it offers.
+\pagebreak

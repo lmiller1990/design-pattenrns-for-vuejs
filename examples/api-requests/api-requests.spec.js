@@ -4,7 +4,7 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import Login from './login.vue'
 
-let postedData = []
+const postedData = []
 const server = setupServer(
   rest.post('/login', (req, res, ctx) => {
     postedData.push(req.body)

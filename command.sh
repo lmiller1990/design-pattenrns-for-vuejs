@@ -7,6 +7,7 @@ cat \
   PROPS.md \
   EVENTS.md \
   FORMS.md \
+  API-REQUESTS.md \
   RENDERLESS-COMPONENTS.md \
   RENDER-FUNCTIONS.md \
   PROVIDE-INJECT.md \
