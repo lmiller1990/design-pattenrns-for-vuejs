@@ -2,6 +2,7 @@
 
 cat \
   CONTENTS.md \
+  ABOUT.md \
   INTRO.md \
   PROPS.md \
   EVENTS.md \
