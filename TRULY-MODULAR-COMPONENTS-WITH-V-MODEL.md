@@ -549,7 +549,7 @@ To make the component even more reusable, we could consider writing it as a rend
 - We did not add any tests for `serialize` or `deserialize`; they are pure functions, so adding some is trivial. See the source code for some tests.
 - Add support for another date library, like Moment. Support for Moment is implemented in the source code.
 - Add hours, minutes, seconds, and AM/PM support.
-- Write some tests with Vue Test Utils; you can use `setValue` to update the value of the `<input>` elements.
+- Write some tests with Testing Library; you can use `fireEvent.update` to update the value of the `<input>` elements.
 
 You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline
