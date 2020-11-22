@@ -125,10 +125,10 @@ It works! Good progress - I added a tiny bit of CSS as well, grab that from the 
 
 This single shared `store` is known as a *global singleton*.
 
-We will allowing adding more users via a form - but first let's add a UI test using Vue Test Utils.
+We will allowing adding more users via a form - but first let's add a UI test using Testing Library.
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import { Store } from './store.js'
 import Users from './users.vue'
 
@@ -137,15 +137,25 @@ describe('store', () => {
     // ...
   })
 
-  it('renders a user', () => {
-    const wrapper = mount(Users)
+  it('renders a user', async () => {
+    render(Users, {
+      global: {
+        provide: {
+          store: new Store({
+            users: []
+          })
+        }
+      }
+    })
 
-    expect(wrapper.html()).toContain('Alice')
+    await fireEvent.update(screen.getByRole('username'), 'Alice')
+    await fireEvent.click(screen.getByRole('submit'))
+    await screen.findByText('Alice')
   })
 })
 ```
 \begin{center}
-UI test with Vue Test Utils.
+UI test with Testing Library
 \end{center}
 
 Working great! We do not want to hard code any users in the store, though. This highlights one of the downsides of a global singleton - no easy way to initialize or update the state for testing purposes. Let's add a feature to create new users via a form, and them that way.
@@ -183,6 +193,10 @@ describe('store', () => {
     // ...
   })
 
+  it('renders a user', async () => {
+    // ...
+  })
+
   it('adds a user', () => {
     const store = new Store({
       users: []
@@ -193,15 +207,6 @@ describe('store', () => {
     expect(store.getState()).toEqual({ 
       users: [{ name: 'Alice' }]
     })
-  })
-
-  it('renders a user', async () => {
-    const wrapper = mount(Users)
-
-    await wrapper.find('input').setValue('Alice')
-    await wrapper.find('button').trigger('submit.prevent')
-
-    expect(wrapper.html()).toContain('Alice')
   })
 })
 ```
@@ -366,12 +371,12 @@ export default {
 Using inject to access the store.
 \end{center}
 
-## Provide in Vue Test Utils
+## Provide in Testing Library
 
-The final UI test is failing. We did `provide('store', store)` when we created our app, but we didn't do it in the test. Vue Test Utils has a mounting option specifically for `provide` and `inject`: `global.provide`:
+The final UI test is failing. We did `provide('store', store)` when we created our app, but we didn't do it in the test. Testing Library has a mounting option specifically for `provide` and `inject`: `global.provide`:
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import { Store } from './store.js'
 import Users from './users.vue'
 
@@ -385,7 +390,7 @@ describe('store', () => {
   })
 
   it('renders a user', async () => {
-    const wrapper = mount(Users, {
+    render(Users, {
       global: {
         provide: {
           store: new Store({
@@ -395,10 +400,9 @@ describe('store', () => {
       }
     })
 
-    await wrapper.find('input').setValue('Alice')
-    await wrapper.find('button').trigger('submit.prevent')
-
-    expect(wrapper.html()).toContain('Alice')
+    await fireEvent.update(screen.getByRole('username'), 'Alice')
+    await fireEvent.click(screen.getByRole('submit'))
+    await screen.findByText('Alice')
   })
 })
 ```
@@ -476,7 +480,7 @@ Now anywhere you need access to the store, just call `useStore`. This is the sam
 
 1. Update the store to have a `removeUser` function. Test it in isolation.
 2. Add a button next to each user - clicking the button should remove them from the store. Use the `removeUser` function here.
-3. Write a UI test to verify this works using Vue Test Utils. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
+3. Write a UI test to verify this works using Testing Library. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
 
 You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline
