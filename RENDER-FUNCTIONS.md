@@ -629,26 +629,23 @@ It works!
 
 ## Testing Render Function Components
 
-Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function from Vue Test Utils works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hood).
+Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `render` function from Testing Library works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hood).
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import App from './app.vue'
 
 test('tabs', async () => {
-  const wrapper = mount(App)
-  expect(wrapper.html()).not.toContain('Content #2')
+  render(App)
+  expect(screen.queryByText('Content #2')).toBeFalsy()
 
-  await wrapper.find('[data-test="2"]').trigger('click')
-
-  expect(wrapper.html()).toContain('Content #2')
+  fireEvent.click(screen.getByText('Tab #2'))
+  await screen.findByText('Content #2')
 })
 ```
 \begin{center}
 Testing render function components is the same as template components.
 \end{center}
-
-I added a `data-test` selector to my `app.vue` test component, to make it clear which tab I am clicking in the test.
 
 ## Exercises
 
