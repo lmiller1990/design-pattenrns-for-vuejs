@@ -441,7 +441,7 @@ We saw how you can isolate business logic in a composable, making it testable an
 
 ## Exercises
 
-1. Write some tests with Vue Test Utils to ensure the UI is working correctly.
+1. Write some tests with Testing Library to ensure the UI is working correctly. See the GitHub repository for the solutions.
 2. Do not allow moving on a square that is already taken.
 3. Add a check after each move to see if a player has won. Display this somewhere in the UI.
 4. Implement `undo` and `redo`.
