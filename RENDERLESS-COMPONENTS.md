@@ -487,7 +487,7 @@ Just for fun, I tried making an alternative UI. All I had to do was move around 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./images/renderless-password/ss-alt.png}
-  \caption{Completed Password Complexity Component}
+  \caption{Alternative Password Complexity Component}
   \label{fig}
 \end{figure}
 
