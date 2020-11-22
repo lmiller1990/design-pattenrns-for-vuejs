@@ -370,11 +370,17 @@ You could still export `complexityStyle` and test it individually, but you still
 By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
 
 ```js
-test('applies correct class based on complexity', async () => {
-  // Foo is the component where we use `<renderless-password>`
-  const wrapper = mount(Foo)
-  await wrapper.find('#password').setValue('this is a long password')
-  expect(wrapper.find('.complexity.high').exists()).toBe(true)
+it('meets default requirements', async () => {
+  render(TestComponent)
+
+  await fireEvent.update(
+    screen.getByLabelText('Password'), 'this is a long password')
+  await fireEvent.update(
+    screen.getByLabelText('Confirmation'), 'this is a long password')
+
+  expect(screen.getByRole('password-complexity').classList)
+    .toContain('high')
+  expect(screen.getByText('Submit').disabled).toBeFalsy()
 })
 ```
 \begin{center}
@@ -491,7 +497,7 @@ See what else you can come up with. I think there is a lot of room for innovatio
 
 This section intentionally omitted writing tests to focus on the concepts. Several techniques regarding tests were mentioned. For practice, try to write the following tests (find the solutions in the source code):
 
-- Some tests using Vue Test Utils to assert the correct complexity class is assigned.
+- Some tests using Testing Library to assert the correct complexity class is assigned.
 - Test that the button is appropriately disabled.
 
 You could also write some tests for the business logic, to make sure we didn't miss any edge cases:

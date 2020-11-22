@@ -651,36 +651,44 @@ I added the `<pre>` block for some debugging. Everything works!
 
 ## Some Basic UI Tests
 
-We can add some basic UI tests using Vue Test Utils, too. Here are two fairly simple ones that cover most of the functionality:
+We can add some basic UI tests using Testing Library, too. Here are two fairly simple ones that cover most of the functionality:
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import FormValidation from './form-validation.vue'
 
 describe('FormValidation', () => {
   it('fills out form correctly', async () => {
-    const wrapper = mount(FormValidation)
+    render(FormValidation)
 
-    await wrapper.find('#name').setValue('lachlan')
-    await wrapper.find('#weight-units').setValue('lb')
-    await wrapper.find('#weight').setValue('150')
+    await fireEvent.update(
+      screen.getByLabelText('Name'),
+      { target: { value: 'lachlan' } }
+    )
 
-    expect(wrapper.findAll('.error')).toHaveLength(0)
+     await fireEvent.update(screen.getByDisplayValue('kg'), 'lb')
+
+    await fireEvent.update(
+      screen.getByLabelText('Weight'),
+      { target: { value: '150' } }
+    )
+
+    expect(screen.queryByRole('error')).toBe(null)
   })
 
   it('shows errors for invalid inputs', async () => {
-    const wrapper = mount(FormValidation)
+    render(FormValidation)
 
-    await wrapper.find('#name').setValue('')
-    await wrapper.find('#weight-units').setValue('lb')
-    await wrapper.find('#weight').setValue('50')
+    await fireEvent.update(screen.getByLabelText('Name'), '')
+    await fireEvent.update(screen.getByLabelText('Weight'), '5')
+    await fireEvent.update(screen.getByDisplayValue('kg'), 'lb')
 
-    expect(wrapper.findAll('.error')).toHaveLength(2)
+    expect(screen.getAllByRole('error')).toHaveLength(2)
   })
 })
 ```
 \begin{center}
-Testing the UI layer with Vue Test Utils.
+Testing the UI layer with Testing Library
 \end{center}
 
 Since these tests are a little larger, I am making the separation between each step clear. I like to write my tests like this:
@@ -688,14 +696,16 @@ Since these tests are a little larger, I am making the separation between each s
 ```js
 it('...', async () => {
   // Arrange - this is where we set everything up
-  const wrapper = mount(...)
+  render(FormValidation)
 
   // Act - do things! 
   // Call functions
   // Assign values
   // Simulate interactions
-  await wrapper.find(...).setValue(...)
-  await wrapper.find(...).trigger(...)
+  await fireEvent.update(
+    screen.getByLabelText('Name'),
+    { target: { value: 'lachlan' } }
+  )
 
   // Assert
   expect(...).toEqual(...)
@@ -717,7 +727,7 @@ As it stands, you can enter any string into the weight field and it will be cons
 
 - Add a test to ensure that any non-numeric values entered into the `weight` field cause the field to become invalid and show a "Weight must be a number" error.
 - Add a `@submit.prevent` listener to `<form>`. When the form is submitted, emit an event with the `patientForm`.
- - Submit the form using Vue Test Utils and assert the correct event and payload are emitted.
+ - Submit the form using Testing Library and assert the correct event and payload are emitted.
 
 You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline
