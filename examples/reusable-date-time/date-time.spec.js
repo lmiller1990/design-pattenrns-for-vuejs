@@ -66,12 +66,6 @@ test('DateTime', async () => {
   // 3 successful updates, 3 emits.
   expect(emitted()['update:modelValue']).toHaveLength(3)
 
-  // update:modelValue will not update the modelValue prop
-  // in Vue Test Utils, though.
-  // we could wrap this in another component and do something
-  // fancy but it's not really worth it. I think this is fine,
-  // since we know the limitations and understand why we are doing
-  // what we are doing here.
   expect(emitted()['update:modelValue'][0][0]).toEqual(
     DateTime.fromObject({ year: '2019', month: '1', day: '1' })
   )
