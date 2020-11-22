@@ -15,7 +15,7 @@ There is no one size fits all solution here. I'll share how I currently like to 
 
 ## Starting Simple
 
-If you application is simple, you probably won't need something like Vuex or a specific HTTP request module. You can just inline everything in your component:
+If you application is simple, you probably won't need something like Vuex or an isolated HTTP request service. You can just inline everything in your component:
 
 ```html
 <template>
@@ -62,7 +62,7 @@ A simple login form component, It makes a request using axios.
 
 This example uses the axios HTTP library, but the same ideas apply if you are using fetch.
 
-We don't actually want to make a request to a real server when testing this component - unit tests should run in isolation. One option here is to mock the `axios` module with `jest.mock`. 
+We don't want to make a request to a real server when testing this component - unit tests should run in isolation. One option here is to mock the `axios` module with `jest.mock`. 
 
 We probably want to test:
 
@@ -109,6 +109,8 @@ Using a mock implementation of axios to test the login workflow.
 
 Testing a failed request is straight forward as well - you would just throw an error in the mock implementation. 
 
+## Refactoring to a store
+
 If you are working on anything other than a trivial application, you probably don't want to store the response in component local state. The most common way to scale a Vue app has traditionally been Vuex. More often than not, you end up with a Vuex store that looks like this:
 
 ```js
@@ -127,7 +129,10 @@ export const store = {
   },
   actions: {
     login: async ({ commit }, { username, password }) => {
-      const response = await axios.post('/login', { username, password })
+      const response = await axios.post('/login', { 
+        username, 
+        password 
+      })
       commit('updateUser', response.data)
     }
   }
@@ -137,7 +142,7 @@ export const store = {
 A simple Vuex store.
 \end{center}
 
-There are many strategies for error handling in this set up. You can have a local `try/catch` in the component. Other developers store the error state in the Vuex state, as well.
+There are many strategies for error handling in this set up. You can have a local `try/catch` in the component. Other developers store the error in the Vuex state, as well.
 
 Either way, the `<login>` component using a Vuex store would look something like this:
 
@@ -202,9 +207,9 @@ describe('login', () => {
 Updating the test to use Vuex.
 \end{center}
 
-I like this option. The only change we made to the test is passing a `store`. The actual user facing behavior has not changed, so the test should not need significant changes either - in fact, the actual test code is the same (entering the username and password and submitting the form). It also shows we are not testing implementation details - we were able to make a significant refactor without changing the test (except for providing the Vuex store - we added a dependency, so this is expected).
+I like this option. We continue to mock `axios`. The only change we made to the test is passing a `store`. The actual user facing behavior has not changed, so the test should not need significant changes either - in fact, the actual test code is the same (entering the username and password and submitting the form). It also shows we are not testing implementation details - we were able to make a significant refactor without changing the test (except for providing the Vuex store - we added this dependency, so this change is expected).
 
-To further illustrate this is a good test, I am going to make another refactor and convert the component to use the composition API. Everything *should* still pass:
+To further illustrate this is a good test, I am going to make another refactor and convert the component to use the Composition API. Everything *should* still pass:
 
 ```js
 <template>
@@ -254,7 +259,11 @@ Everything still passes - another indication we are testing the behavior of the 
 
 I've used the real store + axios mock strategy for quite a long time in both Vue and React apps and had a good experience. The only downside is you need to mock `axios` a lot - you often end up with a lot of copy-pasting between tests. You can make some utilities methods to avoid this, but it's still a little boilerplate heavy.
 
-As your application gets larger and larger, though, using a real store can become complex. Some developers opt to mock the entire store in this scenario. It leads to less boilerplate, for sure, especially if you are using Vue Test Utils, which has a `mocks` mounting option designed for mocking values on `this`, for example `this.$store`. Testing Library does not support this - intentionally - which is a decision I agree with. We can replicate Vue Test Utils' `mocks` feature with `jest.mock` to illustrate why I do not recommend mocking Vuex (or whatever store implementation you are using):
+## To mock or not to mock?
+
+As your application gets larger and larger, though, using a real store can become complex. Some developers opt to mock the entire store in this scenario. It leads to less boilerplate, for sure, especially if you are using Vue Test Utils, which has a `mocks` mounting option designed for mocking values on `this`, for example `this.$store`. 
+
+Testing Library does not support mocking things so easily - intentionally. They want your tests to be as production-like as possible, which means using real dependencies whenever possible. I like this philosophy. To see why I prefer to use a real Vuex store in my tests, let's see what happens if we mock Vuex using `jest.mock`. 
 
 ```js
 let mockDispatch = jest.fn()
@@ -290,7 +299,7 @@ Mocking Vuex.
 
 Since we are mocking the Vuex store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also directly set the `state` however you like - in the snippet above, `dispatch` doesn't actually update the state.
 
-Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a store, we mocked it out entirely). We don't have `mockPost` any more - instead we have `mockDispatch`. The assertion against `mockDispatch` became an assertion that a `login` action was dispatched with the correct payload, as opposed to a HTTP call to the correct endpoint.
+Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't have `mockPost` any more - instead we have `mockDispatch`. The assertion against `mockDispatch` became an assertion that a `login` action was dispatched with the correct payload, as opposed to a HTTP call to the correct endpoint.
 
 There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken.
 
@@ -487,4 +496,5 @@ Tests `msw` is not enough - you still need to test your application against a re
 
 - Trying using `msw` in a browser. You can use the same mock endpoint handlers for both your tests and development.
 - Explore `msw` more and see what other interesting features it offers.
+
 \pagebreak

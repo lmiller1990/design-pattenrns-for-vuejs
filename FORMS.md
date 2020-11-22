@@ -17,7 +17,7 @@ In traditional server-rendered apps, you would only get validation after submitt
 1. Field validation - if a user enters incorrect in invalid data in a single field, we will show an error immediately.
 2. Form validation - the submit button should only be enabled when the entire form is correctly filled out.
 
-Finally, we need two types of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly and that the user can enter data, see error messages, and correctly submit the form.
+Finally, we need two types of tests. The first is around the business logic; given some form, which fields are invalid, and when is the form considered complete? The second is around interactions - ensuring that the UI layer is working correctly and that the user can enter data, see error messages, and submit the form if all the fields are valid.
 
 \pagebreak
 
@@ -34,7 +34,7 @@ For this example, we are building a form to enter patient data for a hospital ap
 
 There are two inputs. The first is the patient name, which is required and can be any text. The second is the patient weight, which can be in imperial or metric units. The constraints are as follows:
 
- .  | Imperial | Metric
+ Constraint | Imperial | Metric
 --- | --- | ---
 min | 66 | 30
 max | 440 | 200
@@ -48,7 +48,7 @@ We will need to validate both the name and the weight. The form with errors look
   \label{fig}
 \end{figure}
 
-We could define those using an object:
+We will define the constraints using an object:
 
 ```js
 const limits = {
@@ -66,13 +66,13 @@ There are plenty of full-featured Vue (and non-Vue) form validation frameworks o
 We need two types of validations: 
 
 1. A required field. Both the patient's name and weight are required fields.
-2. Minimum and maximum constraints. This is for the weight field - it has to be within a specific range. 
+2. Minimum and maximum constraints. This is for the weight field - it has to be within a specific range. It also needs to support metric and imperial units.
 
-As well as validating the fields, our framework should also return an error message if the input is not valid.
+As well as validating the fields, our form validation framework should also return an error messages for each invalid input.
 
-We will write two validation functions: `required` and `isBetween`. While TDD isn't always the right tool, for these two functions I believe it is. This is because we know the inputs and outputs, and all the possible states of the system, it's just a matter of writing the tests and then making them pass.
+We will write two validation functions: `required` and `isBetween`. While test driven development (abbreviated to TDD - where you write the tests first, and let the failing tests guide the implementation) isn't always the right tool, for writing these two functions I believe it is. This is because we know the inputs and outputs, and all the possible states of the system, it's just a matter of writing the tests and then making them pass.
 
-Let's do that - starting with the tests for the `required` validator. Each validator will return an object with the validation status, and a message if there is an error. Using a TypeScript `interface` for notation purposes:
+Let's do that - starting with the tests for the `required` validator. Each validator will return an object with the validation status, and a message if there is an error. A validated input should have this shape:
 
 ```js
 interface ValidationResult {
@@ -115,7 +115,7 @@ describe('required', () => {
 Tests for the required validator.
 \end{center}
 
-Basically, anything that is not truthy is invalid; anything else is considered valid. We can get all the tests passing with this implementation:
+Basically, anything that does not evaluated to `true` is invalid; anything else is considered valid. We can get all the tests passing with this implementation:
 
 ```js
 export function required(value) {
@@ -133,7 +133,7 @@ export function required(value) {
 required validator implementation.
 \end{center}
 
-I like to put the invalid case first for my validators - that's just a personal preference.
+I like to check for the null case first, when `value` is not defined. That's just a personal preference.
 \pagebreak
 
 ## The `isBetween` validator
@@ -232,7 +232,7 @@ There are three scenarios to consider:
 
 1. The happy path when the value is valid. 
 2. The value is null/undefined. 
-3. The value is outside the constraints. 
+3. The value is is defined, but outside the constraints. 
 
 I don't feel the need to add tests for all the cases as we did with `isBetween`, since we already tested that thoroughly.
 
@@ -310,7 +310,7 @@ We have two fields: `name` and `weight`.
 1. `name` is a string. 
 2. `weight` is a number with associated units. 
 
-These are the *inputs*. I will use a TypeScript interface for notation purposes:
+These are the *inputs*. It should have this shape:
 
 ```js
 // definition
@@ -335,7 +335,7 @@ const patientForm: PatientFormState = {
 Object describing the patient.
 \end{center}
 
-Given an input (a `patientForm`), we can valid each field. Fields when validated are either `{ valid: true }` or `{ valid: false, message: '...' }`. So the form and validity interfaces could look like this (again, using TypeScript for notation):
+Given an input (a `patientForm`), we can valid each field. Fields when validated are either `{ valid: true }` or `{ valid: false, message: '...' }`. So the form and validity interfaces could look like this:
 
 
 ```js
@@ -374,8 +374,8 @@ Example usage of the validateForm function we will be writing.
 
 We will need two functions: 
 
-1. `isFormValid()`, to tell us if the form is valid or not. 
-2. `patientForm()`, which handles figuring out the correct weight units, and calling all the validators.
+1. `isFormValid`, to tell us if the form is valid or not. 
+2. `patientForm`, which handles figuring out the correct weight units, and calling all the validators.
 
 Let's start with the tests for `isFormValid`. The form is considered valid when all fields are `valid`, so we only need two tests: the case where all fields are valid, and the case where at least one field is not: 
 
@@ -423,7 +423,7 @@ describe('isFormValid', () => {
 Testing isFormValid.
 \end{center}
 
-The implementation is as simple as you might expect:
+The implementation is simple:
 
 ```js
 export function isFormValid(form) {
@@ -553,7 +553,7 @@ This completes the business logic for the patient form - noticed we haven't writ
 
 ## Writing the UI Layer
 
-Now the fun part - writing the UI layer with Vue. Although I think TDD is a great fit for business logic, I prefer to write the tests for my components after the fact generally, although this doesn't follow the hardcore TDD mantra.
+Now the fun part - writing the UI layer with Vue. Although I think TDD is a great fit for business logic, I generally do not use TDD for my component tests.
 
 I like to start by thinking about how I will manage the state of my component. Let's use the Composition API; I think works great for forms.
 
@@ -661,17 +661,9 @@ describe('FormValidation', () => {
   it('fills out form correctly', async () => {
     render(FormValidation)
 
-    await fireEvent.update(
-      screen.getByLabelText('Name'),
-      { target: { value: 'lachlan' } }
-    )
-
-     await fireEvent.update(screen.getByDisplayValue('kg'), 'lb')
-
-    await fireEvent.update(
-      screen.getByLabelText('Weight'),
-      { target: { value: '150' } }
-    )
+    await fireEvent.update(screen.getByLabelText('Name'), 'lachlan') 
+    await fireEvent.update(screen.getByDisplayValue('kg'), 'lb')
+    await fireEvent.update(screen.getByLabelText('Weight'), '150')
 
     expect(screen.queryByRole('error')).toBe(null)
   })
@@ -688,7 +680,7 @@ describe('FormValidation', () => {
 })
 ```
 \begin{center}
-Testing the UI layer with Testing Library
+Testing the UI layer with Testing Library.
 \end{center}
 
 Since these tests are a little larger, I am making the separation between each step clear. I like to write my tests like this:
@@ -702,10 +694,7 @@ it('...', async () => {
   // Call functions
   // Assign values
   // Simulate interactions
-  await fireEvent.update(
-    screen.getByLabelText('Name'),
-    { target: { value: 'lachlan' } }
-  )
+  await fireEvent.update(screen.getByLabelText('Name'), 'lachlan') 
 
   // Assert
   expect(...).toEqual(...)

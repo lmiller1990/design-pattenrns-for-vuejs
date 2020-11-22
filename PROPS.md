@@ -6,7 +6,7 @@ https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 ______
 
-In this section we explore `props`, and the kinds of tests you might want to consider writing. This leads into a much more fundamental and important topic; drawing a clear line between business logic and UI, also known as *separation of concerns*, and how your tests can help make this distinction clear.
+In this section we explore `props`, and the kind of tests you might want to consider writing. This leads into a much more fundamental and important topic; drawing a clear line between business logic and UI, also known as *separation of concerns*, and how your tests can help make this distinction clear.
 
 Consider one of the big ideas behind frameworks like Vue and React:
 
@@ -38,7 +38,7 @@ A impure function - it has a side effect. Not ideal, but necessary for most syst
 
 This is *not* a pure function because it relies on an external resource - in this case an API and a database. Depending on what is in the database when it is called, we might get a different result. It's *unpredictable*.
 
-How does this relate to `props`? If you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
+How does this relate to `props`? Think of a component that decides what to render based on it's `props` (don't worry about `data`, `computed` or `setup` for now - but the same ideas apply, as you'll see throughout the book). If you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
 
 ## The Basics
 
@@ -76,13 +76,17 @@ export default {
 Declaring a variant prop with the superior object syntax.
 \end{center}
 
-If you are using TypeScript, even better - create a type, for example `type Variant = 'success' | 'warning' | 'error'`. 
+If you are using TypeScript, even better - create a type:
 
-```js
-props: {
-  variant: {
-    type: String as () => Variant,
-    required: true
+```ts
+type Variant = 'success' | 'warning' | 'error'
+
+export default {
+  props: {
+    variant: {
+      type: String as () => Variant,
+      required: true
+    }
   }
 }
 ```
@@ -110,13 +114,13 @@ export default {
 Prop validators are functions. If they return false, Vue will show a warning in the console.
 \end{center}
 
-Prop validators are like the `sum` function we talked about earlier. They are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 
+Prop validators are like the `sum` function we talked about earlier in that they are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 
 
 Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Testing Library and the `classList` attribute:
 
 ```js
 import { render, screen } from '@testing-library/vue'
-import Message, { validateVariant } from './Message.vue'
+import Message, { validateVariant } from './message.vue'
 
 describe('Message', () => {
   it('renders variant correctly when passed', () => {
@@ -169,7 +173,7 @@ Now we will get an error if an invalid prop is passed. An alternative would be j
 
 How do we test the validator? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. 
 
-I prefer to test prop validators in isolation. The test run faster, and since validators are generally pure functions, they are easy to test.
+I prefer to test prop validators in isolation. Since validators are generally pure functions, they are easy to test. There is another reason I test prop validators is isolation too, which we will talk about after writing the test.
 
 To allow testing the validator is isolation, we need to refactor `<message>` a little to separate the validator from the component:
 
@@ -243,13 +247,13 @@ If the developer passes an invalid prop, they get a nice clear message in the co
   \label{fig}
 \end{figure}
 
-## Separation of Concerns
+## Key Concept: Separation of Concerns
 
-We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against the `classes()`. The second is for the validator. It tests business logic. 
+We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against `classList`. The second is for the validator. It tests business logic. 
 
 To make this more clear, imagine your company specializes in design systems. You have some designers who probably use Figma or Sketch to design things like buttons and messages. 
 
-They have decided to support for three message variants: success, warning and error. You are a front-end developer. In this example, you are working on the Vue integration - you will write Vue components that apply specific classes, which use the CSS you receive from the designers. 
+They have decided to support for three message variants: success, warning and error. You are a front-end developer. In this example, you are working on the Vue integration - you will write Vue components that apply specific classes, which use the CSS you provided by the designers. 
 
 In the future, you also need to build React and Angular components using the same CSS and guidelines. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
 
@@ -263,13 +267,84 @@ In this case, you could reuse the validator and it's test when you write the Rea
 
 Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change significantly.
 
-I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. Rewriting the UI means rewriting the business logic.
+I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. Rewriting the UI means rewriting the business logic. 
 
-Understanding the difference between the two, and how to correctly structure your applications is the difference good engineers and great engineers.
+## Separation of Concerns - Case Study
+
+One example of poor separation of concerns costing an organzation was an application I worked on for an electrical components supplier. They had an application customers would use to get an approximate quote for the price of components. The ordering process was quite complex - you would go through a form with several steps, and the values from the previous step would impact the fields on the next step.
+
+The application was written using jQuery (which is not bad. No framework is bad - only if they are used incorrectly). All of the business logic was mixed in with the UI logic (this is the bad part). They had a quantity based discount model - "If purchasing more than 50 resistors, then apply X discount, otherwise Y" - this kind of thing. They decided to move to something a bit more modern - the UI was very dated, and wasn't mobile friendly at all. The complexity of the jQuery code was high and the code was a mess. 
+
+Not only did I need to rewrite the entire UI layer (which was what I was paid to do), but I ended up having to either rewrite or extract the vast majority of the business logic from within the jQuery code, too. This search and extract mission made the task much more difficult and risky than it should have been - instead of just updating the UI layer, I had to dive in and learn their business and pricing model as well (which ended up taking a lot more time and costing a lot more than it probably should have).
+
+Here is a concrete example using the above real-world scenario. Let's say a resistor (a kind of electrical component) costs $0.60. If you buy over 50, you get a 20% discount. The jQuery code-base looked something like this:
+
+```js
+const $resistorCount = $('#resistors-count')
+
+$resistorCount.change((event) => {
+  const amount = parseInt(event.target.value)
+  const totalCost = 0.6 * amount
+  const $price = $("#price")
+  if (amount > 50) {
+    $price.value(totalCost * 0.8)
+  } else {
+    $price.value(totalCost)
+  }
+})
+```
+
+You need to look really carefully to figure out where the UI ends and the business starts. In this scenario, I wanted to move to Vue - the perfect tool for a highly dynamic, reactive form. I had to dig through the code base and figure out this core piece of business logic, extract it, and rewrite it with some tests (of course the previous code base had no tests, like many code bases from the early 2000s). This search-extract-isolate-rewrite journey is full of risk and the chance of making a mistake or missing something is very high! What would have been much better is if the business logic and UI had be separated:
+
+```js
+const resistorPrice = 0.6
+function resistorCost(price, amount) {
+  if (amount > 50) {
+    return price * amount * 0.8
+  } else {
+    return price * amount
+  }
+}
+
+$resistorCount.change((event) => {
+  const amount = parseInt(event.target.value)
+  $("#price").value = resistorCost(resistorPrice, amount)
+})
+```
+
+The second is far superior. You can see where the business logic ends and the UI begins - they are literally separated in two different functions. The pricing strategy is clear - a discount for any amount greater than 50. It's also very easy to test the business logic in isolation. If the day comes you decide your framework of choice is no longer appropriate, it's trivial to move to another framework - your business logic unit tests can remain unchanged and untouched, and hopefully you have some end-to-end browser tests as well to keep you safe.
+
+Moving to Vue is trivial - no need to touch the business logic, either:
+
+```html
+<template>
+  <input v-model="amount" />
+  <div>Price: {{ totalCost }}</div>
+</template>
+
+<script>
+import { resistorCost, resistorPrice } from './logic.js'
+
+export default {
+  data() {
+    return {
+      amount: 0
+    }
+  },
+  computed: {
+    totalCost() {
+      return resistorCost(resistorPrice, this.amount)
+    }
+  }
+}
+</script>
+```
+
+Understanding and identifying the different concerns in a system and correctly structuring applications is the difference good engineers and great engineers.
 
 ## Another Example
 
-Enough philosophy for now. Let's see another example of testing props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
+Enough design philosophy for now. Let's see another example related to props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
 
 ```html
 <template>
@@ -306,6 +381,7 @@ describe('navbar', () => {
       }
     })
 
+    // getByText will throw an error if it cannot find the element.
     screen.getByText('Logout')
   })
 
@@ -317,7 +393,7 @@ describe('navbar', () => {
 })
 ```
 \begin{center}
-Testing the navbar behavior for all value of authenticated.
+Testing the navbar behavior for all values of authenticated.
 \end{center}
 
 The only thing that changes based on the value of `authenticated` is the button text. Since the `default` value is `false`, we don't need to pass it as in `props` in the second test.
@@ -441,9 +517,7 @@ Obviously in a real system a `href` property would be required and change depend
 
 ## Conclusion
 
-This chapter discussed some Testing Library APIs and techniques to test your Vue components. We also discussed using a factory function to make similar tests more concise, and the idea of the data driving the UI.
-
-Finally, we dived into the concept of *separation of concerns*, and how it can make your business logic code outlast your framework. Finally, we saw how refactoring code and seeing how the tests pass or fail can potentially reveal tightly coupled code, and some alternative ways to test DOM content. 
+This chapter discussed some techniques for testing props. We also saw how to use Testing Library's `render` method to test components. We touched on the concept of *separation of concerns*, and how it can make your business logic more testable and your applications more maintainable. Finally, we saw how tests can let us refactoring code with confidence.
 
 You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline

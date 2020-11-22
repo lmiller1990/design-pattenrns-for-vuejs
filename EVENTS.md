@@ -14,7 +14,7 @@ Let's see some examples on how this works, and some guidelines we can set to kee
 
 Here is a very minimal yet perfectly working `<counter>` component. It is not ideal; we will work on improving it during this section. 
 
-This example starts with the Options API; we will eventually refactor at the Composition API (using the tests we write to ensure we don't break anything).
+This example starts with the Options API; we will eventually refactor it to use the Composition API (using the tests we write to ensure we don't break anything).
 
 ```html
 <template>
@@ -36,13 +36,13 @@ export default {
 A simple counter component.
 \end{center}
 
-There are two buttons. One increments the `count` value by 1. The other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence we won't break anything. 
+There are two buttons. One increments the `count` value by 1. The other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence.
 
 As with the other examples, this one uses Testing Library, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
-import Counter, { submitValidator } from './counter.vue'
+import Counter from './counter.vue'
 
 describe('Counter', () => {
   it('emits an event with the current count', async () => {
@@ -88,7 +88,7 @@ Let's add an assertion, before we get onto the main topic: patterns and practice
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
-import Counter, { submitValidator } from './counter.vue'
+import Counter from './counter.vue'
 
 describe('Counter', () => {
   it('emits an event with the current count', async () => {
@@ -107,7 +107,7 @@ Making an assertion against the emitted events.
 
 ## Clean Templates
 
-Templates can often get chaotic among passing props, listening for events and using directives. For this reason, wherever possible, we want to keep our templates simple by moving logic into the `<script>` tag. One way we can do this is to avoid doing `count += 1` and `$emit()` in `<template>`. Let's make this change in the `<counter>` component, moving the logic from `<template>` into the `<script>` tag by creating two new methods:
+Templates can often get chaotic among passing props, listening for events and using directives. For this reason, wherever possible, we want to keep our templates simple by moving logic into the `<script>` tag. One way we can do this is to avoid writing `count += 1` and `$emit()` in `<template>`. Let's make this change in the `<counter>` component, moving the logic from `<template>` into the `<script>` tag by creating two new methods:
 
 ```html
 <template>
@@ -137,14 +137,14 @@ export default {
 Moving the emit logic from the template to the script.
 \end{center}
 
-Running this test confirms that everything is still working. This is good. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
+Running the test confirms that everything is still working. This is good. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
 
-I recommend you avoid putting any logic into `<template>`. Move everything into `<script>`. `count += 1` might seem simple enough to inline in `<template>`. That said, I personally value consistency over saving a few key strokes, and for this reason I put all the logic inside `<script>`.
+I recommend you avoid putting any logic into `<template>`. Move everything into `<script>`. `count += 1` might seem simple enough to inline in `<template>`. That said, I personally value consistency over saving a few key strokes, and for this reason I put all the logic inside `<script>` - no matter how simple it is.
 
 Another thing you may have notices is the *name* of the method we created - `submit`. This is another personal preference, but I recommend having a good convention around naming methods. Here are two I've found useful.
 
 1. Name the method that emits the event the same as the event name. If you are doing `$emit('submit')`, you could name the method that calls this `submit`, too. 
-2. Name methods call `$this.emit()` or `ctx.emit()` using the convention `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the interactions and emitting events.
+2. Name methods that call `$this.emit()` or `ctx.emit()` using the convention `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the interactions and emit the corresponding event.
 
 Which of these you choose isn't really important; you could even pick another convention you like better. Having a convention is generally a good thing, though. Consistency is king!
 
@@ -244,7 +244,7 @@ I am also going to make a change to `submitValidator`; the argument *must* be a 
 export function submitValidator(count) {
   if (typeof count === 'string' || isNaN(count)) {
     throw Error(`
-        Count should have been a number.
+        Count should be a number.
         Got: ${count}
     `)
   }
@@ -294,7 +294,7 @@ Let's see the refactor:
 export function submitValidator(count) {
   if (typeof count === 'string' || isNaN(count)) {
     throw Error(`
-        Count should have been a number.
+        Count should be a number.
         Got: ${count}
     `)
   }
