@@ -18,7 +18,7 @@ Let's start with `makeMove`, which is full of mutation. In our previous implemen
 function makeMove({ row, col }) {
   const newBoard = [...boards.value[boards.value.length - 1]]
   newBoard[row][col] = currentPlayer.value
-  currentPlayer.value  = currentPlayer.value === 'o' ?  x' : 'o'
+  currentPlayer.value  = currentPlayer.value === 'o' ?  'x' : 'o'
   boards.value.push(newBoard)
 }
 ```
