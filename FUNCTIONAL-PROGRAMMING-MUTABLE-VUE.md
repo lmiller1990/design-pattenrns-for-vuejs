@@ -63,7 +63,7 @@ The thin layer surrounding the solid circles represents the "imperative shell". 
 
 The solid rectangles on the right represent interactions between the system and the outside world - things like user input, updating the DOM, the response to a HTTP request to a third party system or a push notification.
 
-By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Vue Test Utils - a library designed for this very purpose - to test Vue components. We won't need too many tests, since all the complexity and edge cases will be covered in the functional core tests.
+By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Testing Library - a library designed for this very purpose - to test Vue components. We won't need too many tests, since all the complexity and edge cases will be covered in the functional core tests.
 
 The final API is going to be the same:
 
@@ -335,20 +335,20 @@ Everything now works in it's functional, loosely coupled, immutable glory.
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 
 ```js
-import { mount } from '@vue/test-utils'
+import { render, fireEvent, screen } from '@testing-library/vue'
 import TicTacToeApp from './tic-tac-toe-app.vue'
 
 describe('TicTacToeApp', () => {
   it('plays a game', async () => {
-    const wrapper = mount(TicTacToeApp)
+    render(TicTacToeApp)
 
-    await wrapper.find('[data-test=row-0-col-0]').trigger('click')
-    await wrapper.find('[data-test=row-0-col-1]').trigger('click')
-    await wrapper.find('[data-test=row-0-col-2]').trigger('click')
+    await fireEvent.click(screen.getByTestId('row-0-col-0'))
+    await fireEvent.click(screen.getByTestId('row-0-col-1'))
+    await fireEvent.click(screen.getByTestId('row-0-col-2'))
 
-    expect(wrapper.html()).toContain('data-test="row-0-col-0">o</div>')
-    expect(wrapper.html()).toContain('data-test="row-0-col-1">x</div>')
-    expect(wrapper.html()).toContain('data-test="row-0-col-2">o</div>')
+    expect(screen.getByTestId('row-0-col-0').textContent).toContain('o')
+    expect(screen.getByTestId('row-0-col-1').textContent).toContain('x')
+    expect(screen.getByTestId('row-0-col-2').textContent).toContain('o')
   })
 })
 ```
@@ -410,7 +410,7 @@ const move = ({ col, row }) => {
 }
 ``` 
 
-Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Vue Test Utils still passes, since the actual behavior from the user's point of view has not changed):
+Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Testing Library still passes, since the actual behavior from the user's point of view has not changed):
 
 ```js
 describe('makeMove', () => {
@@ -445,11 +445,11 @@ There are some easy ways to see if you are separating your Vue UI logic from you
 
 This also prompts another question: what and how should we be testing in our functional core and imperative shell? In the previous section, we tested both in one go - they were so tightly coupled together, so this was the natural way to test them. This worked out fine for that very simple composable, but can quickly become complex. I like to have lots of tests around my business logic. If you write them like we did here - pure functions - they are very easy to test, and the tests run really quickly.
 
-When testing the imperative shell (in this case the Vue UI layer using Vue Test Utils) I like to focus on more high level tests from a user point of view - clicking on buttons and asserting the correct text and DOM elements are rendered. The imperative shell doesn't (and shouldn't) know about how the functional core works - these tests focus on asserting the behavior of the application from the user's perspective.
+When testing the imperative shell (in this case the Vue UI layer using Testing Library) I like to focus on more high level tests from a user point of view - clicking on buttons and asserting the correct text and DOM elements are rendered. The imperative shell doesn't (and shouldn't) know about how the functional core works - these tests focus on asserting the behavior of the application from the user's perspective.
 
 There is no one true way to write applications. It is also very hard to transition an application from a mutation heavy paradigm to the style discussed in this chapter.. I am more and more of the opinion that coupling Vue's reactivity to your composables and business logic is generally not a good idea - this simple separate makes things a whole lot more easy to reason about, test, and has very little downside (maybe a bit more code, but I don't see this is a big deal).
 
-I think you should extract your logic into a functional core that is immutable and does not rely on shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of this chapter - an test is using something like Vue Test Utils (or a similar UI testing framework). These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
+I think you should extract your logic into a functional core that is immutable and does not rely on shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of this chapter - an test is using something like Testing Library (or a similar UI testing framework). These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
 
 ## Exercises
 
