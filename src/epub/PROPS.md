@@ -126,7 +126,8 @@ describe('Message', () => {
       }
     })
 
-    expect(container.firstChild.classList).toContain('success')
+    expect(container.firstChild.classList)
+      .toContain('success')
   })
 })
 ```
@@ -510,8 +511,5 @@ Obviously in a real system a `href` property would be required and change depend
 
 This chapter discussed some techniques for testing props. We also saw how to use Testing Library's `render` method to test components. We touched on the concept of *separation of concerns*, and how it can make your business logic more testable and your applications more maintainable. Finally, we saw how tests can let us refactoring code with confidence.
 
-You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

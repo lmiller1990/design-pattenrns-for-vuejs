@@ -342,9 +342,7 @@ export function useTicTacToe(initialState) {
   const currentPlayer = ref('o')
 
   function makeMove({ row, col }) {
-    const newBoard = JSON.parse(
-      JSON.stringify(boards.value)
-    )[boards.value.length - 1]
+    const newBoard = JSON.parse(JSON.stringify(boards.value))[boards.value.length - 1]
     newBoard[row][col] = currentPlayer.value
     currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
     boards.value.push(newBoard)
@@ -427,8 +425,5 @@ We saw how you can isolate business logic in a composable, making it testable an
 3. Add a check after each move to see if a player has won. Display this somewhere in the UI.
 4. Implement `undo` and `redo`.
 
-You can find the completed source code in the [GitHub repository under examples/composition](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/composition](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

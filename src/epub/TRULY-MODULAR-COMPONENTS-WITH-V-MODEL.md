@@ -516,8 +516,5 @@ To make the component even more reusable, we could consider writing it as a rend
 - Add hours, minutes, seconds, and AM/PM support.
 - Write some tests with Testing Library; you can use `fireEvent.update` to update the value of the `<input>` elements.
 
-You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

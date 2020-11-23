@@ -150,35 +150,27 @@ describe('required' () => {
 
 describe('isBetween', () => {
   it('returns true when value is equal to min', () => {
-    expect(isBetween(5, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
+    expect(isBetween(5, { min: 5, max: 10 })).toEqual({ valid: true })
   })
 
   it('returns true when value is between min/max', () => {
-    expect(isBetween(7, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
+    expect(isBetween(7, { min: 5, max: 10 })).toEqual({ valid: true })
   })
 
   it('returns true when value is equal to max', () => {
-    expect(isBetween(10, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
+    expect(isBetween(10, { min: 5, max: 10 })).toEqual({ valid: true })
   })
 
   it('returns false when value is less than min', () => {
     expect(isBetween(4, { min: 5, max: 10 }))
-      .toEqual({ 
-        valid: false, 
-        message: 'Must be between 5 and 10' 
-      })
+      .toEqual({ valid: false, message: 'Must be between 5 and 10'  })
+    })
   })
 
   it('returns false when value is greater than max', () => {
     expect(isBetween(11, { min: 5, max: 10 }))
-      .toEqual({ 
-        valid: false, 
-        message: 'Must be between 5 and 10' 
-      })
-    })
+      .toEqual({ valid: false, message: 'Must be between 5 and 10' })
+  })
 })
 ```
 \begin{center}
@@ -698,8 +690,5 @@ As it stands, you can enter any string into the weight field and it will be cons
 - Add a `@submit.prevent` listener to `<form>`. When the form is submitted, emit an event with the `patientForm`.
  - Submit the form using Testing Library and assert the correct event and payload are emitted.
 
-You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

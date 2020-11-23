@@ -53,7 +53,7 @@ describe('Counter', () => {
 Observing the emitted events with emitted().
 \end{center}
 
-I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
+I did a `console.log(emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
 
 ```json
 { 
@@ -80,7 +80,6 @@ A submit event was emitted with three arguments, 1, 2, 3.
 \end{center}
 
 Let's add an assertion, before we get onto the main topic: patterns and practices for emitting events.
-\pagebreak
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
@@ -336,8 +335,5 @@ Finally, we saw how our tests was focused on inputs and outputs (in this case, t
 
 We touch on events again later on, in the `v-model` chapter - stay tuned.
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
 
-\pagebreak

@@ -353,13 +353,10 @@ By writing a test and asserting against the DOM, you test `complexityStyle` impl
 it('meets default requirements', async () => {
   render(TestComponent)
 
-  await fireEvent.update(
-    screen.getByLabelText('Password'), 'this is a long password')
-  await fireEvent.update(
-    screen.getByLabelText('Confirmation'), 'this is a long password')
+  await fireEvent.update(screen.getByLabelText('Password'), 'this is a long password')
+  await fireEvent.update(screen.getByLabelText('Confirmation'), 'this is a long password')
 
-  expect(screen.getByRole('password-complexity').classList)
-    .toContain('high')
+  expect(screen.getByRole('password-complexity').classList).toContain('high')
   expect(screen.getByText('Submit').disabled).toBeFalsy()
 })
 ```
@@ -474,8 +471,5 @@ There are also some improvements you could try making:
 - Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
 - Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

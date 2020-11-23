@@ -450,15 +450,11 @@ All the test are still passing, so we can be confident everything still works.
 
 Now anywhere you need access to the store, just call `useStore`. This is the same API Vuex uses. It's a common practice to make global singletons available via a useXXX function, which uses `provide` and `inject` under the hood.
 
-\pagebreak
 ## Exercises
 
 1. Update the store to have a `removeUser` function. Test it in isolation.
 2. Add a button next to each user - clicking the button should remove them from the store. Use the `removeUser` function here.
 3. Write a UI test to verify this works using Testing Library. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
-\pagebreak

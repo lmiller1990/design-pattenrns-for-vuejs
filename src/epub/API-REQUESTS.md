@@ -91,10 +91,8 @@ jest.mock('axios', () => ({
 describe('login', () => {
   it('successfully authenticates', async () => {
     render(App)
-    await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
-    await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
+    await fireEvent.update(screen.getByRole('username'), 'Lachlan')
+    await fireEvent.update(screen.getByRole('password'), 'secret-password')
     await fireEvent.click(screen.getByText('Click here to sign in'))
 
     expect(mockPost).toHaveBeenCalledWith('/login', {
@@ -281,10 +279,8 @@ jest.mock('vuex', () => ({
 describe('login', () => {
   it('successfully authenticates', async () => {
     render(App)
-    await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
-    await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
+    await fireEvent.update(screen.getByRole('username'), 'Lachlan')
+    await fireEvent.update(screen.getByRole('password'), 'secret-password')
     await fireEvent.click(screen.getByText('Click here to sign in'))
 
     expect(mockDispatch).toHaveBeenCalledWith('login', {
@@ -395,10 +391,8 @@ describe('login', () => {
 
   it('successfully authenticates', async () => {
     render(App, { store })
-    await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
-    await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
+    await fireEvent.update(screen.getByRole('username'), 'Lachlan')
+    await fireEvent.update(screen.getByRole('password'), 'secret-password')
     await fireEvent.click(screen.getByText('Click here to sign in'))
 
     await screen.findByText('Hello, Lachlan')
@@ -455,10 +449,8 @@ describe('login', () => {
     )
 
     render(App, { store })
-    await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
-    await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
+    await fireEvent.update(screen.getByRole('username'), 'Lachlan')
+    await fireEvent.update(screen.getByRole('password'), 'secret-password')
     await fireEvent.click(screen.getByText('Click here to sign in'))
 
     await screen.findByText(error)
@@ -484,4 +476,5 @@ Tests `msw` is not enough - you still need to test your application against a re
 - Trying using `msw` in a browser. You can use the same mock endpoint handlers for both your tests and development.
 - Explore `msw` more and see what other interesting features it offers.
 
-\pagebreak
+You can find the completed source code in the [GitHub repository under examples/api-requests](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
+

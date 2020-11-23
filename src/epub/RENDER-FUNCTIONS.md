@@ -603,9 +603,7 @@ Testing render function components is the same as template components.
 - Rewrite this example using TypeScript. You will want to use `defineComponent` and the Composition API for maximum type safety. This screenshot illustrates some of the benefits of TypeScript. Combined with declaring `emits`, you can get type safety for both emitted events and props.
 - Attempt to refactor the other examples throughout this book to use render functions instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and the Composition API).
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
 ![Typesafe Component with Render Function](./images/ss-ts.png)
 
