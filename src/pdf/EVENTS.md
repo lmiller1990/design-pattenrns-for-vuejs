@@ -57,7 +57,7 @@ describe('Counter', () => {
 Observing the emitted events with emitted().
 \end{center}
 
-I did a `console.log(wrapper.emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
+I did a `console.log(emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
 
 ```json
 { 
