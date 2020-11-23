@@ -542,7 +542,7 @@ The goal here was to create a highly reusable `<date-time>` component. If I was 
 
 This will allow developers using tools like webpack or rollup to take advantage of "tree shaking". When they build their final bundle for production, it will only include the `<date-time>` component and the strategy they are using. It will also allow the developer to provide their own more opinionated strategy.
 
-To make the component even more reusable, we could consider writing it as a renderless component, like the one described in chapter 5.
+To make the component even more reusable, we could consider writing it as a renderless component, like the one described in the renderless components section.
  
 ## Exercises
 
