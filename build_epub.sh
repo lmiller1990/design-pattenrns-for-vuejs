@@ -19,4 +19,4 @@ cat \
   --metadata title="Design Patterns for Vue.js" \
   --metadata author="Lachlan Miller" \
   --epub-cover-image ./assets/covers/Vue.js_cover.png \
-  -o design_patterns_for_vuejs.epub 
+  -o build/design_patterns_for_vuejs.epub 
