@@ -2,7 +2,7 @@
 
 This book is aimed at developers who are comfortable with JavaScript and Vue.js. It focuses on ideas and patterns rather than specific APIs. Separation of concerns, pure functions, writing for testability and re-usability are some of the primary motifs.
 
-The examples are written with Vue.js 3, the latest version of Vue.js. Both the classic Options API and new Composition API are covered. Tests are written with [Vue Testing Library](https://github.com/testing-library/vue-testing-library).
+The examples are written with Vue.js 3, the latest version of Vue.js. Both the classic Options API and new Composition API are covered. The tests given as examples throughout the book are written with [Vue Testing Library](https://github.com/testing-library/vue-testing-library). If you prefer Vue Test Utils, no problem - the source code contains the same tests written using both Testing Library and Vue Test Utils.
 
 The final source code including the solutions to the exercises is available [here](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
