@@ -1,6 +1,5 @@
 ---
-title: "Design Patterns for Vue.js"
-author: "Lachlan Miller"
+title: Design Patterns for Vue.js
 numbersections: true
 header-includes:
   \usepackage{graphicx}
@@ -9,5 +8,3 @@ header-includes:
 output:
     epub
 ---
-
-\tableofcontents

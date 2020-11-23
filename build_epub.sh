@@ -1,5 +1,4 @@
 cat \
-  src/epub/CONTENTS.md \
   src/epub/ABOUT.md \
   src/epub/INTRO.md \
   src/epub/PROPS.md \
@@ -15,4 +14,9 @@ cat \
   | pandoc \
   --highlight-style tango \
   --pdf-engine pdflatex \
+  --number-sections \
+  --toc \
+  --metadata title="Design Patterns for Vue.js" \
+  --metadata author="Lachlan Miller" \
+  --epub-cover-image ./assets/covers/Vue.js_cover.png \
   -o design_patterns_for_vuejs.epub 

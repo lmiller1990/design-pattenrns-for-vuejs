@@ -1,5 +1,6 @@
 node_modules
 *.pdf
+build
 
 *.aux
 *.log

@@ -47,3 +47,4 @@ Each section is independent; you don't need to read it in order, so if there is 
 I hope this has given you a good idea of what to expect. If you have any feedback, questions ors comments, or just want to chat about Vue and testing, feel free to reach out via email or Twitter (find my most up to date contact details on the website you got this book).
 
 See you in the next section!
+

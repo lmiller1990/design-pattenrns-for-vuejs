@@ -14,7 +14,7 @@ He picked up Vue.js in 2016 and was immediately hooked. He has been contributing
 
 He also has a YouTube channel where he posts advanced content, similar to that found in this book. He has made two full length courses, enjoyed by over 13000 students.
 
-Lachlan's website: https://lachlan-miller.me
-Lachlan's YouTube channel: https://www.youtube.com/c/LachlanMiller
-Lachlan's Udemy Profile: https://www.udemy.com/user/lachlan-miller-4/
+[Lachlan's website](https://lachlan-miller.me).
+[Lachlan's YouTube channel](https://www.youtube.com/c/LachlanMiller).
+[Lachlan's Udemy Profile](https://www.udemy.com/user/lachlan-miller-4/).
 
