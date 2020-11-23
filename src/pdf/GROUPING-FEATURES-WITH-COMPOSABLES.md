@@ -117,9 +117,9 @@ Let's try it out! Create a new component and use the `useTicTacToe` function:
 
 ```html
 <template>
-  <div v-for="row, rowIdx in boards[0]" class="row">
+  <div v-for="(row, rowIdx) in boards[0]" class="row">
     <div 
-      v-for="col, colIdx in row" 
+      v-for="(col, colIdx) in row" 
       class="col" 
     >
       {{ col }}
@@ -196,9 +196,9 @@ Update the component to use the new `currentBoard` computed property:
 
 ```html
 <template>
-  <div v-for="row, rowIdx in currentBoard" class="row">
+  <div v-for="(row, rowIdx) in currentBoard" class="row">
     <div 
-      v-for="col, colIdx in row" 
+      v-for="(col, colIdx) in row" 
       class="col" 
     >
       {{ col }}
@@ -392,9 +392,9 @@ You can pick whichever you like best. Let's continue by updating the usage:
 
 ```html
 <template>
-  <div v-for="row, rowIdx in currentBoard" class="row">
+  <div v-for="(row, rowIdx) in currentBoard" class="row">
     <div 
-      v-for="col, colIdx in row" 
+      v-for="(col, colIdx) in row" 
       class="col" 
       @click="makeMove({ row: rowIdx, col: colIdx })"
     >
