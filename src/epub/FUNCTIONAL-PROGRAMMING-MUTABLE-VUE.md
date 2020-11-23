@@ -1,10 +1,6 @@
 # Functional Core, Imperative Shell - Immutable Logic, Mutable Vue
 
-You can find the completed source code in the [GitHub repository under examples/composition-functional](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-______
+You can find the completed source code in the [GitHub repository under examples/composition-functional](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
 
 In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We consciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
 

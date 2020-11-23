@@ -1,10 +1,6 @@
 # Emitting Events
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-______
+You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
 
 Vue's primary mechanic for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierarchy, you do so by *emitting events*. This is done by calling `this.$emit()` (Options API) or `ctx.emit()` (Composition API).
 

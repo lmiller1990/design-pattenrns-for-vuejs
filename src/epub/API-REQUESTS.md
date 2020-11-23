@@ -1,5 +1,7 @@
 # HTTP and API Requests
 
+You can find the completed source code in the [GitHub repository under examples/api-requests](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
+
 Something almost every Vue.js application is going to do is make HTTP requests to an API of some sort. This could be for authentication, loading data, or something else. Many patterns have emerged to manage HTTP requests, and even more to test them.
 
 This chapter looks at various ways to architecture your HTTP requests, different ways to test them, and discusses the pros and cons of each approach.

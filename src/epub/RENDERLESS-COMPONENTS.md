@@ -1,11 +1,6 @@
 # Renderless Components
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-______
-
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
 The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility.
 

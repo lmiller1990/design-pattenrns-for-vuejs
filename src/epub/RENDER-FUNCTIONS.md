@@ -1,10 +1,7 @@
 # The Power of Render Functions
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
 
-______
 So far, all the examples in this book have used a `<template>` to structure the components. In reality, Vue does a ton of heavy lifting in the background between writing markup in `<template>` and rendering content in a browser. This is primarily handled by one of Vue's core packages, `@vue/compiler-sfc`. 
 
 Code in `<template>` is compiled to something called *render functions*. Several things happen during this compilation step. Some of these are:

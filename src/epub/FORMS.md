@@ -1,10 +1,6 @@
 # Writing Testable Forms
 
-You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-______
+You can find the completed source code (including exercises) in the [GitHub repository under examples/form-validation](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
 
 Forms are the primary way a user enters information into any web-based system, so getting them right is important. The focus of this section will be on forms, specifically *writing good forms*. 
 

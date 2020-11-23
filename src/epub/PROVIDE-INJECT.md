@@ -1,10 +1,6 @@
 # Dependency Injection with Provide and Inject
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
-\newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-______
+You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
 
 In this section we discuss a pair of functions, `provide` and `inject`. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to this Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. For this reason, `provide` and `inject` were not as commonly used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
 
