@@ -25,13 +25,8 @@ Finally, we need two types of tests. The first is around the business logic; giv
 
 For this example, we are building a form to enter patient data for a hospital application. The form will look like this when filled out without any errors:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
-  \caption{Valid form with debug info}
-  \label{fig}
-\end{figure}
-
+![Valid form with debug info](./images/form-validation/ss-done-clean.png)
+  
 There are two inputs. The first is the patient name, which is required and can be any text. The second is the patient weight, which can be in imperial or metric units. The constraints are as follows:
 
  Constraint | Imperial | Metric
@@ -41,12 +36,7 @@ max | 440 | 200
 
 We will need to validate both the name and the weight. The form with errors looks like this:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-dirty.png}
-  \caption{Invalid form with debug info}
-  \label{fig}
-\end{figure}
+![Invalid form with debug info](./images/form-validation/ss-done-dirty.png)
 
 We will define the constraints using an object:
 
@@ -641,13 +631,7 @@ A simple template with form v-model bindings.
 
 I added the `<pre>` block for some debugging. Everything works!
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
-  \caption{Validation debug info}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Validation debug info](./images/form-validation/ss-done-clean.png)
 
 ## Some Basic UI Tests
 

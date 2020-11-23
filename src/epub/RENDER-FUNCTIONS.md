@@ -34,13 +34,7 @@ In this section we will build a tab component. The usage will look something lik
 Final markup for the tabs component.
 \end{center}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
-  \caption{Completed Tabs Component}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Completed Tabs Component](./images/ss-tabs-done.png)
 
 The `<tab-container>` component works by taking a `<tab>` component with a `tabId` prop. This is paired with a `<tab-content>` component with the same `tabId`. Only the `<tab-content>` where the `tabId` prop matches the `activeTabId` value will be shown. We will dynamically update `activeTabId` when a `<tab>` is clicked.
 
@@ -230,23 +224,11 @@ In this example, `this.$slots.default()` would contain *four* slots (technically
 
 Create a new app using the above component as the root component. Open a browser and open up the console. You should see something like this:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-render-default-slots.png}
-  \caption{Logging Slots (Array of VNodes)}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Logging Slots (Array of VNodes)](./images/ss-render-default-slots.png)
 
 An array of four complex objects. These are `VNodes` - how Vue internally represents nodes in it's virtual DOM. I expanded the first one and marked some of the relevant properties for this section:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-slot-details.png}
-  \caption{Detailed View of the Tab VNode}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Detailed View of the Tab VNode](./images/ss-slot-details.png)
 
 The first one is `children`. This is where the slots go. For example in:
 
@@ -292,13 +274,7 @@ Separating the different slots using filter.
 
 Since `type` is a direct reference to the original component (eg, not a copy), we can use `===` (strict equality) to filter the slots.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-sorted-slots.png}
-  \caption{Filtered VNodes}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Filtered VNodes](./images/ss-sorted-slots.png)
 
 The next goal will be to render the tabs. We will also add some classes to get some nice styling, as well as show which tab is currently selected.
 
@@ -335,13 +311,7 @@ Rendering the tabs using h.
 
 Finally, we have something rendering:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-render-tabs-basic.png}
-  \caption{Rendered Tabs}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Rendered Tabs](./images/ss-render-tabs-basic.png)
 
 You may have noticed I did `h(() => tabs)` instead of just `return tabs`. `h` also accepts a callback - in which case, it will evaluate the callback function when it renders. I recommend always returning `h(() => /* render function */)` for the final value in `render` - if you don't, you may run into subtle caching issues.
 
@@ -520,13 +490,7 @@ A dynamic class binding.
 
 It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, active: tabId === activeTabId }"` in a render function. Here's how it looks in a browser (I added some CSS - grab the CSS from `examples/render-functions/app.vue`):
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-classes.png}
-  \caption{Dynamic Classes}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Dynamic Classes](./images/ss-tabs-classes.png)
 
 ## Event Listeners in Render Functions
 
@@ -549,13 +513,8 @@ onClick listener implemented a the render function
 
 This is the render function version of `<tab v-on:click="update:activeTabId(tabId)" />`. `on:click` becomes `onClick`. Events need to be prepended with `on`. This is enough to update the active tab (I added some debugging information):
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-active.png}
-  \caption{Emitting Events in Render Functions}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Emitting Events in Render Functions](./images/ss-active.png)
+  
 
 ## Filtering Content
 
@@ -618,13 +577,7 @@ It's possible to return an array of `VNodes` from `render`, which is what we do 
 
 It works!
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
-  \caption{Completed Tabs Component}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Completed Tabs Component](./images/ss-tabs-done.png)
 
 
 ## Testing Render Function Components
@@ -657,11 +610,5 @@ You can find the completed source code in the [GitHub repository under examples/
 \newline
 https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-ts.png}
-  \caption{Typesafe Component with Render Function}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Typesafe Component with Render Function](./images/ss-ts.png)
 

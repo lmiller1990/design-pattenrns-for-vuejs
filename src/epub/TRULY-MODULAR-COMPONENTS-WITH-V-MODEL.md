@@ -19,16 +19,7 @@ In this section we will author a reusable date component. Usage will be like thi
 The goal - a <datetime> component that works with any DateTime library via the strategy pattern.
 \end{center}
 
-The finished component will look like this:
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-done.png}
-  \caption{Completed DateTime Component}
-  \label{fig}
-\end{figure}
-
-There are three props: `v-model`, `serialize` and `deserialize`. More on what `serialize` and `deserialize` are soon.
+![Completed DateTime Component](./images/ss-dt-done.png)
 
 The idea is that the `date` value passed to `v-model` can use whichever DateTime library the developer wants to use. We want to allow developers to choose their a DateTime library, instead of mandating a specific one.
 
@@ -92,12 +83,7 @@ The key part is the last sentence. We push the onus of selecting the algorithm o
 
 A diagram might make this more clear:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/dt-ss-1.png}
-  \caption{DateTime data flow}
-  \label{fig}
-\end{figure}
+![DateTime data flow](./images/dt-ss-1.png)
 
 In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
 
@@ -185,12 +171,7 @@ export default {
 </script>
 ```
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-progress.png}
-  \caption{Rendering the Date Inputs}
-  \label{fig}
-\end{figure}
+![Rendering the Date Inputs](./images/ss-dt-progress.png)
 
 I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, made reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
 
@@ -350,14 +331,8 @@ The main changes are:
 1. We now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. 
 2. We use `deserialize` on the `modelValue` in the `update` function when preparing to update `modelValue`. 
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-progress-2.png}
-  \caption{Using the serialize prop.}
-  \label{fig}
-\end{figure}
-\pagebreak
-
+![Using the serialize prop.](./images/ss-dt-progress-2.png)
+  
 Now would generally be a good time to write a test for the `deserialize` function. Notice I exported it independently of the Vue component, and it does not use the Vue reactivity system. This is intentional. It's a pure function, so it's very easy to test. For brevity, the tests are not shown, but you can find them in the GitHub repository. 
 
 This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
@@ -466,13 +441,7 @@ All that changed was declaring the `serialize` prop and calling `props.serialize
 
 It works! Kind of - as long as you only enter value numbers. If you enter a `0` for the day, all the inputs show `NaN`. We need some error handling.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-error.png}
-  \caption{Serializing/Deserializing without error handling.}
-  \label{fig}
-\end{figure}
-\pagebreak
+![Serializing/Deserializing without error handling.](./images/ss-dt-error.png)
 
 ## Error Handling
 

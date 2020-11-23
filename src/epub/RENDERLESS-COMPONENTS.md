@@ -13,12 +13,7 @@ One example is you have some complex logic that needs to be reused in two differ
 
 In this section we will build the following component, a password strength form:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
-  \caption{Completed Password Complexity Component}
-  \label{fig}
-\end{figure}
+![Completed Password Complexity Component](./images/renderless-password/ss-done.png)
 
 There are a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
 
@@ -81,12 +76,7 @@ Trying out the renderless-password.
 
 We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting, but it illustrates the idea of exposing properties via `v-slot`.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss1.png}
-  \caption{Rendering with slots.default() and v-slot}
-  \label{fig}
-\end{figure}
+![Rendering with slots.default() and v-slot](./images/renderless-password/ss1.png)
 
 ## Adding Password and Confirmation Inputs
 
@@ -191,12 +181,7 @@ The main change is we now have a `reactive` input that has `password` and `confi
 
 I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code. It looks like this:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss2.png}
-  \caption{Rendering Inputs and Debug Info}
-  \label{fig}
-\end{figure}
+![Rendering Inputs and Debug Info](./images/renderless-password/ss2.png)
 
 This works great! The complexity and business logic is nicely abstracted away in `renderless-password`. The developer can use the logic to style the component to suit their application and use case.
 
@@ -389,12 +374,7 @@ Testing the correct complexity class is included.
 
 The application now looks like this:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss3.png}
-  \caption{Complexity Indicator}
-  \label{fig}
-\end{figure}
+![Complexity Indicator](./images/renderless-password/ss3.png)
 
 ## Computing Form Validity 
 
@@ -475,21 +455,11 @@ Destructuring valid and binding to it.
 
 Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
-  \caption{Completed Password Complexity Component}
-  \label{fig}
-\end{figure}
+![Completed Password Complexity Component](./images/renderless-password/ss-done.png)
 
 Just for fun, I tried making an alternative UI. All I had to do was move around some markup:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-alt.png}
-  \caption{Alternative Password Complexity Component}
-  \label{fig}
-\end{figure}
+![Alternative Password Complexity Component](./images/renderless-password/ss-alt.png)
 
 See what else you can come up with. I think there is a lot of room for innovation with the renderless component pattern. There is at least one project using this pattern, Headless UI - check it out for more inspiration: https://headlessui.dev/.
 

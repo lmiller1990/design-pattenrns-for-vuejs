@@ -240,12 +240,7 @@ Simply making the `validateVariant` a separate function that is exported might s
 
 If the developer passes an invalid prop, they get a nice clear message in the console:
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{./images/props-error.png}
-  \caption{Error! Passed variant is invalid.}
-  \label{fig}
-\end{figure}
+![Error! Passed variant is invalid.(./images/props-error.png)
 
 ## Key Concept: Separation of Concerns
 
