@@ -242,7 +242,7 @@ If the developer passes an invalid prop, they get a nice clear message in the co
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/props-error.png}
+  \includegraphics[width=\linewidth]{props-error.png}
   \caption{Error! Passed variant is invalid.}
   \label{fig}
 \end{figure}

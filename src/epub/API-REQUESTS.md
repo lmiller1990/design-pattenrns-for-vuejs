@@ -307,17 +307,17 @@ This is not the case with the test using a real Vuex store - breaking the store 
 
 The problem with the above example is we are mocking too far up the chain. Good tests are as production like as possible. This is the best way to have confidence in your test suite. This diagram shows the dependency chain in the `<login>` component:
 
-![Authentication dependency chain](./images/api-map.png)
+![Authentication dependency chain](api-map.png)
 
 The previous test, where we mocked Vuex, mocks the dependency chain here:
 
-![Mocking Vuex](./images/api-vuex.png)
+![Mocking Vuex](api-vuex.png)
 
 This means if anything breaks in Vuex, the HTTP call, or the server, our test will not fail.
 
 The axios test is slightly better - it mocks one layer lower:
 
-![Mocking Axios](./images/api-axios.png)
+![Mocking Axios](api-axios.png)
 
 This is better. If something breaks in either the `<login>` or Vuex, the test will fail.
 

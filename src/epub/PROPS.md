@@ -237,7 +237,7 @@ Simply making the `validateVariant` a separate function that is exported might s
 
 If the developer passes an invalid prop, they get a nice clear message in the console:
 
-![Error! Passed variant is invalid.(./images/props-error.png)
+![Error! Passed variant is invalid.(props-error.png)
 
 ## Key Concept: Separation of Concerns
 

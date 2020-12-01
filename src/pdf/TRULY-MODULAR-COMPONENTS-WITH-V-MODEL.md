@@ -23,7 +23,7 @@ The finished component will look like this:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-done.png}
+  \includegraphics[width=\linewidth]{ss-dt-done.png}
   \caption{Completed DateTime Component}
   \label{fig}
 \end{figure}
@@ -94,7 +94,7 @@ A diagram might make this more clear:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/dt-ss-1.png}
+  \includegraphics[width=\linewidth]{dt-ss-1.png}
   \caption{DateTime data flow}
   \label{fig}
 \end{figure}
@@ -187,7 +187,7 @@ export default {
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-progress.png}
+  \includegraphics[width=\linewidth]{ss-dt-progress.png}
   \caption{Rendering the Date Inputs}
   \label{fig}
 \end{figure}
@@ -352,7 +352,7 @@ The main changes are:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-progress-2.png}
+  \includegraphics[width=\linewidth]{ss-dt-progress-2.png}
   \caption{Using the serialize prop.}
   \label{fig}
 \end{figure}
@@ -468,7 +468,7 @@ It works! Kind of - as long as you only enter value numbers. If you enter a `0` 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-dt-error.png}
+  \includegraphics[width=\linewidth]{ss-dt-error.png}
   \caption{Serializing/Deserializing without error handling.}
   \label{fig}
 \end{figure}

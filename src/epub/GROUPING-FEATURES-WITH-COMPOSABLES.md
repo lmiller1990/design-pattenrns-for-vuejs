@@ -4,7 +4,7 @@ You can find the completed source code in the [GitHub repository under examples/
 
 Vue 3's flagship feature is The Composition API; it's main selling point is to easily group and reuse code by *feature*. In this section we will see some techniques to write testable composables by building a tic tac toe game, including undo and redo.
 
-![Completed Game](./images/ss-tic-tac-toe-done.png)
+![Completed Game](ss-tic-tac-toe-done.png)
 
 The API we will end with looks like this:
 
@@ -150,7 +150,7 @@ Testing out the new useTicTacToe composable.
 
 Great! It works:
 
-![Rendered game board](./images/ttt-1.png)
+![Rendered game board](ttt-1.png)
 
 ## Computing the Current State
 
@@ -404,7 +404,7 @@ export default {
 </script>
 ```
 
-![Completed Game](./images/ss-tic-tac-toe-done.png)
+![Completed Game](ss-tic-tac-toe-done.png)
 
 That's it! Everything now works. The game is now playable - well, you can make moves. There are several problems:
 

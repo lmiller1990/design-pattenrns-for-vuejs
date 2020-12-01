@@ -10,7 +10,7 @@ Vue 3's flagship feature is The Composition API; it's main selling point is to e
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-tic-tac-toe-done.png}
+  \includegraphics[width=\linewidth]{ss-tic-tac-toe-done.png}
   \caption{Completed Game}
   \label{fig}
 \end{figure}
@@ -161,7 +161,7 @@ Great! It works:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ttt-1.png}
+  \includegraphics[width=\linewidth]{ttt-1.png}
   \caption{Rendered game board}
   \label{fig}
 \end{figure}
@@ -422,7 +422,7 @@ export default {
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-tic-tac-toe-done.png}
+  \includegraphics[width=\linewidth]{ss-tic-tac-toe-done.png}
   \caption{Completed Game}
   \label{fig}
 \end{figure}

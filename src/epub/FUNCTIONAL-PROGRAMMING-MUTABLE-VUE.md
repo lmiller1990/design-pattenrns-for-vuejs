@@ -46,7 +46,7 @@ You may be wondering: if we cannot mutate anything, how do we get anything done?
 
 The answer is that while we only avoid mutation in the business logic. This is the "functional core" part of the paradigm. All side effects, mutation and unpredictable actions, such as updating the DOM and listening for user input will be handled in a thin layer. This thin layer is the  *imperative shell* part of the paradigm. The imperative shell wraps the functional core (the business logic) with Vue's reactivity APIs. All mutation will occur in the imperative shell. 
 
-![Functional Core, Imperative Shell. Image Credit: mokagio (Twitter)](./images/functional-core-imperative-shell.jpg)
+![Functional Core, Imperative Shell. Image Credit: mokagio (Twitter)](functional-core-imperative-shell.jpg)
 
 In this diagram the solid white circles represents the "functional core". These are a collection of pure functions that are written in plain JavaScript - no reactivity and no global variables. This includes methods like the new `makeMove` function we are about to write.
 
@@ -285,7 +285,7 @@ export default {
 Testing out the implementation.
 \end{center}
 
-![Rendered game board](./images/ttt-1.png)
+![Rendered game board](ttt-1.png)
 
 ## Integrating makeMove
 
@@ -311,7 +311,7 @@ move is just a wrapper around the functional `makeMove`.
 
 Everything now works in it's functional, loosely coupled, immutable glory.
 
-![Rendered game board](./images/ttt-2.png)
+![Rendered game board](ttt-2.png)
 
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 

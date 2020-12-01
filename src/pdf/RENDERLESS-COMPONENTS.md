@@ -15,7 +15,7 @@ In this section we will build the following component, a password strength form:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
+  \includegraphics[width=\linewidth]{./ss-done.png}
   \caption{Completed Password Complexity Component}
   \label{fig}
 \end{figure}
@@ -83,7 +83,7 @@ We can destructure the object passed to `slots.default()` in `v-slot`, and are f
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss1.png}
+  \includegraphics[width=\linewidth]{./ss1.png}
   \caption{Rendering with slots.default() and v-slot}
   \label{fig}
 \end{figure}
@@ -193,7 +193,7 @@ I also added some extra `<div>` elements and classes - those are mainly for styl
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss2.png}
+  \includegraphics[width=\linewidth]{./ss2.png}
   \caption{Rendering Inputs and Debug Info}
   \label{fig}
 \end{figure}
@@ -391,7 +391,7 @@ The application now looks like this:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss3.png}
+  \includegraphics[width=\linewidth]{./ss3.png}
   \caption{Complexity Indicator}
   \label{fig}
 \end{figure}
@@ -477,7 +477,7 @@ Everything works! And we can easily move elements around to change the look and 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-done.png}
+  \includegraphics[width=\linewidth]{./ss-done.png}
   \caption{Completed Password Complexity Component}
   \label{fig}
 \end{figure}
@@ -486,7 +486,7 @@ Just for fun, I tried making an alternative UI. All I had to do was move around 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/renderless-password/ss-alt.png}
+  \includegraphics[width=\linewidth]{./ss-alt.png}
   \caption{Alternative Password Complexity Component}
   \label{fig}
 \end{figure}

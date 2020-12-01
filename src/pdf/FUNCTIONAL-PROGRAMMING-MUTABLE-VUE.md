@@ -52,7 +52,7 @@ The answer is that while we only avoid mutation in the business logic. This is t
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/functional-core-imperative-shell.jpg}
+  \includegraphics[width=\linewidth]{functional-core-imperative-shell.jpg}
   \caption{Functional Core, Imperative Shell. Image Credit: mokagio (Twitter)}
   \label{fig}
 \end{figure}
@@ -296,7 +296,7 @@ Testing out the implementation.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ttt-1.png}
+  \includegraphics[width=\linewidth]{ttt-1.png}
   \caption{Rendered game board}
   \label{fig}
 \end{figure}
@@ -327,7 +327,7 @@ Everything now works in it's functional, loosely coupled, immutable glory.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ttt-2.png}
+  \includegraphics[width=\linewidth]{ttt-2.png}
   \caption{Rendered game board}
   \label{fig}
 \end{figure}

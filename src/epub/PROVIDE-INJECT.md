@@ -6,7 +6,7 @@ In this section we discuss a pair of functions, `provide` and `inject`. These fa
 
 Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` function, for example simply importing and exporting a global singleton. We will see why `provide` and `inject` are a better way of sharing a global variable.
 
-![Completed demo app](./images/ss-complete.png)
+![Completed demo app](ss-complete.png)
 
 ## A Simple Store
 
@@ -104,7 +104,7 @@ export default {
 accessing the state via the the imported store.
 \end{center}
 
-![Displaying a user from the store state.](./images/ss-basic.png)
+![Displaying a user from the store state.](ss-basic.png)
 
 It works! Good progress - I added a tiny bit of CSS as well, grab that from the source code. 
 
@@ -244,7 +244,7 @@ A form to create new users.
 
 Great! The test now passes - again, I added a tiny bit of CSS and a nice title, which you can get in the source code if you like.
 
-![Completed app](./images/ss-complete.png)
+![Completed app](ss-complete.png)
 
 ## Provide/Inject to Avoid Cross Test Contamination
 
@@ -254,7 +254,7 @@ Ideally each test should run in isolation. We can't isolate the store if we are 
 
 This diagram, taken from this official documentation, explains it well:
 
-![Provide/Inject diagram. Credit: Vue documentation.](./images/ss-provde-inject.png)
+![Provide/Inject diagram. Credit: Vue documentation.](ss-provde-inject.png)
 
 Let's say you have a component, `Parent.vue`, that looks like something this:
 

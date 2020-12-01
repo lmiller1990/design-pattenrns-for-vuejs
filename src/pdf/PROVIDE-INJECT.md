@@ -12,7 +12,7 @@ Instead of providing a toy example, we will see a real use case by building a si
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-complete.png}
+  \includegraphics[width=\linewidth]{ss-complete.png}
   \caption{Completed demo app}
   \label{fig}
 \end{figure}
@@ -116,7 +116,7 @@ accessing the state via the the imported store.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-basic.png}
+  \includegraphics[width=\linewidth]{ss-basic.png}
   \caption{Displaying a user from the store state.}
   \label{fig}
 \end{figure}
@@ -261,7 +261,7 @@ Great! The test now passes - again, I added a tiny bit of CSS and a nice title, 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-complete.png}
+  \includegraphics[width=\linewidth]{ss-complete.png}
   \caption{Completed app}
   \label{fig}
 \end{figure}
@@ -276,7 +276,7 @@ This diagram, taken from this official documentation, explains it well:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-provde-inject.png}
+  \includegraphics[width=\linewidth]{ss-provde-inject.png}
   \caption{Provide/Inject diagram. Credit: Vue documentation.}
   \label{fig}
 \end{figure}

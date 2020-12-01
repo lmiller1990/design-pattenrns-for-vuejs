@@ -311,7 +311,7 @@ The problem with the above example is we are mocking too far up the chain. Good 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/api-map.png}
+  \includegraphics[width=\linewidth]{./api-map.png}
   \caption{Authentication dependency chain}
   \label{fig}
 \end{figure}
@@ -320,7 +320,7 @@ The previous test, where we mocked Vuex, mocks the dependency chain here:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/api-vuex.png}
+  \includegraphics[width=\linewidth]{./api-vuex.png}
   \caption{Mocking Vuex}
   \label{fig}
 \end{figure}
@@ -331,7 +331,7 @@ The axios test is slightly better - it mocks one layer lower:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/api-axios.png}
+  \includegraphics[width=\linewidth]{./api-axios.png}
   \caption{Mocking Axios}
   \label{fig}
 \end{figure}

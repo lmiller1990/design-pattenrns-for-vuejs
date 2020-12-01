@@ -27,7 +27,7 @@ For this example, we are building a form to enter patient data for a hospital ap
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
+  \includegraphics[width=\linewidth]{ss-done-clean.png}
   \caption{Valid form with debug info}
   \label{fig}
 \end{figure}
@@ -43,7 +43,7 @@ We will need to validate both the name and the weight. The form with errors look
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-dirty.png}
+  \includegraphics[width=\linewidth]{ss-done-dirty.png}
   \caption{Invalid form with debug info}
   \label{fig}
 \end{figure}
@@ -643,7 +643,7 @@ I added the `<pre>` block for some debugging. Everything works!
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/form-validation/ss-done-clean.png}
+  \includegraphics[width=\linewidth]{ss-done-clean.png}
   \caption{Validation debug info}
   \label{fig}
 \end{figure}

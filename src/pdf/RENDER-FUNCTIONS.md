@@ -36,7 +36,7 @@ Final markup for the tabs component.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
+  \includegraphics[width=\linewidth]{ss-tabs-done.png}
   \caption{Completed Tabs Component}
   \label{fig}
 \end{figure}
@@ -232,7 +232,7 @@ Create a new app using the above component as the root component. Open a browser
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-render-default-slots.png}
+  \includegraphics[width=\linewidth]{ss-render-default-slots.png}
   \caption{Logging Slots (Array of VNodes)}
   \label{fig}
 \end{figure}
@@ -242,7 +242,7 @@ An array of four complex objects. These are `VNodes` - how Vue internally repres
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-slot-details.png}
+  \includegraphics[width=\linewidth]{ss-slot-details.png}
   \caption{Detailed View of the Tab VNode}
   \label{fig}
 \end{figure}
@@ -294,7 +294,7 @@ Since `type` is a direct reference to the original component (eg, not a copy), w
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-sorted-slots.png}
+  \includegraphics[width=\linewidth]{ss-sorted-slots.png}
   \caption{Filtered VNodes}
   \label{fig}
 \end{figure}
@@ -337,7 +337,7 @@ Finally, we have something rendering:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-render-tabs-basic.png}
+  \includegraphics[width=\linewidth]{ss-render-tabs-basic.png}
   \caption{Rendered Tabs}
   \label{fig}
 \end{figure}
@@ -522,7 +522,7 @@ It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, ac
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-classes.png}
+  \includegraphics[width=\linewidth]{ss-tabs-classes.png}
   \caption{Dynamic Classes}
   \label{fig}
 \end{figure}
@@ -551,7 +551,7 @@ This is the render function version of `<tab v-on:click="update:activeTabId(tabI
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-active.png}
+  \includegraphics[width=\linewidth]{ss-active.png}
   \caption{Emitting Events in Render Functions}
   \label{fig}
 \end{figure}
@@ -620,7 +620,7 @@ It works!
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-tabs-done.png}
+  \includegraphics[width=\linewidth]{ss-tabs-done.png}
   \caption{Completed Tabs Component}
   \label{fig}
 \end{figure}
@@ -659,7 +659,7 @@ https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{./images/ss-ts.png}
+  \includegraphics[width=\linewidth]{ss-ts.png}
   \caption{Typesafe Component with Render Function}
   \label{fig}
 \end{figure}
