@@ -1,21 +1,21 @@
-# HTTP and API Requests
+# HTTPとAPIのリクエスト
 
-Something almost every Vue.js application is going to do is make HTTP requests to an API of some sort. This could be for authentication, loading data, or something else. Many patterns have emerged to manage HTTP requests, and even more to test them.
+ほとんど全てのVue.jsアプリケーションで行われていることは、何らかのAPIに対してHTTPリクエストを送ることです。これは、認証やデータローディング、あるいはそれ以外の目的であったりします。HTTPリクエストを管理し、さらにテストするため、多くのデザインパターンが考案されてきました。
 
-This chapter looks at various ways to architecture your HTTP requests, different ways to test them, and discusses the pros and cons of each approach.
+この章では、HTTPリクエストを構築する様々な方法、リクエストをテストする異なる方法を見ていき、各々のアプローチの長所と短所を論じていきます。
 
-## The Login Component
+## Loginコンポーネント
 
-The example I will use is the `<login>` component. It lets the user enter their username and password and attempt to authenticate. We want to think about:
+今後の例で使用するのは`<login>`コンポーネントです。このコンポーネントは、ユーザーに名前とパスワードを入力させ、認証を試みさせるものです。以下のことについて考えていきたいです:
 
-- where should the HTTP request be made from? The component, another module, in a store (like Vuex?)
-- how can we test each of these approaches?
+- HTTPリクエストはどこから発せられるべきか？コンポーネント、別のモジュール、ストア（Vuexのような）？
+- 各アプローチに対してどのようにテストできるか？
 
-There is no one size fits all solution here. I'll share how I currently like to structure things, but also provide my opinion on other architectures.
+万能のソリューションは存在しません。以下では最近お気に入りの構成方法を共有しますが、他のアーキテクチャーについても私見を述べます。
 
-## Starting Simple
+## シンプルに始める
 
-If you application is simple, you probably won't need something like Vuex or an isolated HTTP request service. You can just inline everything in your component:
+アプリケーションがシンプルであれば、Vuexや独立したHTTPリクエストサービスは不要でしょう。単に全ての作業をコンポーネントの中ですることができます:
 
 ```html
 <template>
@@ -57,20 +57,20 @@ export default {
 </script>
 ```
 \begin{center}
-A simple login form component, It makes a request using axios.
+シンプルなログインフォームコンポーネント。axiosを用いてリクエストを行います。
 \end{center}
 
-This example uses the axios HTTP library, but the same ideas apply if you are using fetch.
+この例ではaxiosのHTTPライブラリを使用していますが、fetchを使用した場合も同様の考え方が当てはまります。
 
-We don't want to make a request to a real server when testing this component - unit tests should run in isolation. One option here is to mock the `axios` module with `jest.mock`. 
+このコンポーネントをテストする際に、実際のサーバーにリクエストを投げたくありません－単体テストは分離して実行するべきです。ここでの選択肢の一つは、`jest.mock`を用いて`axios`モジュールをモックすることです。
 
-We probably want to test:
+このコンポーネントをテストする際に、実際のサーバーにリクエストを投げたくありません－単体テストは分離して実行するべきです。ここでの選択肢の一つは、`jest.mock`を用いて`axios`モジュールをモックすることです。
 
-- is the correct endpoint used?
-- is the correct payload included?
-- does the DOM update accordingly based on the response?
+- 正しいエンドポイントが使われているか？
+- 正しいペイロードが含まれているか？
+- レスポンスに基づいて適宜DOMが更新されたか？
 
-A test where the user successfully authenticates might look like this:
+ユーザーが認証に成功した場合のテストは以下のようになるはずです:
 
 ```js
 import { render, fireEvent, screen } from '@testing-library/vue'
@@ -87,7 +87,7 @@ jest.mock('axios', () => ({
 }))
 
 describe('login', () => {
-  it('successfully authenticates', async () => {
+  it('認証に成功すること', async () => {
     render(App)
     await fireEvent.update(
       screen.getByRole('username'), 'Lachlan')
@@ -104,14 +104,14 @@ describe('login', () => {
 })
 ```
 \begin{center}
-Using a mock implementation of axios to test the login workflow.
+ログイン時のワークフローをテストするために、asiosのモックを利用します。
 \end{center}
 
-Testing a failed request is straight forward as well - you would just throw an error in the mock implementation. 
+リクエストが失敗した場合のテストも簡単です－mockの実装の中でエラーを投げればいいだけです。
 
-## Refactoring to a store
+## storeにリファクタリングする
 
-If you are working on anything other than a trivial application, you probably don't want to store the response in component local state. The most common way to scale a Vue app has traditionally been Vuex. More often than not, you end up with a Vuex store that looks like this:
+小規模ではないアプリケーション上で実装する場合、コンポーネント内のローカルなstateにレスポンスを保存したくはないでしょう。Vueをスケールする伝統的に最も一般的な方法はVuexを用いることでしょう。大抵、Vuexストアは以下のようになるでしょう:
 
 ```js
 import axios from 'axios'
@@ -139,12 +139,12 @@ export const store = {
 }
 ```
 \begin{center}
-A simple Vuex store.
+シンプルなVuexのストア。
 \end{center}
 
-There are many strategies for error handling in this set up. You can have a local `try/catch` in the component. Other developers store the error in the Vuex state, as well.
+この場合のエラーハンドリングには様々な方法があります。コンポーネント内にローカルの`try/catch`を書いてもいいですし、Vuexのstate内にエラーを保存する開発者もいます。
 
-Either way, the `<login>` component using a Vuex store would look something like this:
+いずれにせよ、Vuexを用いた`<login>`コンポーネントは以下のようになるでしょう:
 
 ```js
 <template>
@@ -183,33 +183,33 @@ export default {
 </script>
 ```
 \begin{center}
-Using Vuex in the login component.
+ログインコンポーネントの中でVuexを使用。
 \end{center}
 
-You now need a Vuex store in your test, too. You have a few options. The two most common are:
+また、テストの中でもVuexストアが必要になります。いくつかやり方がありますが、最も一般的な方法は以下の2つです:
 
-- use a real Vuex store - continue mocking axios
-- use a mock Vuex store
+- 実際のVuexストアを用いる－axiosのモックは継続する
+- Vuexストアのモックを用いる
 
-The first option would look something like this:
+最初の方法は以下のようになるでしょう:
 
 ```js
 import { store } from './store.js'
 
 describe('login', () => {
-  it('successfully authenticates', async () => {
-    // add 
+  it('認証に成功すること', async () => {
+    // 以下を加える
     render(App, { store })
   })
 })
 ```
 \begin{center}
-Updating the test to use Vuex.
+Vuexを用いて、テストを更新。
 \end{center}
 
-I like this option. We continue to mock `axios`. The only change we made to the test is passing a `store`. The actual user facing behavior has not changed, so the test should not need significant changes either - in fact, the actual test code is the same (entering the username and password and submitting the form). It also shows we are not testing implementation details - we were able to make a significant refactor without changing the test (except for providing the Vuex store - we added this dependency, so this change is expected).
+こちらの方法の方が好みです。`axios`のモックは継続します。テストに対して行った唯一の変更は`store`を渡したことだけです。ユーザーが直面する実際の挙動は変わっていないので、テストも大幅に変える必要はありません－事実、実際のテストコードは変わっていません（ユーザー名とパスワードを入力してフォームを送信する）。これはまた、実装の詳細をテストしていないことを示しています－テストを変えずに大きなリファクタリングを行うことができました（Vuexストアを利用したことは除きます－この依存関係は我々が追加したのですから、変更は予期されたものです）。
 
-To further illustrate this is a good test, I am going to make another refactor and convert the component to use the Composition API. Everything *should* still pass:
+このテストが優れたものであることをさらに示すため、今一度リファクタリングを行い、コンポーネントがComposition APIを用いるように変更してみましょう。ここでも、すべてのケースは依然としてパス*するはず*です:
 
 ```js
 <template>
@@ -252,18 +252,20 @@ export default {
 </script>
 ```
 \begin{center}
-Converting the component to use the Component API.
+コンポーネントを変更して、Composition APIを用います。
 \end{center}
 
-Everything still passes - another indication we are testing the behavior of the component, as opposed to the implementation details.
+全てのケースは依然パスします－このことからも、実装の詳細ではなくコンポーネントの振る舞いをテストしていることがわかります。
 
-I've used the real store + axios mock strategy for quite a long time in both Vue and React apps and had a good experience. The only downside is you need to mock `axios` a lot - you often end up with a lot of copy-pasting between tests. You can make some utilities methods to avoid this, but it's still a little boilerplate heavy.
+「実際のstore + axiosのモック」という組み合わせをVueとReactの双方でずいぶん長い間使ってきましたが、うまく機能してきました。唯一の欠点は`axios`を何度もモックしなければならないことです－しばしば、テスト間でコピー&ペーストを何度も繰り返すはめになるでしょう。これを避けるために有用な方法はいくつかありますが、それでも多少のボイラープレート※が残ってしまうでしょう。
 
-## To mock or not to mock?
+※【訳者註】boilerplate (英) 殆ど、または全く変化することなく、複数の場所で繰り返される定型コードのセクションのこと。
 
-As your application gets larger and larger, though, using a real store can become complex. Some developers opt to mock the entire store in this scenario. It leads to less boilerplate, for sure, especially if you are using Vue Test Utils, which has a `mocks` mounting option designed for mocking values on `this`, for example `this.$store`. 
+## Mockを用いるか否か？
 
-Testing Library does not support mocking things so easily - intentionally. They want your tests to be as production-like as possible, which means using real dependencies whenever possible. I like this philosophy. To see why I prefer to use a real Vuex store in my tests, let's see what happens if we mock Vuex using `jest.mock`. 
+アプリケーションが大きくなればなる程、実際のstoreを使うのは複雑になっていきます。こういったシナリオでは、store全体をモックすることを選択する開発者もいるでしょう。そうすることで確実にボイラープレートを減らすことができます。特にVue Test Utilsを使っている場合、例えば`this.$store`のように、`this`が持つ値をモックするために作られた`mocks`マウントオプションが使えます。
+
+Testing Libraryはこのような簡単にモックを利用する機能をサポートしていません－これは意図的なものです。Testing Libraryはできる限り本物に近いテストを推奨しています。つまり、可能な限り実際の依存関係を利用するということです。私はこの考え方が好きです。私がなぜ実際のVuexストアを用いる方を好むのかを理解するために、`jest.mock`を使ってVuexをモックすると何が起こるのか見てみましょう。
 
 ```js
 let mockDispatch = jest.fn()
@@ -277,7 +279,7 @@ jest.mock('vuex', () => ({
 }))
 
 describe('login', () => {
-  it('successfully authenticates', async () => {
+  it('認証に成功すること', async () => {
     render(App)
     await fireEvent.update(
       screen.getByRole('username'), 'Lachlan')
@@ -294,51 +296,51 @@ describe('login', () => {
 })
 ```
 \begin{center}
-Mocking Vuex. 
+Vuexのモック。
 \end{center}
 
-Since we are mocking the Vuex store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also directly set the `state` however you like - in the snippet above, `dispatch` doesn't actually update the state.
+Vuexストアをモックしているため、`axios`を完全に無視しています。このスタイルのテストは最初は魅力的に見えます。書くべきコードは少なく、非常に簡単に書けます。同時に、`state`を好きなように設定することができます－上記のコードでは、`dispatch`は実際には`state`を更新さえしません。
 
-Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't have `mockPost` any more - instead we have `mockDispatch`. The assertion against `mockDispatch` became an assertion that a `login` action was dispatched with the correct payload, as opposed to a HTTP call to the correct endpoint.
+再度、実際のテストコードはそんなに変わっていないことが見て取れます－`store`を`render`に渡す必要はもうありません（何故ならば、テスト内で実際のstoreすら使っていないからです。storeを完全にモックしています）。`mockPost`はもう使いません－その代わりに`mockDispatch`を使います。`mockDispatch`に対するアサートは`login`アクションが正しいペイロードで呼ばれたかに対するアサートになっていて、正しいエンドポイントに対してHTTPが呼ばれたかに対するものではなくなっています。
 
-There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken.
+ここに大きな問題があります。仮に`login`アクションをstoreから削除しても、テストは*通り続けます*。なんと恐ろしい！テストが全て通っているため、全てはうまくいっているのだと自信を持ってしまいます。現実には、あなたのアプリケーションは完全に壊れているのに。
 
-This is not the case with the test using a real Vuex store - breaking the store correctly breaks the tests. There is only one thing worse than a code-base with no tests - a code-base with *bad* tests. At least if you have not tests, you have no confidence, which generally means you spend more time testing by hand. Tests that give false confidence are actually worse - they lure you into a false sense of security. Everything seems okay, when really it is not.
+これは実際のVuexストアを用いた場合のテストには当てはまりません－ストアが壊れればテストも「正しく」壊れます。テストを伴わないコードベースよりも駄目なものが一つだけ存在します－*駄目な*テストを伴うコードベースです。テストがないということは少なくとも、結果に確信が持てない状態にあるということですから、一般的には手動でのテストに多くの時間を費やすことになるはずです。間違った自信を与えるテストは、実際にはそれよりもっと駄目なことです－それは、安全だという間違った認識をあなたに与えます。全ては大丈夫なように見えますが、実際には全く大丈夫ではありません。
 
-## Mock Less - mock the lowest dependency in the chain
+## モックを減らす－連鎖関係の最下層の要素をモックする
 
-The problem with the above example is we are mocking too far up the chain. Good tests are as production like as possible. This is the best way to have confidence in your test suite. This diagram shows the dependency chain in the `<login>` component:
+上記の例の問題は、連鎖関係のあまりに上部をモックしていることにあります。良いテストは、できる限り製品に近いものです。それがテストスイートに自信を持つ最善の方法です。以下の図は`<login>`コンポーネントの依存関係を示しています:
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./api-map.png}
-  \caption{Authentication dependency chain}
+  \caption{認証の依存関係}
   \label{fig}
 \end{figure}
 
-The previous test, where we mocked Vuex, mocks the dependency chain here:
+直前のテストでは、Vuexをモックしていました。つまり依存関係のこの部分をモックしています:
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./api-vuex.png}
-  \caption{Mocking Vuex}
+  \caption{Vuexのモック}
   \label{fig}
 \end{figure}
 
-This means if anything breaks in Vuex, the HTTP call, or the server, our test will not fail.
+これはつまり、Vuex、HTTPコール、サーバーのいずれかが壊れていても、テストは失敗しないということです。
 
-The axios test is slightly better - it mocks one layer lower:
+axiosのテストは若干ましです－1つ下の階層をモックしているからです:
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{./api-axios.png}
-  \caption{Mocking Axios}
+  \caption{Axiosのモック}
   \label{fig}
 \end{figure}
 
-This is better. If something breaks in either the `<login>` or Vuex, the test will fail.
+こちらの方が良いです。`<login>`かVuexのいずれかが壊れていた場合、テストは失敗します。
 
-Wouldn't it be great to avoid mocking `axios`, too? This way, we could not need to do:
+`axios`をモックするのも避けることができたら、もっと良いとは思いませんか？この場合、全てのテストで以下が不要となります:
 
 ```js
 let mockPost = jest.fn()
@@ -352,16 +354,16 @@ jest.mock('axios', () => ({
 }))
 ```
 \begin{center}
-Boilerplate code to mock axios.
+axiosをモックするためのボイラープレートのコード。
 \end{center}
 
-... in every test. And we'd have more confidence, further down the dependency chain.
+また、依存関係のより下部に行くことで、より自信を持つことができます。
 
 ## Mock Service Worker
 
-A new library has come into the scene relatively recently - Mock Service Worker, or `msw` for short. This does exactly what is discussed above - it operates one level lower than `axios`, mocking the actual network request! How `msw` works will not be explained here, but you can learn more on the [website](https://mswjs.io/): https://mswjs.io/. One of the cool features is that you can use it both for tests in a Node.js environment and in a browser for local development.
+新しいライブラリーが比較的最近登場しました－Mock Service Worker(略して`msw`)です。これはまさに先ほど議論したことができます－`axios`よりも一段階下で動作し、実際のネットワークリクエストをモックすることができます。ここでは`msw`がどのように動くかは説明しませんが、[website](https://mswjs.io/): https://mswjs.io/ でより詳しく知ることができます。`msw`の素晴らしい機能の一つとして、Node.js環境のテストにおいても、ローカル開発におけるブラウザにおいても利用できる点があります。
 
-Let's try it out. Basic usage is like this:
+早速試してみましょう。基本的な使い方は以下のようになります:
 
 ```js
 import { rest } from 'msw'
@@ -378,12 +380,12 @@ const server = setupServer(
 )
 ```
 \begin{center}
-A basic server with msw.
+mswを用いた基本的なサーバー。
 \end{center}
 
-The nice thing is we are not mocking `axios` anymore. You could change you application to use `fetch` instead - and you wouldn't need to change you tests at all, because we are now mocking at a layer lower than before.
+素晴らしいことに、`axios`をモックする必要はもうありません。代わりに、`fetch`を使うようにアプリケーションに変更を加える必要があります。そして、テストは一切変える必要がありません。何故ならば、以前よりも低い階層をモックしているからです。
 
-A full test using `msw` looks like this:
+`msw`を使用した完全なテストは以下のようになります:
 
 ```js
 import { render, fireEvent, screen } from '@testing-library/vue'
@@ -406,7 +408,7 @@ describe('login', () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
-  it('successfully authenticates', async () => {
+  it('認証に成功すること', async () => {
     render(App, { store })
     await fireEvent.update(
       screen.getByRole('username'), 'Lachlan')
@@ -419,12 +421,12 @@ describe('login', () => {
 })
 ```
 \begin{center}
-Using msw instead of mocking axios.
+axiosのモックの代わりにmswを使用。
 \end{center}
 
-You can have even less boilerplate by setting up the server in another file and importing it automatically, as suggested [in the documentation](https://mswjs.io/docs/getting-started/integrate/node): https://mswjs.io/docs/getting-started/integrate/node. Then you won't need to copy this code into all your tests - you just test as if you are in production with a real server that responds how you expect it to.
+[以下のドキュメント](https://mswjs.io/docs/getting-started/integrate/node): https://mswjs.io/docs/getting-started/integrate/node に示されるように、別のファイルでサーバーをセットアップして自動的にインポートすることで、さらにボイラープレートを減らすことができます。そうすると、上記のコードを全てのテストにコピーする必要がなくなります－あたかも、期待通りにレスポンスする実際のサーバーがある本番環境下のようにテストができます。
 
-One thing we are not doing in this test that we were doing previously is asserting the expected payload is sent to the server. If you want to do that, you can just keep track of the posted data with an array, for example:
+以前は行っていたのにこのテストではやっていないことが一つあります。サーバーに送るべきペイロードに対するアサートです。もしこれを行いたい場合、ポストされたデータを配列に入れて追跡し続けることができます。以下がその例です:
 
 ```js
 const postedData = []
@@ -440,23 +442,23 @@ const server = setupServer(
 )
 ```
 \begin{center}
-Keeping track of posted data.
+ポストされたデータを追跡。
 \end{center}
 
-Now you can just assert that `postedData[0]` contains the expected payload. You could reset it in the `beforeEach` hook, if testing the body of the post request is something that is valuable to you.
+後は、`postedData[0]`が期待するペイロードを含むことをアサートするだけです。ポストリクエストの中身をテストすることに何かしら意味がある場合、配列を`beforeEach`フック内でリセットできます。
 
-`msw` can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where `msw` really shines compared to the using `jest.mock` to mock `axios`. Let's add another test for this exact case:
+`msw`は他にもたくさんのことができます。例えば、特定のHTTPコードでレスポンスすることで、失敗したリクエストを簡単にシミュレートすることもできます。ここに、`jest.mock`を用いて`axios`をモックすることに対して、`msw`が輝く点があります。まさにこのケースに対して、テストを追加してみましょう:
 
 ```js
 describe('login', () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
-  it('successfully authenticates', async () => {
+  it('認証に成功すること', async () => {
     // ...
   })
 
-  it('handles incorrect credentials', async () => {
+  it('間違った認証情報を処理できること', async () => {
     const error = 'Error: please check the details and try again' 
     server.use(
       rest.post('/login', (req, res, ctx) => {
@@ -479,22 +481,22 @@ describe('login', () => {
 })
 ```
 \begin{center}
-A test for a failed request.
+失敗したリクエストに対するテスト。
 \end{center}
 
-It's easy to extend the mock server on a test by test basis. Writing these two tests using `jest.mock` to mock `axios` would be very messy!
+テストのたびにモックサーバーを簡単に拡張できます。`jest.mock`を用いて`axios`をモックすることで、上記の2つのテストを行うのは非常に煩雑です。
 
-Another very cool feature about `msw` is you can use it in a browser during development. It isn't showcased here, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
+`msw`のもう一つの非常に優れた機能に、開発中にこの機能をブラウザ上で使用できる点があります。ここでは例示しませんが、実際にやってみて経験すると良いエクササイズになると思います。例えば、テストと開発の両方で同じエンドポイントハンドラーを使用できるでしょうか？
 
-## Conclusion
+## 結論
 
-This chapter introduces various strategies for testing HTTP requests in your components. We saw the advantage of mocking `axios` and using a real Vuex store, as opposed to mocking the Vuex store. We then moved one layer lower, mocking the actual server with `msw`. This can be generalized - the lower the mock in the dependency chain, the more confidence you can be in your test suite.
+この章では、コンポーネント上のHTTPリクエストをテストする様々な方法を紹介しました。まず、`axios`のモックと実際のVuexストアの組み合わせが、Vuexストアのモックよりも優れていることを見ていきました。次に、1つ下の階層に移動して実サーバーを`msw`でモックしました。これは以下のように一般化できます－依存関係のより低い部分をモックすると、テストスイートに対してより自信を持つことができます。
 
-Tests `msw` is not enough - you still need to test your application against a real server to verify everything is working as expected. Tests like the ones described in this chapter are still very useful - they run fast and are very easy to write. I tend to use testing-library and `msw` as a development tool - it's definitely faster than opening a browser and refreshing the page every time you make a change to your code.
+ただし、`msw`のテストだけでは十分ではありません－全てが想定通りに動くかを検証するためには、実サーバーに対してもアプリケーションのテストを行う必要があります。それでも、本章で説明してきたテストは依然とても有効です－高速に動作し、とても簡単に書くことができます。私自身は、Testing Libraryと`msw`を開発ツールとして選択することが多いです－こちらの方が、コードに変更を加えるたびにブラウザを開いてページを更新するよりも確実に高速になります。
 
-## Exercises
+## エクササイズ
 
-- Trying using `msw` in a browser. You can use the same mock endpoint handlers for both your tests and development.
-- Explore `msw` more and see what other interesting features it offers.
+- ブラウザ上で`msw`を使用する。テストと開発の双方で同じエンドポイントハンドラーのモックをつかうことができます。
+- `msw`をより探求して、他にも興味深い機能が提供されているので見てみてください。
 
 \pagebreak

@@ -14,5 +14,5 @@ cat \
   src/pdf/FUNCTIONAL-PROGRAMMING-MUTABLE-VUE.md \
   | pandoc \
   --highlight-style tango \
-  --pdf-engine pdflatex \
+  --pdf-engine xelatex \
   -o build/design_patterns_for_vuejs.pdf 

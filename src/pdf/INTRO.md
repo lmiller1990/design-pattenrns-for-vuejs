@@ -1,52 +1,60 @@
-# Design Patterns for Vue.js - a Test Driven Approach to Maintainable Applications
+# Vue.jsのデザインパターン－メンテナンス性に優れたアプリケーションのためのテスト駆動アプローチ
 
-## Introduction
+## イントロダクション
 
-Chances are, if you are interested in something as abstract as *design patterns*, you have been coding for a while now, likely with an interested in front-end development. You might have written a few interfaces using jQuery, that seemed pretty good. As time passed, requirements changed, and your once maintainable jQuery code-base has become a mess. 
+*デザインパターン*のように抽象度が高いものに関心があるのですから、読者は一定期間のコーディング経験を持ち、フロントエンド開発に関心をお持ちのことでしょう。JQueryを用いたインターフェース開発の経験をお持ちかもしれません。JQueryはとても優れたものでしたが、時は流れ、要求される内容も変わっていきました。当時はメンテナンス性に優れたJQueryのコードベースは、どんどん混沌としたものになってしまいました。
 
-At this point, you might have looked around for an alternative. Things like React and Vue are often the next step - Components! Encapsulation! Unit Tests! You `vue create app` and things are great!
+ここに至って、あなたは代替となるものを見つけようとしたかもしれません。ReactやVueは、その際の典型的な次のステップでしょう。－コンポーネント！カプセル化！単体テスト！`vue create app`すれば、すべては完璧です！
 
-Again, time passes - requirements change. Things get messy - again. It's a more organized, less crazy kind of messy, but it still doesn't feel *right*. You end up with giant components ("god components"), that are nearing a thousand lines, doing everything from fetching data, validation and everything else you can imagine. Passing tens of props down and emitting tens of events back up becomes normal. A "single source of truth" starts to be come "several sources of truth". The lines between your business logic, the problem you are solving and the presentation components starts to blur. Eventually velocity slows, and subtle bugs start to creep in.
+再び、時は流れ－要求される内容も、再び変わりました。状況は再び混沌としてきています。今回の混沌は少しは整理されたもので、混沌の極みというほどの状況ではなくなりました。しかし、物事が*正しい*状態にあるとは言えません。コンポーネントは巨大化していき（通称"God Component"と呼ばれます）、コードは1000行に達する程になっているかもしれません。データの取得やバリデーション、その他想像しうる全てを、一つのコンポーネントの中でやろうとしています。数十のpropsを下位に渡し、数十のイベントを上位にemitし返す、といったことは当たり前になっています。"信頼できる唯一の情報源"は、"信頼できるいくつもの情報源"になりつつあります。ビジネスロジック（つまり、解決するべき問題）と見た目に関する要素の境界線は曖昧になり始めました。結果、開発スピードは低下し、見つけづらいバグが忍び寄り始めます。
 
-A few years later, all the original developers are gone and no-one really knows how things work, or what exactly `// TODO: fix this` actually refers to. The business opts to do a major rewrite, and the cycle continues.
+数年後、初期の開発者は全員いなくなりました。どのようにアプリが動作しているのか、あるいは`// TODO: fix this`が、実際のところ何について言及しているのか、本当に理解している人は誰もいません。企業は大規模な改修を選択せざるをえなくなり、同じ過ちが繰り返されます。
 
-*This isn't unusual*. Maybe jQuery wasn't the problem after all? 
+*実際のところ、これはよくあることです*。結局のところ、JQueryが問題ではなかったのでしょうか？
 
-It doesn't have to be like this! Vue is a powerful and flexible UI layer, JavaScript (and TypeScript) get improvements every year and Jest is a first class test runner. All the tools needed to write reliable, maintainable and bug free applications are available. What's often missing is the design patterns, best practices, proper separation on concerns, and a reliable test suite. These are the fundamental ideas that underpin all software development, not just front-end applications.
+こんなはずではなかったのに！Vueはパワフルで柔軟性の高いUIレイヤーであり、JavaScript（及びTypeScript）は毎年改善しており、Jestは最高のテストランナーです。信頼性とメンテナンス性に優れたバグフリーなアプリケーションに必要な全てのツールは揃っています。見落とされがちなのは、デザインパターンやベストプラクティス、適切な関心の分離、そして信頼性の高いテストスイートです。これらは、全てのソフトウェア開発を支える基礎的なアイデアで、フロントエンド、アプリケーションに限った話ではありません。
 
-## The Book
+## この本について
 
-This is a book about design patterns and testing. But it's also more. Thinking in design patterns is not about memorizing a lot of fancy names and diagrams. Knowing how to test is not really about learning a test runner or reading documentation. 
+この本はデザインパターンとテストについての書籍です。しかし、それ以上の内容も含んでいます。デザインパターンについて考えるということは、そこに登場する抽象的な命名や図解について多くを記憶する、ということではありません。どのようにテストするかを知るというのは、本来テストランナーを学んだり、ドキュメントを読むことではありません。
 
-Thinking in patterns, consider how data flows between different parts of a system and writing for testability starts *before* writing any code. 
+デザインパターンについて考え、システムの異なる部分間のデータの流れについて考慮し、テスト容易性のために記述することは、いかなるコードの記述に*先立つ*ものです。
 
-Good software design is a philosophy. It's a way of life. Finally, as engineer, writing good software *is your job*. So is writing testable code - even if HR forgot to put it in your job description.
+優れたソフトウェアデザインとは、一種の哲学です。一種の生き方とも言えます。最終的には、良いソフトウェアを書くことは一人のエンジニアとしてのあなたの*仕事*です。テスト容易性の高いコードを書くことも同様です－仮に人事部があなたの職務経歴書にそのことを書くことを忘れたとしても。
 
-My goal is to get you in the habit of writing testable code, and how to choose the right abstraction for the problem at hand. The first things you think when you hear a new business requirement or request should be: 
+本書のゴールは読者に、テスト容易性の高いコードを書き、問題解決のための正しい抽象化を選択する習慣を身につけてもらうことです。ビジネス上の新しい要求や要望を聞いた際にあなたが一番に考えるべきことは以下のようなことです：
 \newline
-\newline - What design pattern will give me the most flexibility moving forward? 
-\newline - What new requirements could come up, and how will this decision deal with them?
-\newline - How am I going to write my code in a testable, loosely coupled fashion? 
+\newline －どのデザインパターンが将来的に最も柔軟性が高いものとなるか？
+\newline －どのような新しい要求が出てきうるか、その際、この要求を今回の決定がどのように対処できるのだろうか？
+\newline －どのようにしてテスト容易性が高く、疎結合な方法でコードを書いていくのか？
 
-The lessons and patterns I'll be sharing are not Vue-specific at all; they are framework agnostic. I'd even say that they are language agnostic; they are fundamental concepts you can take with you and apply them to any software design problem. Good developers focus on tools and frameworks, great developers focus on data structures and how they interact with each other, testability and maintainability.
+これからお伝えするレッスンやデザインパターンはVueに限った話では全くありません。それらはフレームワークを問わないものです。もっと言えばそれらはプログラミング言語すら問いません。それらはどこでも通用するもので、どのようなソフトウェアデザインにも当てはめることができます。良い開発者はツールやフレームワークにフォーカスを当てます。偉大な開発者はデータ構造やそれらが相互にどのように影響しあうか、テスト容易性、メンテナンス性にフォーカスを当てます。
 
-All of the content is, of course, based on my opinion. Like most best practices and design patterns, there is a time and place for everything, and not every recommendation will apply to every use case.  The best way to get value from this book is to read the examples, think about the concepts and compare it to what you are currently doing. 
+本書の全ての内容はもちろん、私の意見に基づいています。ほとんどのベストプラクティスやデザインパターンがそうであるように、物事には時と場合があり、全ての推奨が全てのユースケースに当てはまるというわけではありません。この本の価値を最大化する方法は、サンプルコードを読み、コンセプトについて考え、それをあなたが現在やっていることと比較することです。
 
-If you think it solves a problem you have, try it out and see where it leads. There will always be exceptions, but the most important thing is you think about your concerns, testability and reliability. If you disagree with something you see, I'm always open to discussion and improvements; please reach out. I'm always interested in new perspectives and ideas.
+もしそれがあなたの抱える問題を解決してくれると思うなら、実際に試してみて何が起こるか確かめてみて下さい。例外というものは常にありますが、最も重要なことは、自分自身で関心の分離、テスト容易性、可読性といった問題を考えることです。何か同意できない部分があれば、議論や改善に対して、私はいつでもオープンです。ぜひ連絡をください。新しい視点やアイデアというものに、いつでも関心があります。
 
-## What To Expect
+## 本書で期待されること
 
-Most books that teach you frameworks, languages or testing will be an app or two, incrementally adding new features. This works great for learning a new language or framework, but isn't ideal for focusing on concepts or ideas. In this book, each section will be focused on a single idea, and we will build a small component or application to illustrate it. This approach has a few benefits; you can read the content is any order, and use it as a kind of reference.
+フレームワークやプログラミング言語、テストを教える大抵の書籍は、1つ又は2つのアプリを作成し、段階的にそこに新しい機能を追加していくという形式であることが多いです。この方法は新しい言語やフレームワークを学ぶ上では非常にうまく機能しますが、コンセプトやアイデアに焦点を当てる理想的な方法ではありません。本書においては、各章は一つのアイデアに焦点を当て、それを説明するための小規模なコンポーネント、あるいはアプリケーションを開発します。このアプローチにはいくつかの利点があります。本書をどのような順番で読むこともできますし、ある種のリファレンスとして使うこともできます。
 
-We start with some patterns for `props`, as well as a discussion around one of the most fundamental ideas in this book, *separation of concerns*. We proceed to cover a wide variety of design patterns for events, forms, components, renderless components, feature separation with the Composition API, and everything else you'll need to know to create well engineered Vue.js applications.
+本書では、まず`props`のデザインパターンから始めます。それと同時に、本書の最も基礎的なアイデアの一つである*関心の分離*についても論じます。その後、events、forms、components、renderless components、そしてComposition APIを用いた機能の分離に関する幅広いデザインパターンや、他にも技術的に優れたVue.jsアプリケーションを作るうえで知っておくべきことを論じていきます。
 
-Most sections end with some exercises to help you improve and practice what you learned. The source code, including all the solutions for the exercises are [included in the source code](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): (https://github.com/lmiller1990/design-patterns-for-vuejs-source-code), so you can check your solutions.
+ほとんどの章の最後には複数のエクササイズがあり、その章で学んだことをより深く理解し練習することができます。エクササイズの全ての解答を含むソースコードは[こちらで参照できます](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): (https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)ので、自分の回答が正しかったかを確認できます。
 
-Each section is independent; you don't need to read it in order, so if there is a particular section you are interested in, feel free to skip to it. Try to think of this book as a reference tool; I hope it is something you can come back to for years to come and learn something useful each time.
+それぞれの章は独立していますので、順番に読む必要はありません。関心がある特定の章がありましたら、遠慮なくそこまでスキップしてください。本書をある種のレファレンスツールとして考えてください。読者が何年にも渡って本書に立ち帰り、その都度何か有益なことを学んでいただければ幸いです。
 
-I hope this has given you a good idea of what to expect. If you have any feedback, questions ors comments, or just want to chat about Vue and testing, feel free to reach out via email or Twitter (find my most up to date contact details on the website you got this book).
+本書が読者の期待する内容に沿うものであることを願っています。なにかフィードバック、質問、コメント等ありましたら、または単にVueやテストについて私と話したいという場合であっても、気軽にemailやTwitterでご連絡ください（最新の連絡先の詳細については、本書に記載のウェブサイトをご確認ください）※。
 
-See you in the next section!
+※【訳者註】本書は英語の原書を翻訳したものであり、作者はオーストラリア人です。ご連絡は可能かと思いますが、英語にてお願いいたします。
+
+それでは、次の章でお会いしましょう！
+
+## 訳者補足
+
+日本の読者にとってなじみが薄いと思われる用語については、【訳者註】を記載しておりますので、ご参照ください。
+
+また、可読性のために、ソースコード内のコメント及びテストにおけるアサートは日本語に訳しておりますが、オリジナルのソースコード上は英語のままですので、ご了承ください。
 
 \pagebreak
 

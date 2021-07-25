@@ -1,31 +1,31 @@
-# Renderless Components
+# レンダーレスコンポーネント
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/renderless-password配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 
-The primary way you reuse components in Vue is *slots*. This works great for a lot of cases, but sometimes you need *more* flexibility.
+コンポーネントを再利用する主要な方法は*slots*です。多くの場合これはとても有用ですが、時には*より*柔軟性を必要とします。
 
-One example is you have some complex logic that needs to be reused in two different interfaces. One way to reuse complex logic with several different interfaces is the *renderless* component pattern.
+例えば、2つの異なるインターフェースで再利用する必要がある複雑なロジックがあるといった場合です。異なるインターフェースで複雑なロジックを再利用する方法の一つに、*rederless*コンポーネントのパターンがあります。
 
-In this section we will build the following component, a password strength form:
+この章では、以下の「パスワード強度チェックフォーム」コンポーネントを作成します:
 
-![Completed Password Complexity Component](./ss-done.png)
+![完成したパスワード複雑度チェックフォーム](./ss-done.png)
 
-There are a few requirements. We'd like to publish this on npm; to make it as flexible as possible, we will use a technique known as a "renderless" component. This means we will not ship and specific markup. Instead, the developer will need to provide their own. 
+このコンポーネントにはいくつかの要件があります。まず、これをnpm上で公開したいです。できる限り柔軟性を高めるため、"レンダーレス"コンポーネントとして知られるテクニックを利用します。つまり、コンポーネントは特定のマークアップを提供しません。その代わり、開発者はそれを自前で用意する必要があります。
 
-This means we will work with a `render` function, the low-level JavaScript that `<template>` is compiled to. This will allow developers to fully customize the markup and style as they see fit.
+つまり、`<template>`がコンパイルされた結果生成される、より低次元のJavaScriptである`render`関数を使う必要があるということです。そうすることで、開発者は自分が望ましいと思う方法でマークアップとスタイルを完全にカスタマイズすることができます。
 
-We would like to support the following features:
+以下の機能をサポートしたいと思います:
 
-- A `matching` variable that returns true if the password and confirmation match.
-- Support a `minComplexity` prop; by default, the minimum complexity is 0 and the maximum complexity is 3. This is represented by the yellow bar above the submit button in the screenshot above.
-- support a custom complexity algorithm (eg, require specific characters or numbers in the password).
-- Expose a `valid` value which is true when the password and confirmation match and the password meets the minimum complexity.
+- `matching`変数: パスワードとパスワードの確認がマッチした場合にtrueを返却する。
+- `minComplexity`プロパティのサポート: デフォルトでは、複雑度の最小値は0で最大値は3となる。これは、上のスクリーンショット内で送信ボタン上部の黄色のバーとして表現される。
+- 複雑度のカスタムアルゴリズムのサポート（e.g. パスワード内に特定の文字列や数値を要求する）。
+- パスワードとパスワードの確認が一致し、パスワードが複雑度の最小値を満たした場合にtrueとなる、値`valid`を返却する。
 
-Let's get started.
+早速やってみましょう。
 
-## Rendering without Markup
+## マークアップなしのレンダリング
 
-I will work out of a file called `renderless-password.js`. That's right - not a `vue` file. No need - we won't be shipping a `<template>`.
+これから`renderless-password.js`というファイル上で作業していきます。そうです－`vue`ファイルではありません。その必要はありません－`<template>`を利用しないからです。
 
 ```js
 export default {
@@ -37,12 +37,12 @@ export default {
 }
 ```
 \begin{center}
-Renderless functions return slots.default() in setup or render.
+setupまたはrenderでslots.default()を返却するレンダーレス関数。
 \end{center}
 
-This is how renderless components work; calling `slots` with an object will expose whatever properties are passed to the object via the `v-slot` directive. 
+これがレンダーレスコンポーネントの使い方です。オブジェクトを入れて`slots`を呼ぶことで、オブジェクトに渡したどんなプロパティも、`v-slot`ディレクティブを通じて表示することができます。
 
-Let's see this in action but using the component in a regular `vue` file. Mine is called `app.vue`; find the completed version in the source code.
+これから実際の使い方を見ていきますが、通常の`vue`ファイル上のコンポーネントを使ってみましょう。今回の例では`app.vue`となります。完全なバージョンはソースコードをご覧ください。
 
 ```html
 <template>
@@ -66,18 +66,18 @@ export default {
 </script>
 ```
 \begin{center}
-Trying out the renderless-password.
+renderless-passwordを試してみます。
 \end{center}
 
-We can destructure the object passed to `slots.default()` in `v-slot`, and are free to use them however we like in the `<template>`. Great! This currently just renders a 5; not very interesting, but it illustrates the idea of exposing properties via `v-slot`.
+`v-slot`内で`slots.default()`に渡されたオブジェクトを取り出して、`<template>`の中でどのようにでも好きに利用できます。素晴らしいですね！現在はただ5を表示しているだけなので、あまり面白くありませんが、`v-slot`を通してプロパティを表示するというアイデアを説明しています。
 
-![Rendering with slots.default() and v-slot](./ss1.png)
+![slots.default()とv-slotを用いたレンダリング](./ss1.png)
 
-## Adding Password and Confirmation Inputs
+## パスワードとパスワードの確認の入力を追加する
 
-The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, to see if the password and confirmation are the same. 
+次に追加する機能はパスワードとパスワードの確認のフィールドです。さらに`matching`プロパティも追加することで、パスワードとパスワードの確認が等しいかを確認します。
 
-First, update `renderless-password.js` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
+最初に、`renderless-password.js`を更新して、`password`と`confirmation`のプロパティを受け取るようにしましょう。また、パスワードが一致したかを確認するロジックも加えます:
 
 ```js
 import { computed } from 'vue'
@@ -110,16 +110,16 @@ export default {
 }
 ```
 \begin{center}
-Checking if password and confirmation match.
+パスワードとパスワードの確認が合致するかをチェック。
 \end{center}
 
-You may notice I implemented `isMatching` as a separate function, which I've exported. I consider this part of the *business logic*, not the UI, so I like to keep it separate. This makes it super easy to test, and also keeps my `setup` function nice and simple. You could declare it inside of `setup` if you prefer that style.
+`isMatching`を独立した関数として実装してエクスポートしている点にお気づきかもしれません。`isMatching`をUIではなく*ビジネスロジック*の一部と見なしたので、分離させることにしました。そうすることでテストが非常に容易になりますし、`setup`関数を優れて簡潔に保つことができます。`setup`の中で宣言するスタイルの方がお好みであれば、そうすることも可能です。
 
-I also removed `complexity: 5` from `slots.default()`; we will come back to this, but we aren't using it right now.
+また、`slots.default()`から`complexity: 5`を取り除きました。後ほどこの話題に戻りますが、今すぐには使いません。
 
-One thing that might be a little surprising if you need to pass `matching.value` to `slots.default()`. This is because I would like to let the developer destructure `matching` by doing `v-slot={ matching }"` as opposed to `v-slot="{ matching: matching.value }"`; the former feels cleaner to me.
+`slots.default()`に`matching.value`を渡す必要があるのか、と驚かれたかもしれません。これは、開発者に`matching`を`v-slot="{ matching }"`という形で取得してほしいからです。そうしなければ、`v-slot="{ matching: matching.value }"`という形で取得することになりますが、個人的には前者の方がスッキリしていると思います。
 
-Let's try it out:
+早速試してみましょう:
 
 ```html
 <template>
@@ -169,28 +169,28 @@ export default {
 </script>
 ```
 \begin{center}
-password and confirmation are saved in a reactive object.
+パスワードとパスワードの確認はリアクティブなオブジェクトに保存されます。
 \end{center}
 
-The main change is we now have a `reactive` input that has `password` and `confirmation` properties. You could have used two `ref`s; one for `password` and one for `confirmation`. I like to group related properties using `reactive`, so that's why I am using `reactive` here.
+大きな違いは、`password`と`confirmation`をプロパティとして持つ、`reactive`なinputがある点です。1つは`password`に対して、もう1つは`confirmation`に対して、`ref`を2回使うこともできたはずです。関連するプロパティは`reactive`を用いてグループ化したかったので、ここでは`reactive`を使用しました。
 
-I also added some extra `<div>` elements and classes - those are mainly for styling. You can grab the final styles from the source code. It looks like this:
+いくつか追加で`<div>`エレメントとclassを加えましたが、これは主にスタイルのためです。最終的なスタイルはソースコードでご覧いただけます。コンポーネントは以下のようになります:
 
-![Rendering Inputs and Debug Info](./ss2.png)
+![インプットとデバッグ情報の表示](./ss2.png)
 
-This works great! The complexity and business logic is nicely abstracted away in `renderless-password`. The developer can use the logic to style the component to suit their application and use case.
+うまくいきました！複雑な部分やビジネスロジックは、`renderless-password`内に望ましい形で抽出されました。開発者はこのロジックを使って、アプリケーションやユースケースに適するように、コンポーネントをスタイルすることができます。
 
-Let's keep going and add a customizable `complexity` feature, to rate whether a password is sufficiently complex.
+続いて、カスタマイズ可能な`complexity`機能を追加して、パスワードの複雑度が十分かを評価してみましょう。
 
-## Adding Password Complexity
+## パスワードの複雑度の追加
 
-For now, we will implement a very naive complexity check. Most developers will want to customize this. For this example, we will keep it simple and choose an algorithm that will rate complexity based on the length of the password:
+今から、非常に繊細な複雑度チェックを実装していきます。ほとんどの開発者はこれをカスタマイズしたいと思うでしょう。今回の例では、シンプルに保つため、パスワードの長さに基づいて複雑度を評価するアルゴリズムを採用します:
 
-- high: length >= 10
-- mid: length >= 7
-- low: length >= 5
+- 高: length >= 10
+- 中: length >= 7
+- 低: length >= 5
 
-As with `isMatching`, we will make a `calcComplexity` a pure function. Decoupled, deterministic, and easily testable.
+`isMatching`の場合と同様に、`calcComplexity`を純粋関数にしましょう。その方が、疎結合で、決定論的であり、テストしやすいです。
 
 ```js
 import { computed } from 'vue'
@@ -236,12 +236,12 @@ export default {
 }
 ```
 \begin{center}
-Adding a simple calcComplexity function.
+シンプルなcalcComplexity関数を追加します。
 \end{center}
 
-Everything is very similar to what we did with the `isMatching` function and `matching` computed property. We will add support for a custom complexity function in the future passed via a prop. 
+全体的に、`isMatching`関数とcomputedな`matching`プロパティを使った場合と非常に似ています。将来的には、カスタムの複雑度関数をpropを通して渡す機能をサポートしましょう。
 
-Let's try it out:
+それではさっそく使ってみましょう:
 
 ```html
 <template>
@@ -313,8 +313,8 @@ export default {
 
 <style>
 /**
-  some styles excluded for brevity
-  see source code for full styling
+  簡潔性のためにスタイルの一部を省略
+  完全なスタイルはソースコードをご覧ください
 */
 .complexity {
   transition: 0.2s;
@@ -338,19 +338,19 @@ export default {
 </style>
 ```
 \begin{center}
-Styling the form based using a computed style.
+computeされたスタイルに基づいてフォームをスタイリング。
 \end{center}
 
-I also added a `complexityStyle` function to apply a different CSS class depending on the complexity. I have consciously chosen *not* to define and export this function outside of `setup` - instead, I defined it *inside* of `setup`. 
+また、`complexityStyle`関数を追加して、複雑度に応じて異なるCSSクラスを適用するようにしました。今回は意識的に、`setup`の外部に関数を定義してエクスポート*しない*ことを選択しました－その代わり、`setup`の*中に*定義しています。
 
-The reason for this is I see no value in testing `complexityStyle` separately to the component - knowing that the correct class (`high`, `mid`, or `low`) is returned is not enough. To fully test this component, I'll need to assert against the DOM. 
+この理由は、コンポーネントに対して`complexityStyle`を独立してテストすることに意味を見出さないからです－正しいクラス (`high`, `mid`, `low`) が返却されたかを知るだけでは十分ではありません。このコンポーネントを十分にテストするには、DOMに対するアサートが必要です。
 
-You could still export `complexityStyle` and test it individually, but you still need to test that the correct class is applied (eg, you could forget to code `:class="complexityStyle(complexity)"`, for example, and the `complexityStyle` test would still pass).
+もちろん`complexityStyle`をエクスポートして個別にテストすることは可能ですが、正しいクラスが適用されたかをテストすることは依然として必要です（例えば、`:class="complexityStyle(complexity)"`のコードを忘れることはあり得ますが、`complexityStyle`のテストはパスしてしまいます）。
 
-By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
+テストを書いてDOMに対してアサートすることで、間接的に`complexityStyle`をテストできます。テストは以下のようになるでしょう（実際に動作するサンプルはソースコードをご覧ください）:
 
 ```js
-it('meets default requirements', async () => {
+it('デフォルトの条件を満たすこと', async () => {
   render(TestComponent)
 
   await fireEvent.update(screen.getByLabelText('Password'), 'this is a long password')
@@ -361,16 +361,16 @@ it('meets default requirements', async () => {
 })
 ```
 \begin{center}
-Testing the correct complexity class is included.
+複雑度を満たしたクラスが含まれるかどうかのテスト。
 \end{center}
 
-The application now looks like this:
+アプリケーションは現在以下のようになっています:
 
-![Complexity Indicator](./ss3.png)
+![複雑度インジケーター](./ss3.png)
 
-## Computing Form Validity 
+## フォームの妥当性を検証する
 
-Let's add the final feature: a button that is only enabled when a `valid` property is `true`. The `valid` property is exposed by the `<renderless-password>` and accessed via `v-slot`.
+最後の機能を追加しましょう: `valid`プロパティが`true`の場合だけ活性化するボタンです。`valid`プロパティは`<renderless-password>`によって提供され、`v-slot`を通してアクセスします。
 
 ```js
 import { computed } from 'vue'
@@ -389,7 +389,7 @@ export default {
       type: Number,
       default: 3
     },
-    // ... other props ...
+    // ... その他のprops ...
   },
 
   setup(props, { slots }) {
@@ -410,12 +410,12 @@ export default {
 }
 ```
 \begin{center}
-Validating the form with a valid computed property, derived from matching and complexity.
+matchingとcomplexityに由来する、computedなvalidプロパティを用いたフォームの検証。
 \end{center}
 
-I added a `valid` computed property, based on the result of `complexity` and `matching`. You could make a separate function for this if you wanted to test it in isolation. If I was going to distribute this npm, I probably would; alternatively, we can test this implicitly by binding `valid` to a button's `disabled` attribute, like we are about to do, and then assert against the DOM that the attribute is set correctly.
+`complexity`と`matching`の結果に基づく、computedな`valid`プロパティを追加しました。これを個別にテストしたい場合、独立した関数とすることもできます。このnpmを配布したい場合には、恐らく私もそうするでしょう。今回はその代わりに、`valid`をボタンの`disabled`属性にバインディングすることで、これを間接的にテストすることができます。これからそれを行い、属性が正しく付与されたかDOMに対してアサートしましょう。
 
-Update the usage to include a `<button>` that binds to `valid`:
+`valid`をバインドした`<button>`を追加してみましょう:
 
 ```html
 <template>
@@ -442,34 +442,34 @@ Update the usage to include a `<button>` that binds to `valid`:
 </template>
 ```
 \begin{center}
-Destructuring valid and binding to it.
+validを取り出してバインドします。
 \end{center}
 
-Everything works! And we can easily move elements around to change the look and feel of `<renderless-password>`.
+うまくいきましたね！また、要素を変更することで、簡単に`<renderless-password>`の見映えや操作感を変えることができます。
 
-![Completed Password Complexity Component](./ss-done.png)
+![完成したパスワードの複雑度チェックコンポーネント](./ss-done.png)
 
-Just for fun, I tried making an alternative UI. All I had to do was move around some markup:
+おもしろ半分で、代替のUIを作ってみました。必要なことは、マークアップを変更することだけです:
 
-![Alternative Password Complexity Component](./ss-alt.png)
+![代替のパスワードの複雑度チェックコンポーネント](./ss-alt.png)
 
-See what else you can come up with. I think there is a lot of room for innovation with the renderless component pattern. There is at least one project using this pattern, Headless UI - check it out for more inspiration: https://headlessui.dev/.
+他に思い付くことを考えてみましょう。レンダーレスコンポーネントのパターンには改良の余地が多く残されていると思います。少なくとも一つ、レンダーレスコンポーネントを利用したプロジェクトがあります。Headless UIです－インスピレーションをより得るためにチェックしてみてください: https://headlessui.dev/
 
-## Exercises
+## エクササイズ
 
-This section intentionally omitted writing tests to focus on the concepts. Several techniques regarding tests were mentioned. For practice, try to write the following tests (find the solutions in the source code):
+この章では、コンセプトに集中するために、意図的にテストを省略しましたが、テストに関するいくつかのテクニックについては言及しました。練習のために、以下のテストを書いてみて下さい（答えはソースコードをご覧ください）:
 
-- Some tests using Testing Library to assert the correct complexity class is assigned.
-- Test that the button is appropriately disabled.
+- Testing Libraryを用いて、正しいcomplexityクラスが適用されているかアサートするテスト。
+- ボタンが正しく非活性になるかのテスト。
 
-You could also write some tests for the business logic, to make sure we didn't miss any edge cases:
+加えて、ビジネスロジックに対するテストを書いて、エッジケースを見落としていないか確かめることもできます:
 
-- Test the `calcComplexity` and `isMatching` functions in isolation.
+- `calcComplexity`関数と`isMatching`関数を独立してテストする。
 
-There are also some improvements you could try making:
+いくつかの機能改善を試してみることもできます:
 
-- Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
-- Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
+- 開発者が独自の`calcComplexity`関数をpropとして渡せるようにする。渡された場合はそちらを使う。
+- カスタムの`isValid`ファンクションをサポートし、`password`, `confirmation`, `isMatching`, `complexity`を引数とする。
 
-You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/renderless-password配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 

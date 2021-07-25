@@ -1,5 +1,5 @@
 ---
-title: Design Patterns for Vue.js
+title: Vue.jsのデザインパターン
 numbersections: true
 header-includes:
   \usepackage{graphicx}

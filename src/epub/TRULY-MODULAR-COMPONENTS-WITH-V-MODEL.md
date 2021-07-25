@@ -1,8 +1,8 @@
-# Modular Components, v-model, and the Strategy Pattern
+# モジュラーコンポーネント、v-model、Strategyパターン
 
-You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/reusable-date-time配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 
-In this section we will author a reusable date component. Usage will be like this:
+この章では、再利用可能なdateコンポーネントを作ります。使用方法は以下のようになります:
 
 ```html
 <date-time 
@@ -12,18 +12,20 @@ In this section we will author a reusable date component. Usage will be like thi
 />
 ```
 \begin{center}
-The goal - a <datetime> component that works with any DateTime library via the strategy pattern.
+ゴール－Strategyパターンによって、どのDateTimeライブラリでも動作する<datetime>コンポーネント。
 \end{center}
 
-![Completed DateTime Component](ss-dt-done.png)
+![完成したDateTimeコンポーネント](ss-dt-done.png)
 
-The idea is that the `date` value passed to `v-model` can use whichever DateTime library the developer wants to use. We want to allow developers to choose their a DateTime library, instead of mandating a specific one.
+そのアイデアは、`v-model`に渡された値`date`は、開発者が望むいかなるDateTimeライブラリであっても使えるようにする、というものです。開発者にDateTimeライブラリの選択を許容し、特定のライブラリを強制しないようにしたいです。
 
-Some applications use the native JavaScript `Date` object (don't do this; it's not a very good experience). Older applications will often use [Moment](https://momentjs.com/) and newer ones common opt for [Luxon](https://moment.github.io/luxon/). 
+JavaScript固有の`Date`オブジェクトを使うアプリケーションもあります（これはしないでください。あまり良いことがありません）。比較的古いアプリケーションは[Moment](https://momentjs.com/)を使っている傾向にあり、最近のものは[Luxon](https://moment.github.io/luxon/)を選択する傾向にあります。
 
-I'd like to support both - and any other library the user might choose to use! In other words, we want the component to be agnostic - it should not be coupled to a specific date time library.
+ここでは、その両方をサポートしたいです－加えて、ユーザーが選択しうる、その他のいかなるライブラリをも！言い換えると、コンポーネントをアグノスティック※なものにしたいのです－コンポーネントは特定のDateTimeライブラリと結びつくべきでありません。
 
-One way to handle this would be to pick a simple format of our own, for example `YYYY-MM-DD`, and then have the user wrap the component and provide a custom integration layer. For example a user wanting to use Luxon might wrap `<date-time>` in their own `<date-time-luxon>` component:
+※【訳者註】ソフトウェアやハードウェアが、特定のプロトコル、プログラミング言語、オペレーティング・システムに依存しない、あるいはその仕様の詳細に関知しない設計であること。
+
+この問題を取り扱う方法の一つは、例えば`YYYY-MM-DD`といった独自のシンプルなフォーマットを選び、コンポーネントをラップして独自のインテグレーション層を供給することでしょう。例えば、Luxonを用いたいユーザーは`<date-time>`を独自の`<date-time-luxon>`コンポーネントでラップすることになるでしょう:
 
 ```html
 <template>
@@ -42,8 +44,8 @@ export default {
     return {
       date: ref(DateTime.local()),
       updateDate: (value) => {
-        // some logic to turn value which is
-        // YYYY-MM-DD into Luxon DateTime
+        // YYYY-MM-DD を Luxon DateTime に
+        // 変換する何らかのロジック
       }
     }        
   }
@@ -51,14 +53,14 @@ export default {
 </script>
 ```
 \begin{center}
-Wrapping `<datetime>` to provide Luxon integration.
+`<datetime>`をラッピングして、Luxonとのインテグレーションを提供します。
 \end{center}
 
-This might work okay - now you can put your `<luxon-date-time>` on npm to share, listing `luxon` as a `peerDependency` in `package.json`. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue`, or have a different opinion on the API `<date-time-luxon>` should expose. Can we be more flexible? What about moment? Do we need to make a `<moment-date-time>` component too? 
+このやり方はうまくいくはずです－配布用にnpmに`<luxon-date-time>`を追加し、`luxon`を`peerDependency`として`package.json`に列挙することができます。しかし、`updateValue`を呼ぶ前に、v-model上のdateをバリデートするために別の方法を用いる人がいるかもしれませんし、`<date-time-luxon>`が提供するAPIについて異なる意見を持っている人がいるかもしれません。より柔軟に対応できないでしょうか？momentについてはどうでしょう？`<moment-date-time>`コンポーネントも作る必要があるでしょうか？
 
-The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. The `<date-time>` component doesn't need to know the specifics of the DateTime object it is dealing with.
+"wrapper"による解決の問題の中核にあるのは、別の抽象化－すなわち別のレイヤーを加えようとしていることです。これは望ましくありません。解決すべき問題は、ライブラリを問わない方法で`v-model`の*シリアライズ*と*デシリアライズ*を行うことです。`<date-time>`コンポーネントは、取り扱うDateTimeオブジェクトの詳細を知る必要がありません。
 
-Here is the API I am proposing to make `<date-time>` truly agnostic, not needing to know the implementation details of the date library:
+以下は、`<date-time>`を真にアグノスティックなもの、すなわちDateライブラリの実装の詳細を知る必要がないものにするために、私が提案するAPIです:
 
 ```html
 <date-time 
@@ -68,26 +70,26 @@ Here is the API I am proposing to make `<date-time>` truly agnostic, not needing
 />
 ```
 \begin{center}
-<datetime> with serialize and deserialize props.
+シリアライズ及びデシリアライズのプロパティを伴った<datetime>。
 \end{center}
 
-`date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<date-time>` how to handle the value, which will be some kind of DateTime object. This pattern is generalized as the "strategy" pattern. A textbook definition is as follows:
+`date`はどのようなものでも構いません－`serialize`と`deserialize`は、なんらかのDateTimeオブジェクトになるであろう値を、どのように取り扱うかを`<date-time>`に伝える関数になります。このデザインパターンは"Strategy"パターンとして一般化されます。教科書的な定義は以下となります:
 
-> In computer programming, the strategy pattern (also known as the policy pattern) is a behavioral software design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of algorithms to use (https://en.wikipedia.org/wiki/Strategy_pattern). The strategy lets the algorithm vary independently from clients that use it.
+> コンピュータプログラミングにおいて、Strategyパターン（Policyパターンとしても知られる）とは、ソフトウェアのふるまいに関するデザインパターンであり、実行時にアルゴリズムを選択できるようにするものである。一つのアルゴリズムを直接実装する代わりに、コードは実行時に複数のアルゴリズムからどれを使うべきかの指示を受け取る(https://en.wikipedia.org/wiki/Strategy_pattern)。Strategyパターンは、アルゴリズムがそれを使用するクライアントから独立して変化することを許容する。
 
-The key part is the last sentence. We push the onus of selecting the algorithm onto the developer.
+キーとなるのは最後の一文です。アルゴリズムの選択という責務を開発者に与えるのです。
 
-A diagram might make this more clear:
+以下の図はこのことをより明確にします:
 
-![DateTime data flow](dt-ss-1.png)
+![DateTimeのデータの流れ](dt-ss-1.png)
 
-In this diagram, the internal implementation of `<date-time>` is on the right. Regardless of what the developer passes to `v-model`, we will convert it to a framework agnostic representation. In this case, it's `{ year: '', month: '', day: '' }`. We then transform it *back* to the desired value when it is updated. 
+この図において、`<date-time>`の内部的な実装は右側です。開発者が`v-model`に何を渡すかに関わらず、これをフレームワークを問わない表現に変換します。この場合は、`{ year: '', month: '', day: '' }`という形式です。値が更新された場合は、望む値に変換し*返し*ます。
 
-If the developer was using Luxon, the workflow would be something like `luxon.DateTime()` -> `{ year: '', month: '', day: '' }` -> `luxon.Datetime()`. The input *and* output is a Luxon DateTime - the developer doesn't need to know or care about the internal representation.
+開発者がLuxonを使用している場合、ワークフローは`luxon.DateTime()` `->` `{ year: '', month: '', day: '' }` `->` `luxon.Datetime()`のようになるでしょう。インプットとアウトプットは*どちらも*Luxon DateTimeです－開発者は内部的な表現を知ったり気を配る必要はありません。
 
-## Foundations of v-model
+## v-modelの基礎
 
-Before implementing the strategy pattern (in this example, the `serialize` and `deserialize` functions), let's write the base for `<date-time>`. It will use `v-model`. This means we receive a `modelValue` prop and update the value by emitting a `update:modelValue` event. To keep things simple, I will just use 3 `<input>` elements for the year, month and day.
+Strategyパターンの実装（今回の例では`serialize`関数と`deserialize`関数）をする前に、`<date-time>`のベースを書いてみましょう。これには`v-model`を使用します。つまり、`modelValue`プロパティを受け取り、`update:modelValue`イベントをemitすることで値を更新します。シンプルに保つため、year, mounth, dayの3つの`<input>`要素のみを用います。
 
 ```html
 <template>
@@ -135,10 +137,10 @@ export default {
 </script>
 ```
 \begin{center}
-Implementing v-model for the datetime.
+datetimeのv-modelの実装。
 \end{center}
 
-Usage is like this:
+使用法は以下のようになります:
 
 ```html
 <template>
@@ -167,13 +169,13 @@ export default {
 </script>
 ```
 
-![Rendering the Date Inputs](ss-dt-progress.png)
+![Date入力フォームの表示](ss-dt-progress.png)
 
-I called the variable `dateLuxon` since we will eventually change it to be a Luxon `DateTime`. For now it is just a plain JavaScript object, made reactive via `ref`. This is all standard - we made our custom component work with `v-model` by binding to `:value` with `modelValue`, and update the original value in the parent component with `emit('update:modelValue')`.
+最終的にはLuxon `DateTime`に変更する予定なので、変数は`dateLuxon`と命名しました。現在は単なるJavaScriptオブジェクトにすぎず、`ref`を通してリアクティブとなっています。これらは全てスタンダードなやり方です－`:value`を`modelValue`と紐づけることでカスタムコンポーネントが`v-model`を使えるようにして、親コンポーネント内の元の値を`emit('update:modelValue')`で更新します。
 
-## Deserializing for modelValue
+## modelValueのためのDeserialize
 
-We have established the internal API. This is how the `<date-time>` component will manage the value. For notation purposes, if we were to write an interface in TypeScript, it would look like this:
+内部のAPIは作り終えました。これは、`<date-time>`コンポーネントが値をどのように管理するかについてのものでした。ついでに言及すると、TypeScriptでInterfaceを書くとした場合には、以下のようになるでしょう:
 
 ```ts
 interface InternalDateTime {
@@ -183,21 +185,21 @@ interface InternalDateTime {
 }
 ```
 
-We will now work on the `deserialize` prop, which is a function that will convert any object (so a Luxon `DateTime` object, or Moment `Moment` object) into an `InternalDateTime`. This is the representation the `<date-time>` component uses internally.
+ここから`deserialize`プロパティを作成していきますが、これは（Luxonの`DateTime`オブジェクトやMomentの`Moment`オブジェクトなどの）いかなるオブジェクトをも`InternalDateTime`に変換するための関数です。これは、`<date-time>`コンポーネントが内部的に用いる表現です。
 
-## Deserializing modelValue
+## modelValueのDeserialize
 
-The next goal is to write a `deserialize` function. In pseudocode:
+次のゴールは`deserialize`関数を書くことです。擬似コードで示すと以下のようなものです:
 
 ```js
 export function deserialize(inputDateTime) {
-  // do whatever needs to be done to convert
-  // the inputDateTime to a JS object with
-  // { year, month, day }
+  // inputDateTimeを { year, month, day } の
+  // JSオブジェクトに変換するために必要な
+  // 全処理をここに記載
   return yearMonthDateObject
 ```
 
-I will use Luxon's `DateTime` to demonstrate. You can create a new `DateTime` like this:
+ここではLuxonの`DateTime`を用います。新しい`DateTime`は以下のように作成できます:
 
 ```js
 import { DateTime } from 'luxon'
@@ -209,12 +211,12 @@ const date = DateTime.fromObject({
 })
 ```
 
-The goal is to get from our input from `v-model`, in this case a Luxon `DateTime`, to our internal representation, `InternalDateTime`. This conversion is trivial in the case of Luxon's DateTime. You can just do `date.get()` passing in `year`, `month` or `day`. So our `deserialize` function looks like this:
+ここでのゴールは、`v-model`から受け取ったインプットから（今回の例ではLuxonの`DateTime`から）、内部的な表現である`InternalDateTime`を取得することです。この変換はLuxonのDateTimeの場合は簡単なものです。`date.get()`に`year`, `month`, `day`を渡すだけです。結果、`deserialize`関数は以下のようになります:
 
 ```js
-// value is what is passed to `v-model`
-// in this example a Luxon DateTime
-// we need to return an InternalDateTime
+// valueはv-modelに渡された値で、
+// 今回の例ではLuxon DateTimeとなります
+// InternalDateTimeを返却する必要があります
 export function deserialize(value) {
   return {
     year: value.get('year'),
@@ -224,7 +226,7 @@ export function deserialize(value) {
 }
 ```
 
-Let's update the usage:
+使用方法も改善してみましょう:
 
 ```html
 <template>
@@ -267,7 +269,7 @@ export default {
 </script>
 ```
 
-Next, update `<date-time>` to use the new `deserialize` prop:
+次に、`<date-time>`を改善して`deserialize`プロパティを使うようにしましょう:
 
 ```html
 <template>
@@ -322,22 +324,22 @@ export default {
 </script>
 ```
 
-The main changes are:
+主な変更は以下です:
 
-1. We now need to use a `computed` property for `modelValue`, to ensure it is correctly transformed into our `InternalDateTime` representation. 
-2. We use `deserialize` on the `modelValue` in the `update` function when preparing to update `modelValue`. 
+1. `modelValue`に対して`computed`プロパティを使用して、`InternalDateTime`の表現に正しく変換できるようにする必要があります。
+2. `modelValue`を更新する準備をする際に、`update`関数内の`modelValue`に対して`deserialize`を使用します。
 
-![Using the serialize prop.](ss-dt-progress-2.png)
+![Seriarizeプロパティの使用](ss-dt-progress-2.png)
   
-Now would generally be a good time to write a test for the `deserialize` function. Notice I exported it independently of the Vue component, and it does not use the Vue reactivity system. This is intentional. It's a pure function, so it's very easy to test. For brevity, the tests are not shown, but you can find them in the GitHub repository. 
+ここまでくれば、`deserialize`関数に対してテストを書くいいタイミングだと思います。Vueコンポーネントに対して独立して関数をエクスポートしており、Vueのリアクティブシステムを用いていないことにお気づきでしょうか。これは意図的なものです。上記は純粋関数なので、テストは非常に簡単です。簡潔のため、テストは掲載しませんが、GitHubリポジトリ上でご覧いただけます。
 
-This implementation currently works - kind of - it displays the correct values in the `<input>` elements, but you cannot update the value. We need the opposite of `deserialize` - `serialize`.
+この実装は今のところうまく動作します－大体は。`<input>`要素に正しい値を表示できますが、値を更新することができません。`deserialize`の反対－`serialize`が必要となります。
 
-## Serializing modelValue
+## modelValueのSerialize
 
-We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime` now, not an `InternalDateTime` object, since that is what the developer expects. Remember, the input and output value needs to be of whichever DateTime library the developer has provided. 
+`emit('update:modelValue')`はLuxonの`DateTime`（`InternalDateTime`オブジェクトではない）と一緒に呼ばれるべきです。それが開発者が期待するところだからです。思い出してください。インプットとアウトプットは開発者が提供するいかなるDateTime Libraryであってもいいはずです。
 
-Let's write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime` - `{ year, month, day }`. We will see a more complex example with the Moment integration.
+値を変換するための`serialize`関数を書いてみましょう。これはシンプルです。偶然にも、Luxonの`DateTime.fromObject`は`InternalDateTime`と同じ形のオブジェクト - `{ year, month, day }` - をとります。Momentの場合、サンプルはより複雑になるでしょう。
 
 ```js
 export function serialize(value) {
@@ -345,7 +347,7 @@ export function serialize(value) {
 }
 ```
 
-Again, update the usage.
+再び、使用法も更新しましょう:
 
 ```html
 <template>
@@ -382,15 +384,15 @@ export default {
 </script>
 ```
 
-I added a `:serialize` prop and returned `serialize` from the `setup` function. 
+`:serialize`プロパティを追加し、`setup`関数から`serialize`を返却しました。
 
-Next, we need to call `serialize` every time we try to update `modelValue`. Update `<date-time>`:
+次に、`modelValue`を更新しようとする度に`serialize`が呼ばれる必要があります。`<date-time>`を更新しましょう:
 
 ```html
 <template>
   <!-- 
-    Omitted for brevity.
-    Nothing to change here right now.
+    簡潔のため省略。
+    現時点では何も変更なし。
   -->
 </template>
 
@@ -433,17 +435,17 @@ export default {
 </script>
 ```
 
-All that changed was declaring the `serialize` prop and calling `props.serialize` when emitting the new value.
+変更点は、`serialize`プロパティを宣言して、新しい値をemitする際に`props.serialize`を呼ぶことだけです。
 
-It works! Kind of - as long as you only enter value numbers. If you enter a `0` for the day, all the inputs show `NaN`. We need some error handling.
+うまくいきました！－大体は。有効な数字を入力する限りは問題ありません。例えば、日にちに`0`を入れたら、すべての入力は`NaN`を示します。何らかのエラーハンドリングが必要です。
 
-![Serializing/Deserializing without error handling.](ss-dt-error.png)
+![エラーハンドリングがないSerializing/Deserializing。](ss-dt-error.png)
 
-## Error Handling
+## エラーハンドリング
 
-In the case of an error - either we could not serialize or deserialize the value - we will just return the current input value, and give the user a chance to fix things.
+エラーが起きた場合－値をシリアライズまたはデシリアライズできなかったいずれの場合でも－現在の値を返却し、ユーザーに修正の機会を与ましょう。
 
-Let's update `serialize` to be more defensive:
+`serialize`を更新して、より防御的にしましょう:
 
 ```js
 export function serialize(value) {
@@ -460,7 +462,7 @@ export function serialize(value) {
 }
 ```
 
-In the case that we failed to serialize the value, we just return `undefined`. Update the `emit` in `<date-time>` to use this new logic; if the value is invalid, we simply do not update modelValue:
+値のserializeに失敗した場合、単に`undefined`と返却されます。この新しいロジックを使って`<date-time>`内の`emit`を改善してみましょう; 値が不正な場合、単純にmodelValueを更新するのをやめます:
 
 ```js
 export default {
@@ -491,30 +493,32 @@ export default {
 }
 ```
 
-I just added a check - `if (!asObject)` and return early if the `props.serialize` did not return a value.
+単純に`if (!asObject)`のチェックを追加し、`props.serialize`が値を返却しなかった場合、emitの前に`return`するようにしました。
 
-Now everything works correctly, and `<date-time>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<date-time>` to work.
+これですべてが正しく動作するようになり、`<date-time>`は日付が有効な場合にのみ`modelValue`を更新するようになりました。この振る舞いこそ私が決めた設計です。`<date-time>`がどのように動作してほしいかに応じて、異なる実装が可能です。
 
-Adding support for Moment is not especially difficult or interesting - it is left as an exercise, and the solution included in the source code.
+Momentに対するサポートを追加するのは特段難しくも面白くもありませんので、エクササイズに残しておきました。解法はソースコードに含まれます。
 
-## Deploying
+## デプロイ
 
-The goal here was to create a highly reusable `<date-time>` component. If I was going to release this on npm, there is a few things I'd do.
+ここでのゴールは、極めて再利用性の高い`<date-time>`コンポーネントを作成することでした。もしこれをnpmにリリースしようと思った場合、いくつかやるべきことがあります。
 
-1. Remove `serialize` and `deserialize` from the `<date-time>` component and put them into another file. Perhaps one called `strategies.js`.
-2. Write a number of strategies for popular DateTime libraries (Luxon, Moment etc).
-3. Build and bundle the component and strategies separately. 
+1. `serialize`と`deserialize`を`<date-time>`コンポーネントから除外して別のファイルに移す。ファイル名はおそらく`strategies.js`等になるだろう。
+2. 人気のDateTimeライブラリ（Luxon, Moment等）のためにStrategyを複数書いておく。
+3. コンポーネントとストラテジーを別々にビルド及びバンドルする。
 
-This will allow developers using tools like webpack or rollup to take advantage of "tree shaking". When they build their final bundle for production, it will only include the `<date-time>` component and the strategy they are using. It will also allow the developer to provide their own more opinionated strategy.
+こうすることで開発者は、"tree shaking"※の利点を得るためにwebpackやrollupといったツールを使うことができます。本番用の最終的なバンドルをビルドする際は、`<date-time>`コンポーネントと使用しているstrategyだけを含めます。また、開発者が自分たちのより特殊なstrategyを提供することもできます。
 
-To make the component even more reusable, we could consider writing it as a renderless component, like the one described in the renderless components section.
- 
-## Exercises
+※【訳者註】実行されないコードを削除することで、JavaScriptの文脈で利用される用語（[MDN Web Docs 用語集](https://developer.mozilla.org/ja/docs/Glossary/Tree_shaking)）。
 
-- We did not add any tests for `serialize` or `deserialize`; they are pure functions, so adding some is trivial. See the source code for some tests.
-- Add support for another date library, like Moment. Support for Moment is implemented in the source code.
-- Add hours, minutes, seconds, and AM/PM support.
-- Write some tests with Testing Library; you can use `fireEvent.update` to update the value of the `<input>` elements.
+レンダーレスコンポーネントの章で説明したように、コンポーネントの再利用性をさらに高めるため、レンダーレスコンポーネントとして書き直すことも検討可能です。
 
-You can find the completed source code in the [GitHub repository under examples/reusable-date-time](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+## エクササイズ
+
+- `serialize`と`deserialize`に関して一切テストを書いていません。これらは純粋関数なので、テストを加えるのは簡単です。いくつかのテストの例はソースコードをご覧ください。
+- 他のdateライブラリ（例えばMoment）のサポートを加えてください。Momentへのサポートはソースコードに実装しています。
+- hours, minutes, seconds, AM/PMのサポートを追加して下さい。
+- Testing Libraryを用いて何かテストを書いてください。`<input>`要素の値を更新するには、`fireEvent.update`を使うことができます。
+
+完全なソースコードは[GitHubリポジトリのexamples/reusable-date-time配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 

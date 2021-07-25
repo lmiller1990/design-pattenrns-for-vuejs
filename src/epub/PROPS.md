@@ -1,16 +1,16 @@
-# Patterns for Testing Props
+# Propsのテストにおけるデザインパターン
 
-You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
+完全なソースコードについては、[GitHubリポジトリのexmples/props配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)をご覧ください。
 
-In this section we explore `props`, and the kind of tests you might want to consider writing. This leads into a much more fundamental and important topic; drawing a clear line between business logic and UI, also known as *separation of concerns*, and how your tests can help make this distinction clear.
+この章では、`props`について論じます。また、テストを書く上で考慮すべきことも見ていきます。こちらは、より基礎的で重要なトピックに繋がっていきます。すなわち、ビジネスロジックとUIの間に明確な線を引くこと、つまり*関心の分離*についてです。そしてテストがどのようにしてこれらの区別を明確にするのに役立つかを見ていきましょう。
 
-Consider one of the big ideas behind frameworks like Vue and React:
+VueやReactといったフレームワークの背景にある、大きな概念の一つについて考えてみましょう:
 
 \begin{center}
-Your user interface is a function of your data.
+ユーザーインターフェースは、データにとってのある種の関数である。
 \end{center}
 
-This idea comes in many forms; another is "data driven interfaces". Basically, your user interface (UI) should be determined by the data present. Given X data, your UI should be Y. In computer science, this is referred to as *determinism*. Take this `sum` function for example:
+このアイデアは様々な形で現れます。その一つは"データ駆動インターフェース"です。これは、基本的にユーザーインターフェース(UI)はデータの内容によって決定されるべきであるというものです。Xというデータを与えれば、UIはYになるべき、ということです。コンピュータサイエンスの分野では、*決定論*として言及されます。以下の`sum`関数を例に見てみましょう:
 
 ```js
 function sum(a, b) {
@@ -18,10 +18,10 @@ function sum(a, b) {
 }
 ```
 \begin{center}
-A simple sum function. It's a pure function.
+シンプルなsum関数。これは純粋関数です。
 \end{center}
 
-When called with the same value for `a` and `b`, you always get same result. The result is pre-determined. It's *deterministic*. An example of an impure function would be this:
+`a`と`b`が同じ値で呼ばれれば、常に同じ結果を得ることになります。結果はあらかじめ決まっていると言えます。これが*決定論的*ということの意味です。純粋関数でない関数の例は以下のようなものでしょう:
 
 ```js
 async function fetchUserData(userId) {
@@ -29,16 +29,16 @@ async function fetchUserData(userId) {
 }
 ```
 \begin{center}
-A impure function - it has a side effect. Not ideal, but necessary for most systems to do anything useful.
+純粋でない関数－副次的効果を持っています。理想的ではありませんが、ほとんどのシステムで何かしら有益なことをする時に必要です。
 \end{center}
 
-This is *not* a pure function because it relies on an external resource - in this case an API and a database. Depending on what is in the database when it is called, we might get a different result. It's *unpredictable*.
+これは純粋関数*ではありません*。なぜなら外部のリソースに依存しているからです－このケースではAPIとデータベースに依存しています。関数が呼ばれる際にデータベースの中身が何であるかによって、異なる結果を得ることになるでしょう。これは*予測不可能*ということです。
 
-How does this relate to `props`? Think of a component that decides what to render based on it's `props` (don't worry about `data`, `computed` or `setup` for now - but the same ideas apply, as you'll see throughout the book). If you think of a component as a function and the `props` as the arguments, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
+これが`props`とどう関係があるのでしょうか？`props`の値に基づいて何が表示されるか決まるコンポーネントを想像してみて下さい（ここでは、まだ`data`、`computed`、`setup`については気にしなくて大丈夫です。しかし同じアイデアが当てはまることは、本書を通してご理解いただけるでしょう）。コンポーネントを関数、`props`を引数と考えると、`props`に同じ値を与えれば、コンポーネントは常に同じ内容を表示すると理解できるでしょう。結果は決定論的に決まっています。コンポーネントに`props`としてどの値を渡すかを決めれば、テストは簡単です。なぜなら、コンポーネントの中身がどのようになるかは完全に明らかだからです。
 
-## The Basics
+## 基本
 
-You can declare props in a few ways. We will work with the `<message>` component for this example. You can find it under `examples/props/message.vue`.
+propsを宣言する方法はいくつかあります。今回の例では`<message>`コンポーネントを使っていきましょう。実際のソースは`examples/props/message.vue`をご覧ください。
 
 ```html
 <template>
@@ -47,16 +47,16 @@ You can declare props in a few ways. We will work with the `<message>` component
 
 <script>
 export default {
-  // can be 'success', 'warning', 'error'
+  // 'success', 'warning', 'error'のいずれかの値をとります
   props: ['variant']
 }
 </script>
 ```
 \begin{center}
-Declaring a variant prop with the inferior array syntax.
+低次の表現である配列構文を用いて、variantプロパティを宣言します。
 \end{center}
 
-In this example we declare props using the array syntax: `props: ['variant']`. I recommend avoiding the array syntax. Using the object syntax gives the reader more insight into the type of values `variant` can take:
+この例では、配列構文: `props: ['variant']`によってpropsを宣言しています。配列構文を用いるのは避けることをお勧めします。オブジェクト構文を用いることで、`variant`がとりうる値の形式について、読者により多くの洞察を与えることができます:
 
 ```js
 export default {
@@ -69,10 +69,10 @@ export default {
 }
 ```
 \begin{center}
-Declaring a variant prop with the superior object syntax.
+高次の表現であるオブジェクト構文を用いて、variantプロパティを宣言します。
 \end{center}
 
-If you are using TypeScript, even better - create a type:
+TypeScriptを使っている場合はなお良いです－型を作りましょう:
 
 ```ts
 type Variant = 'success' | 'warning' | 'error'
@@ -87,39 +87,39 @@ export default {
 }
 ```
 \begin{center}
-A strongly typed variant prop using TypeScript.
+TypeScriptを用いて、強力に型付けされたvariantプロパティ
 \end{center}
 
-In our `<message>` example, we are working with regular JavaScript, so we cannot specify specific strings for the `variant` props like you can in TypeScript. There are some other patterns we can use, though.
+`<message>`の例では、通常のJavaScriptを用います。そのため、TypeScriptの例のように、`variant`プロパティの値を特定の文字列に限定することはできません。しかし、他のパターンを採用することができます。
 
-We have specified the `variant` prop is `required`, and we would like to enforce a specific subset of string values that it can receive. Vue allows us to validate props using a `validator` key. It works like this:
+`variant`プロパティを`required`にしましたが、さらに受け取る文字列の値を特定の集合に限定したいです。Vueは`validator`キーを用いることで、propsをバリデートすることを可能にします。これはこのように用います:
 
 ```js
 export default {
   props: {
     variant: {
       validator: (val) => {
-        // if we return true, the prop is valid.
-        // if we  return false, a runtime warning will be shown.
+        // trueを返す場合、propは有効です。
+        // falseを返す場合、ランタイムの警告が表示されます。
       }
     }
   }
 } 
 ```
 \begin{center}
-Prop validators are functions. If they return false, Vue will show a warning in the console.
+プロパティのバリデーターは関数です。falseを返却した場合、Vueはコンソールに警告を表示します。
 \end{center}
 
-Prop validators are like the `sum` function we talked about earlier in that they are pure functions! That means they are easy to test - given X prop, the validator should return Y result. 
+propsバリデーターは、純粋関数であるという点で上述した`sum`関数と似ています。つまり、テストが簡単であるということです－Xというプロパティが与えられれば、バリデーターはYという結果を返します。
 
-Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Testing Library and the `classList` attribute:
+バリデーターを追加する前に、`<message>`コンポーネントのためのシンプルなテストを書きましょう。*インプット*と*アウトプット*をテストしたいです。`<message>`のケースでは、`variant`プロパティがインプットで、何が表示されるかがアウトプットです。Testing Libraryと`classList`属性を用いることで、正しいクラスが適用されたかを判定するテストを書くことができます:
 
 ```js
 import { render, screen } from '@testing-library/vue'
 import Message, { validateVariant } from './message.vue'
 
 describe('Message', () => {
-  it('renders variant correctly when passed', () => {
+  it('渡されたvariantが、正しく表示されること', () => {
     const { container } = render(Message, {
       props: {
         variant: 'success'
@@ -132,14 +132,14 @@ describe('Message', () => {
 })
 ```
 \begin{center}
-Testing the prop is applied to the class.
+プロパティのテストはクラスに適用されています。
 \end{center}
 
-This verifies everything works as expected when a valid `variant` prop is passed to `<message>`. What about when an invalid `variant` is passed? We want to prohibit using the `<message>` component with a valid `variant`. This is a good use case for a `validator`.
+上記は、有効な`variant`プロパティが`<message>`に渡された時に、全てが期待通りに動作するかを検証しています。不正な`variant`が渡された時はどうでしょう？不正な`variant`で`<message>`コンポーネントが使用されることを禁止したいです。これは、`validator`の優れたユースケースです。
 
-## Adding a Validator
+## バリデーターの追加
 
-Let's update the `variant` prop to have a simple validator:
+`variant`プロパティを更新して、シンプルなバリデーターを追加してみましょう:
 
 ```js
 export default {
@@ -163,16 +163,16 @@ export default {
 }
 ```
 \begin{center}
-If the variant is not valid, we throw an error.
+variantが有効でない場合、エラーをスローします。
 \end{center}
 
-Now we will get an error if an invalid prop is passed. An alternative would be just to return `false` instead of throwing an error - this will just give you a warning in the console via `console.warn`. Personally, I like loud and clear errors when a component isn't used correctly, so I chose to throw an error.
+これで、不正なプロパティが渡された場合はエラーとなります。エラーをスローする代わりに、単に`false`を返すこともできるでしょう。その場合、`console.warn`を通してコンソールに警告が表示されます。個人的には、コンポーネントが正しく使用されていない場合は、明示的にはっきりとそれを伝えたいので、エラーをスローする方を選びました。
 
-How do we test the validator? If we want to cover all the possibilities, we need 4 tests; one for each `variant` type, and one for an invalid type. 
+バリデーターはどのようにテストすれば良いでしょうか？全ての可能性を網羅するためには、4つのテストが必要です。`variant`の有効な型のそれぞれに対してと、不正な型の1つに対してです。
 
-I prefer to test prop validators in isolation. Since validators are generally pure functions, they are easy to test. There is another reason I test prop validators is isolation too, which we will talk about after writing the test.
+propバリデーターを独立してテストする方が好ましいです。バリデーターはたいてい純粋関数であるため、テストは簡単です。propバリデーターを独立してテストする理由はもう一つがありますが、それについては実際のテストを書いてから言及しましょう。
 
-To allow testing the validator is isolation, we need to refactor `<message>` a little to separate the validator from the component:
+バリデーターを独立してテストするために、`<message>`を少しばかりリファクターして、バリデーターをコンポーネントから分離したいと思います:
 
 ```html
 <template>
@@ -204,72 +204,72 @@ export default {
 </script>
 ```
 \begin{center}
-Exporting the validator separately to the component.
+バリデーターをコンポーネントから分離して抽出します。
 \end{center}
 
-Great, `validateVariant` is now exported separately and easy to test:
+素晴らしい！`validateVariant`は独立してエクスポートされ、簡単にテストできるようになりました:
 
 ```js
 import { render, screen } from '@testing-library/vue'
 import Message, { validateVariant } from './message.vue'
 
 describe('Message', () => {
-  it('renders variant correctly when passed', () => {
-    // omitted for brevity ...
+  it('渡されたvariantが、正しく表示されること', () => {
+    // 簡潔のため省略 ...
   })
 
-  it('validates valid variant prop', () => {
+  it('有効なvariantプロパティが正しく検証されること', () => {
     ;['success', 'warning', 'error'].forEach(variant => {
       expect(() => validateVariant(variant)).not.toThrow()
     })
   })
 
-  it('throws error for invalid variant prop', () => {
+  it('不正なvariantプロパティに対して、エラーがスローされること', () => {
     expect(() => validateVariant('invalid')).toThrow()
   })
 })
 ```
 \begin{center}
-Testing all the cases for the validator.
+バリデーターの全てのケースをテストします。
 \end{center}
 
-Simply making the `validateVariant` a separate function that is exported might seem like a small change, but it's actually a big improvement. By doing so, we were able to write tests for `validateVariant` with ease. We can be confident the `<message>` component can only be used with valid a `variant`.
+単に`validateVariant`を独立した関数としてエクスポートするだけでは、大した変化に見えないかもしれませんが、実際には大きな改善があります。こうすることで、`validateVariant`のテストを簡単に記述することができます。`<message>`コンポーネントが有効な`variant`を伴ってのみ利用されていると、確信を持つことができるのです。
 
-If the developer passes an invalid prop, they get a nice clear message in the console:
+開発者が不正なプロパティを渡した場合、コンソール上にとても明確なメッセージが表示されます:
 
-![Error! Passed variant is invalid.(props-error.png)
+![Error! Passed variant is invalid.](props-error.png)
 
-## Key Concept: Separation of Concerns
+## キーコンセプト: 関心の分離
 
-We have written two different types of tests. The first is a UI test - that's the one where we make an assertions against `classList`. The second is for the validator. It tests business logic. 
+ここまで、2つの異なるタイプのテストを書いてきました。最初はUIテストで、 `classList`に対してアサートを行いました。2つ目はバリデーターに対してで、ビジネスロジックをテストしています。
 
-To make this more clear, imagine your company specializes in design systems. You have some designers who probably use Figma or Sketch to design things like buttons and messages. 
+これをより明確にするために、あなたの会社はデザインシステムを専門にしていると考えて下さい。会社にはデザイナーが複数いて、（おそらく）FigmaやSketchなどを使ってボタンやメッセージのようなものをデザインしています。
 
-They have decided to support for three message variants: success, warning and error. You are a front-end developer. In this example, you are working on the Vue integration - you will write Vue components that apply specific classes, which use the CSS you provided by the designers. 
+デザイナー達は、以下3種類のメッセージをサポートすることにしました: success、warning、error。そして、あなたはフロントエンドの開発者です。この例では、あなたはVueフレームワーク上で業務を行うことになります－つまり、デザイナーによって提供されるCSSで使用される、特定のクラスを適用したVueコンポーネントを作成する、ということです。
 
-In the future, you also need to build React and Angular components using the same CSS and guidelines. All three of the integrations could make use of the `validateVariant` function and test. It's the core business logic.
+将来的には、同一のCSSやガイドラインを用いて、ReactやAngularのコンポーネントを構築する必要が生じるかもしれません。その際には、3つのフレームワークのいずれの場合でも、`validateVariant`関数やそのテストを利用することができるでしょう。`validateVariant`はコアとなるビジネスロジックだからです。
 
-This distinction is important. When we use Testing Library methods (such as `render`) and DOM APIs (like `classList`) we are verifying that the Vue UI layer is working correctly. The test for `validateVariant` is for our business logic. These differences are sometimes called *concerns*. One piece of code is concerned with the UI. The other is concerned with the business logic. 
+この区別こそが重要です。（例えば`render`等の）Testing Libraryのメソッドや（`classList`のような）DOM APIを使用する際には、VueのUIレイヤーが正しく動作しているかを検証しようとしています。それに対して、`validateVariant`のテストはビジネスロジックを検証するためのものです。これらの違いは、*関心*と呼ばれます。あるコード群はUIに関心があり、他方はビジネスロジックに関心があるのです。
 
-Separating them is good. It makes your code easier to test and maintain. This concept is known as *separation of concerns*. We will revisit this throughout the book. 
+こうした区別は良いことです。こうすることで、テストと保守が容易になります。このコンセプトは*関心の分離*として知られます。本書を通して何度もこのテーマに立ち帰ることになるでしょう。
 
-If you want to know if something is part of the UI or business logic, ask yourself this: "if I switched to React, would I be able to re-use this code and test?". 
+あるコードがUIとビジネスロジックのどちらに属するのかを知りたい時には、このように自問をしてみてください－「もしReactに切り替えた場合、同じコードとテストを再利用できるだろうか？」
 
-In this case, you could reuse the validator and it's test when you write the React integration. The validator is concerned with the business logic, and doesn't know anything about the UI framework. Vue or React, we will only support three message variants: success, warning and error. The component and component test (where we assert using `classes()`) would have to be rewritten using a React component and React testing library.
+今回のケースでは、Reactフレームワークを用いた場合でもバリデーターとそのテストは再利用できます。バリデーターはビジネスロジックに関心があり、UIフレームワークについては何も知らないからです。VueであってもReactであっても、以下3種類のメッセージ変数のみがサポートされます: success、warning、error。コンポーネントとコンポーネントのテスト（`classes()`を用いてアサートしている箇所）は、ReactコンポーネントとReact Testing Libraryを用いて書き直す必要があるでしょう。
 
-Ideally, you don't want your business logic to be coupled to your framework of choice; frameworks come and go, but it's unlikely the problems your business is solving will change significantly.
+理想的には、ビジネスロジックをどのフレームワークを選ぶかという問題と結びつけたくありません。フレームワークには流行り廃りがありますが、ビジネスが解決すべき問題が著しく変わるということはそうそうありません。
 
-I have seen poor separation of concerns costs companies tens of thousands of dollars; they get to a point where adding new features is risky and slow, because their core business problem is too tightly coupled to the UI. Rewriting the UI means rewriting the business logic. 
+私はこれまで、関心の分離が十分でなかったために、企業が数万ドルを支払う羽目になった例をたくさん見てきました。彼らは、新しい機能を追加することは危険で時間がかかるという状態に陥ってしまいました。なぜなら、コアとなるビジネスロジックはUIとあまりに密接に結びついてしまっているからです。UIを書き直すことは、すなわちビジネスロジックを書き直すことを意味します。
 
-## Separation of Concerns - Case Study
+## 関心の分離－ケーススタディ
 
-One example of poor separation of concerns costing an organzation was an application I worked on for an electrical components supplier. They had an application customers would use to get an approximate quote for the price of components. The ordering process was quite complex - you would go through a form with several steps, and the values from the previous step would impact the fields on the next step.
+関心の分離が十分でなかったがために企業にコストが生じた一例として、とある電気部品のサプライヤー向けに私が携わったアプリケーションがあります。サプライヤーは、顧客が部品の概算見積りを計算するためのアプリケーションを持っていました。計算の工程は非常に複雑で、いくつもステップを経る必要があり、前のステップから生じた値が、次のステップのフィールドに影響を持つような状態でした。
 
-The application was written using jQuery (which is not bad. No framework is bad - only if they are used incorrectly). All of the business logic was mixed in with the UI logic (this is the bad part). They had a quantity based discount model - "If purchasing more than 50 resistors, then apply X discount, otherwise Y" - this kind of thing. They decided to move to something a bit more modern - the UI was very dated, and wasn't mobile friendly at all. The complexity of the jQuery code was high and the code was a mess. 
+アプリケーションはJQueryを使って書かれていました（JQuery自体が悪いわけではありません。フレームワークは悪くないのです－それが正しく使用されている限りは）。すべてのビジネスロジックはUIロジックとごちゃ混ぜになっていました（この点こそが問題です）。サプライヤーは、数量ベースの割引制度を持っていました－「抵抗器を50個以上買ってくれれば、Xという割引を適用します。そうでなければYです」といったイメージです。サプライヤーはもう少しモダンなシステムに移行することに決めました－UIはとても時代遅れで、全くモバイルフレンドリーではありませんでした。JQueryコードの複雑性は非常に大きく、コードは散らかっていました。
 
-Not only did I need to rewrite the entire UI layer (which was what I was paid to do), but I ended up having to either rewrite or extract the vast majority of the business logic from within the jQuery code, too. This search and extract mission made the task much more difficult and risky than it should have been - instead of just updating the UI layer, I had to dive in and learn their business and pricing model as well (which ended up taking a lot more time and costing a lot more than it probably should have).
+UI層の全体を書き直す必要があっただけでなく（その作業に対して私はお金をもらっていたわけですが）、ビジネスロジックの圧倒的大部分がJQueryコードの中に埋もれており、これを抽出して書き直す羽目になってしまいました。この「探し出して抽出する」というミッションのせいで、作業は当初の想定よりもはるかに難しくリスキーなものになってしまいました－単にUIレイヤーをアップデートするだけでなく、サプライヤーのビジネスや価格体系にも深く立ち入って学ぶ必要がありました（そのために、当初の見積もりよりもはるかに多くの時間と費用が必要になってしまいました）。
 
-Here is a concrete example using the above real-world scenario. Let's say a resistor (a kind of electrical component) costs $0.60. If you buy over 50, you get a 20% discount. The jQuery code-base looked something like this:
+上記の現実にあったシナリオを用いて、具体的な例を以下に提示します。ある抵抗器（電気部品の一種）が$0.60するとします。50個以上買うと、20%の割引を受けることができます。JQueryのコードベースは以下のようなものでした:
 
 ```js
 const $resistorCount = $('#resistors-count')
@@ -286,7 +286,7 @@ $resistorCount.change((event) => {
 })
 ```
 
-You need to look really carefully to figure out where the UI ends and the business starts. In this scenario, I wanted to move to Vue - the perfect tool for a highly dynamic, reactive form. I had to dig through the code base and figure out this core piece of business logic, extract it, and rewrite it with some tests (of course the previous code base had no tests, like many code bases from the early 2000s). This search-extract-isolate-rewrite journey is full of risk and the chance of making a mistake or missing something is very high! What would have been much better is if the business logic and UI had be separated:
+上記の例では、どこでUIロジックが終わり、どこからビジネスロジックが始まるのか、注意深く判断する必要があります。今回のシナリオでは、Vue（非常に動的でリアクティブなフォームのための優れたツール）に移行する必要があります。そのために、コードベースを深堀りしてビジネスロジックの中核を理解し、抽出し、いくつかのテストを加えて書き直す必要が生じました（当然ながら、以前のコードベースにはテストは一切ありませんでした。2000年代初頭の多くのコードベースにはよくあることですが）。この、「探し出し、抽出し、分離し、書き直す」という作業は危険に満ちており、間違いを犯したり、ロジックの一部を喪失してしまう可能性は極めて高いです！仮にビジネスロジックとUIが分離していれば、はるかに状況は良かったでしょう:
 
 ```js
 const resistorPrice = 0.6
@@ -304,9 +304,9 @@ $resistorCount.change((event) => {
 })
 ```
 
-The second is far superior. You can see where the business logic ends and the UI begins - they are literally separated in two different functions. The pricing strategy is clear - a discount for any amount greater than 50. It's also very easy to test the business logic in isolation. If the day comes you decide your framework of choice is no longer appropriate, it's trivial to move to another framework - your business logic unit tests can remain unchanged and untouched, and hopefully you have some end-to-end browser tests as well to keep you safe.
+2番目の例の方がはるかに優れています。ビジネスロジックがどこで終わり、UIがどこから始まるのか一目で分かります－それらは文字通り2つの関数に分かれています。価格決定の仕組みは明らかです－50個以上買えば割引があります。ビジネスロジックを個別にテストすることも非常に容易です。いつの日かフレームワークの選択がもはや適切でないと判断する時が来たとしても、他のフレームワークに移行することは容易です－ビジネスロジックの単体テストは、手を付けずにそのまま利用することができますし、安全を確保するためにE2Eのブラウザテストを実施するとより望ましいでしょう。
 
-Moving to Vue is trivial - no need to touch the business logic, either:
+Vueに移行するのは簡単です－ビジネスロジックに手を付ける必要はありません:
 
 ```html
 <template>
@@ -332,11 +332,11 @@ export default {
 </script>
 ```
 
-Understanding and identifying the different concerns in a system and correctly structuring applications is the difference good engineers and great engineers.
+システム内の異なる関心を理解して峻別し、正しくアプリケーションを構築する能力は、良いエンジニアと偉大なエンジニアを区別する違いと言えます。
 
-## Another Example
+## その他の例
 
-Enough design philosophy for now. Let's see another example related to props. This examples uses the `<navbar>` component. You can find it in `examples/props/navbar.vue`. It looks like this:
+デザインパターンの考え方は十分ご理解いただけたでしょうから、propsに関連するその他の例を見てみましょう。今回の例では`<navbar>`コンポーネントを用います。実際のソースは`examples/props/navbar.vue`をご覧ください。サンプルコードは以下のようになります:
 
 ```html
 <template>
@@ -356,28 +356,28 @@ export default {
 </script>
 ```
 \begin{center}
-The navbar component. It has one prop, authenticated. It is false by default.
+navbarコンポーネント。authenticatedというプロパティを1つ持ちます。デフォルトではfalseとなります。
 \end{center}
 
-Before even seeing the test, it is clear we need *two* tests to cover all the use cases. The reason this is immediately clear is the `authenticated` prop is a `Boolean`, which only has two possible values. The test is not especially interesting (but the discussion that follows is!):
+実際のテストを見ずとも、全てのユースケースをカバーするのにテストが*2つ*必要なことは明らかです。理由は即座に明らかで、`authenticated`プロパティが`Boolean`だからです。とりうる値は2つしかありません。そのため、テストは特段面白くありません（その後の議論は面白くなります！）:
 
 ```js
 import { render, screen } from '@testing-library/vue'
 import Navbar from './navbar.vue'
 
 describe('navbar', () => {
-  it('shows logout when authenticated is true', () => {
+  it('authenticatedがtrueの場合、logoutを表示すること', () => {
     render(Navbar, {
       props: {
         authenticated: true
       }
     })
 
-    // getByText will throw an error if it cannot find the element.
+    // 要素が見つからない場合、getByTextはエラーをスローします。
     screen.getByText('Logout')
   })
 
-  it('shows login by default', () => {
+  it('デフォルトの場合、loginを表示すること', () => {
     render(Navbar)
 
     screen.getByText('Login')
@@ -385,12 +385,12 @@ describe('navbar', () => {
 })
 ```
 \begin{center}
-Testing the navbar behavior for all values of authenticated.
+authenticatedの全ての値に対してnavbarの振る舞いをテストします。
 \end{center}
 
-The only thing that changes based on the value of `authenticated` is the button text. Since the `default` value is `false`, we don't need to pass it as in `props` in the second test.
+`authenticated`の値によって変わるのはボタンのテキストだけです。`default`の値は`false`なので、2番目のテストでは`props`にfalseを渡す必要はありません。
 
-We can refactor a little with a `renderNavbar` function:
+`renderNavbar`関数を用いて少しだけリファクターすることができます:
 
 ```js
 describe('Navbar', () => {
@@ -400,26 +400,26 @@ describe('Navbar', () => {
     })
   }
 
-  it('shows login authenticated is true', () => {
+  it('authenticatedがtrueの場合、logoutを表示すること', () => {
     renderNavbar({ authenticated: true })
     screen.getByText('Logout')
   })
 
-  it('shows logout by default', () => {
+  it('デフォルトの場合、loginを表示すること', () => {
     renderNavbar()
     screen.getByText('Login')
   })
 })
 ```
 \begin{center}
-More concise tests.
+より簡潔なテスト。
 \end{center}
 
-I like this version of the test better. It might seem a little superficial for such a simple test, but as your components become more complex, having a function to abstract away some of the complexity can make your tests more readable. 
+こちらのバージョンのテストの方が好ましいと思います。このようなシンプルなテストに対しては表面的な違いに過ぎないと感じるかもしれませんが、コンポーネントが複雑になるにつれ、関数化して複雑さを取り除くことはテストの可読性を向上させます。
 
-I also removed the new line between the rendering the component and making the assertion. I usually don't leave any new lines in my tests when they are this simple. When they get more complex, I like to leave some space - I think it makes it more readable. This is just my personal approach. The important thing is not your code style, but that you are writing tests.
+同時に、コンポーネントを表示する行とアサートする行の間から改行を取り除いています。テストが今回のようにシンプルな場合、通常改行はしませんが、より複雑になった場合には可読性のために改行するようにしています。しかし、これは単に私の個人的なやり方に過ぎません。コーディングのスタイルではなく、テストを書くことそれ自体が重要です。
 
-Although we technically have covered all the cases, I like to add the third case: where `authenticated` is explicitly set to `false`.
+技術的には既に全てのケースをカバーしていますが、3番目のケースを加えてみたいと思います: `authenticated`に明示的に`false`を与える場合です。
 
 ```js
 describe('navbar', () => {
@@ -429,37 +429,39 @@ describe('navbar', () => {
     })
   }
 
-  it('shows login authenticated is true', () => {
+  it('authenticatedがtrueの場合、logoutを表示すること', () => {
     // ...
   })
 
-  it('shows logout by default', () => {
+  it('デフォルトの場合、loginを表示すること', () => {
     // ...
   })
 
-  it('shows login when authenticated is false', () => {
+  it('authenticatedがfalseの場合、loginを表示すること', () => {
     renderNavbar({ authenticated: false })
     screen.getByText('Login')
   })
 })
 ```
 \begin{center}
-Adding a third test to be explicit.
+明瞭性のため、3番目のテストを追加。
 \end{center}
 
-This, of course, passes. I really like the symmetry the three tests exhibit, showing all three cases in such a concise manner. 
+もちろん、このテストもパスします。3つの対称性のとれたテストが存在し、それら3つのケースが全て非常に簡潔であり、とても望ましいと思います。
 
-Let's revisit the idea of separation of concerns; is this a UI test or business logic test? If we moved framework, could we re-use this test? 
+それでは、関心の分離というアイデアを再び考えてみましょう。これはUIテストでしょうか？それともビジネスロジックのテストでしょうか？フレームワークを変更した場合、このテストは再利用可能でしょうか？
 
-The answer is *no* - we'd need to write a new test (to work with React and it's Testing Library integration). This is fine - it just means this part of our codebase is part of the UI layer, not our core business logic. Nothing to extract.
+答えは*No*です－（例えばReactとそのTesting Libraryで動作する）新しいテストを書く必要が生じるでしょう。それでいいのです－つまり、コードベースの該当部分はUIレイヤーに属するもので、ビジネスロジックのコアではないというだけのことです。ビジネスロジックとして抽出すべきものは何もありません。
 
-## The real test: Does it refactor?
+## 実際のテスト: リファクタリング可能か？
 
-We can do a little sanity check and make sure our tests are not testing implementation details. Implementation details refers to *how* something works. When testing, we don't care about the specifics of how something works. Instead, we care about *what it does*, and if it does it correctly. Remember, we should be testing that we get the expected output based on given inputs. In this case, we want to test that the correct text is rendered based on the data, and not caring too much about how the logic is actually implemented. 
+ちょっとしたサニティーチェック※を行い、テストが実装の詳細を検証しているわけではないことを確認してみましょう。実装の詳細とは、プログラムが*どのように*動作しているかということです。テストする際は、どのように動作するのか、その詳細を気にする必要はありません。そうではなく、実装が*何をしているのか*、そしてそれが正しく行れているかが重要となります。思い出してください。与えられたインプットに基づいて、期待するアウトプットが得られるのかをテストすべきでしたよね。今回のケースでは、データに基づいて正しいテキストが表示されるのかをテストしたい訳で、ロジックが実際どのように実装されているのかはあまり気にしていません。
 
-We can validate this by refactoring the `<navbar>` component. As long as the tests continue to past, we can be confident they are resilient to refactors and are testing behaviors, not implementation details.
+※【訳者註】計算結果が正しいかどうかを素早く評価するための基本的なテストのこと（[ウィキペディア](https://ja.wikipedia.org/wiki/%E5%81%A5%E5%85%A8%E6%80%A7%E3%83%86%E3%82%B9%E3%83%88)）。
 
-Let's refactor `<navbar>`:
+`<navbar>`コンポーネントをリファクターすることで、このことを確かめてみましょう。テストが通り続ける限り、プログラムはリファクターに強く、実装の詳細ではなくその振る舞いについてテストしていることを確信できるでしょう。
+
+それではさっそく、`<navbar>`をリファクターしてみましょう:
 
 ```html
 <template>
@@ -480,10 +482,10 @@ export default {
 </script>
 ```
 \begin{center}
-Refactoring navbar. The behavior is still the same!
+navbarのリファクター。振る舞いは依然と同じです！
 \end{center}
 
-Everything still passes! Our tests are doing what they are supposed to be. Or are they? What if we decide we would like to use a `<a>` tag instead of a `<button>`?
+テストは依然パスします！検証すべき内容をテストできているわけです。しかし、本当でしょうか？仮に、`<button>`タグの代わりに`<a>`タグを使うことにした場合どうなるでしょうか？
 
 ```html
 <template>
@@ -502,14 +504,14 @@ export default {
 </script>
 ```
 \begin{center}
-Using an anchor tag instead of a button.
+ボタンタグの代わりにアンカータグを使用。
 \end{center}
 
-Obviously in a real system a `href` property would be required and change depending on `authenticated`, but that isn't what we are focusing on here. It still passes. Great news! Our tests survived two refactors - this means we are testing the behavior, not the implementation details, which is good.
+実際のシステムでは当然、`href`プロパティが必要でしょうし、`authenticated`によってその値は変わるでしょう。しかし、今回のケースではそれは重要な問題ではありません。テストは今回もパスします。素晴らしい！テストは2回のリファクタリングを生き延びました－つまり、（素晴らしいことに）我々はプログラムの振る舞いをテストしており、実装の詳細はテストしていないということです。
 
-## Conclusion
+## 結論
 
-This chapter discussed some techniques for testing props. We also saw how to use Testing Library's `render` method to test components. We touched on the concept of *separation of concerns*, and how it can make your business logic more testable and your applications more maintainable. Finally, we saw how tests can let us refactoring code with confidence.
+この章では、propsのテストにおけるテクニックをいくつか論じました。また、コンポーネントをテストするためにTesting Libraryの`render`メソッドを使用する方法も紹介しました。*関心の分離*という概念について、及びこの概念がいかにビジネスロジックをテストしやすく、アプリケーションを保守しやすくするかについても触れました。最後に、テストによって、いかに自信をもってリファクターできるようになるのかも見ました。
 
-You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/props配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 

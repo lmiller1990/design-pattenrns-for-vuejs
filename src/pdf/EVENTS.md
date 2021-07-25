@@ -1,20 +1,20 @@
-# Emitting Events
+# イベントのEmit
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+完全なソースコードは[GitHubリポジトリのexamples/events配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります: 
 \newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code
 
 ______
 
-Vue's primary mechanic for passing data *down* to components is `props`. In contrast, when components needs to communicate with another component higher in the hierarchy, you do so by *emitting events*. This is done by calling `this.$emit()` (Options API) or `ctx.emit()` (Composition API).
+Vueにおいて*配下の*コンポーネントにデータを渡す主要な仕組みは`props`です。一方で、コンポーネントが階層のより上位のコンポーネントと通信するには、*イベントのemit*を用います。これは、`this.$emit()`(Options APIの場合)、又は`ctx.emit()`(Composition APIの場合)を呼ぶことで実施します。
 
-Let's see some examples on how this works, and some guidelines we can set to keep things clean and understandable.
+実際どのように動作するのか、いくつか具体例を見ていきましょう。同時に情報を整理して理解しやすい状態に保つためのガイドラインについても見ていきます。
 
-## Starting Simple
+## シンプルに始める
 
-Here is a very minimal yet perfectly working `<counter>` component. It is not ideal; we will work on improving it during this section. 
+以下は、ごく最小限ですが完全に動作する`<counter>`コンポーネントです。理想的とは言えませんが、この章の中で改善していきましょう。
 
-This example starts with the Options API; we will eventually refactor it to use the Composition API (using the tests we write to ensure we don't break anything).
+この例では、Options APIからスタートして、最終的にはリファクターによってComposition APIを用います（テストを書いて、ロジックが壊れていないことを試しながら進めましょう）。
 
 ```html
 <template>
@@ -33,19 +33,19 @@ export default {
 </script>
 ```
 \begin{center}
-A simple counter component.
+シンプルなcounterコンポーネント。
 \end{center}
 
-There are two buttons. One increments the `count` value by 1. The other emits a `submit` event with the current count. Let's write a simple test that will let us refactor with the confidence.
+ボタンが二つあります。一方は`count`の値を1ずつ増加させます。他方は現在のcountの値で`submit`イベントをemitします。自信をもってリファクターできるように、簡単なテストを書いてみましょう。
 
-As with the other examples, this one uses Testing Library, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
+他の例と同様に、今回もTesting Libraryを使用しています。しかし、テストのフレームワークは何でも大丈夫です－重要なことは、何かを壊してしまった時にそれを知らせる仕組みを持つことです。
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
 import Counter from './counter.vue'
 
 describe('Counter', () => {
-  it('emits an event with the current count', async () => {
+  it('現在のcountでイベントをemitすること', async () => {
     const { emitted } = render(Counter) 
     await fireEvent.click(screen.getByRole('increment'))
     await fireEvent.click(screen.getByRole('submit'))
@@ -54,10 +54,10 @@ describe('Counter', () => {
 })
 ```
 \begin{center}
-Observing the emitted events with emitted().
+emitted()を用いてemitされたイベントを観察します。
 \end{center}
 
-I did a `console.log(emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
+`console.log(emitted())`を行うことで、Testing Libraryにおいて`emitted`がどのように動作するかを説明します。テストを走らせると、コンソールのアウトプットは以下のようになります:
 
 ```json
 { 
@@ -67,10 +67,10 @@ I did a `console.log(emitted())` to illustrate how `emitted` works in Testing Li
 }
 ```
 \begin{center}
-A submit event was emitted with one argument: the number 1.
+submitイベントは以下の引数を1つ伴ってemitされます: 数字の1。
 \end{center}
 
-`emitted` is an object - each event is a key, and it maps to an array with an entry for each time the event was emitted. `emit` can have any amount of arguments; if I had written `$emit('submit', 1, 2, 3,)` the output would be:
+`emitted`はオブジェクトです－それぞれのイベントがキーとなり、イベントがemitされる度に入力を配列としてマッピングします。`emit`は引数をどれだけの数でも持つことができます。`$emit('submit', 1, 2, 3,)`と書いたとすれば、アウトプットは以下のようになります:
 
 ```json
 { 
@@ -80,10 +80,10 @@ A submit event was emitted with one argument: the number 1.
 }
 ```
 \begin{center}
-A submit event was emitted with three arguments, 1, 2, 3.
+submitイベントは以下3つの引数を伴ってemitされます: 1, 2, 3。
 \end{center}
 
-Let's add an assertion, before we get onto the main topic: patterns and practices for emitting events.
+メインのトピック（イベントのemitにおけるパターンとプラクティス）に移る前に、アサートを追加しましょう。
 \pagebreak
 
 ```js
@@ -91,7 +91,7 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 import Counter from './counter.vue'
 
 describe('Counter', () => {
-  it('emits an event with the current count', async () => {
+  it('現在のcountでイベントをemitすること', async () => {
     const { emitted } = render(Counter) 
 
     await fireEvent.click(screen.getByRole('increment'))
@@ -102,12 +102,12 @@ describe('Counter', () => {
 })
 ```
 \begin{center}
-Making an assertion against the emitted events.
+emitされたイベントに対してアサートを行います。
 \end{center}
 
-## Clean Templates
+## Templateをクリーンに保つ
 
-Templates can often get chaotic among passing props, listening for events and using directives. For this reason, wherever possible, we want to keep our templates simple by moving logic into the `<script>` tag. One way we can do this is to avoid writing `count += 1` and `$emit()` in `<template>`. Let's make this change in the `<counter>` component, moving the logic from `<template>` into the `<script>` tag by creating two new methods:
+propsを渡したり、イベントを監視したり、ディレクティブを利用したりとすると、templateはすぐにカオス化します。このため、`<script>`タグにロジックを移すことで、可能な限りtemplateをシンプルに保ちたいです。そのための方法の一つは、`count += 1`と`$emit()`を`<template>`内に書くのを避けることです。`<counter>`コンポーネントで、この変更を行ってみましょう。2つの新しいメソッドを作ることでロジックを`<template>`から`<script>`タグに移しましょう:
 
 ```html
 <template>
@@ -134,29 +134,29 @@ export default {
 </script>
 ```
 \begin{center}
-Moving the emit logic from the template to the script.
+emitロジックをテンプレートからスクリプトに移動します。
 \end{center}
 
-Running the test confirms that everything is still working. This is good. Good tests are resilient to refactors, since they test inputs and outputs, not implementation details. 
+テストを走らせることで、全てが依然としてうまく動作していることを確かめることができます。いいですね。良いテストはリファクタリングに強いものです。なぜなら、良いテストはインプットとアウトプットをテストし、実装の詳細をテストしないからです。
 
-I recommend you avoid putting any logic into `<template>`. Move everything into `<script>`. `count += 1` might seem simple enough to inline in `<template>`. That said, I personally value consistency over saving a few key strokes, and for this reason I put all the logic inside `<script>` - no matter how simple it is.
+`<template>`の中には、いかなるロジックも入れないことをお勧めします。全てを`<script>`の中に移しましょう。`count += 1`は、`<template>`の中にインラインで記述しても良いくらいにシンプルに見えるかもしれません。しかし、個人的には多少のタイピングの手間を節約することよりも、一貫性を保つことに価値を見出します。このため、私は全てのロジックを`<script>`の中に入れることにしています－それがどれだけシンプルであってもです。
 
-Another thing you may have notices is the *name* of the method we created - `submit`. This is another personal preference, but I recommend having a good convention around naming methods. Here are two I've found useful.
+もう一点、既にお気付きかもしれないのが、作成したメソッドの*命名*－`submit`についてです。これもまた個人的な好みですが、メソッドの命名に分かりやすい規則を持つことをお勧めします。以下に有益と思う2つのパターンを記載します。
 
-1. Name the method that emits the event the same as the event name. If you are doing `$emit('submit')`, you could name the method that calls this `submit`, too. 
-2. Name methods that call `$this.emit()` or `ctx.emit()` using the convention `handleXXX`. In this example, we could name the function `handleSubmit`. The idea is those methods *handle* the interactions and emit the corresponding event.
+1. イベントをemitするメソッドをイベント名と同名とする。例えば`$emit('submit')`を行うなら、それを呼ぶメソッドも`submit`と命名します。
+2. `$this.emit()` または `ctx.emit()` を呼ぶメソッドを `handleXXX` という規則で命名する。今回の例では、関数を`handleSubmit`と命名できます。関数がコンポーネント間のやりとりを*handle*し、対応するイベントをemitするという意味です。
 
-Which of these you choose isn't really important; you could even pick another convention you like better. Having a convention is generally a good thing, though. Consistency is king!
+どちらを選ぶかはあまり重要ではありません。より望ましいと思う命名規則があれば、そちらを採用していただいても大丈夫です。ただ、命名規則を持つことは一般的に望ましいことです。一貫性は偉大です！
 
-## Declaring emits 
+## Emitを宣言する
 
-As of Vue 3, you are able to (and encouraged to) declare the events your component will emit, much like you declare props. It's a good way to communicate to the reader what the component does. Also, if you are using TypeScript, you will get better autocompletion and type safety.
+Vue 3では、propsを宣言するように、コンポーネントがemitするイベントを宣言することができ（、また推奨され）ます。これは、コンポーネントが何をしているのかを読者に伝える良い方法です。また、TypeScriptを使用するならば、より良い自動補完や型安全が利用できるでしょう。
 
-Failing to do so will give you a warning in the browser console: *"Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop"*.
+もし上記を行わないと、ブラウザコンソールに以下の警告が表示されます: *"Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop"*. *(コンポーネントはイベントをemitしましたが、イベントはemitオプション内においても"<event name>prop"としても宣言されていません)*
 
-By declaring the events a component emits, it can make it easier for other developers (or yourself in six months time) to understand what your component does and how to use it.
+コンポーネントがemitするイベントを宣言することで、他の開発者にとって（あるいは半年後のあなたにとって）、コンポーネントが何を行っていて、どのように使用するのかを理解しやすくなります。
 
-You can declare events in the same way you declare props; using the array syntax:
+eventは、propsの宣言と同じ方法で宣言できます。配列構文を利用する場合は以下のようになります:
 
 ```js
 export default {
@@ -164,10 +164,10 @@ export default {
 }
 ```
 \begin{center}
-Declaring emits with the inferior array syntax.
+低次の表現である配列構文を用いて、emitsを宣言します。
 \end{center}
 
-Or the more verbose but explicit object syntax:
+より冗長だが明示的なオブジェクト構文の場合は、以下のようになります:
 
 ```js
 export default {
@@ -177,12 +177,12 @@ export default {
 }
 ```
 \begin{center}
-Declaring emits with the verbose but explicit object syntax.
+より冗長だが明示的なオブジェクト構文を用いて、emitsを宣言します。
 \end{center}
 
-If you are using TypeScript, you will get even better type safety with this syntax - including the types in the payload!
+TypeScriptを利用している場合は、この構文に対して（ペイロード内の型定義などの）より良い型安全が利用できます！
 
-The object syntax also supports *validation*. As an example, we could validate the payload for an imaginary `submit` event is a number:
+オブジェクト構文は*バリデーション*もサポートしています。例えば、仮想の`submit`イベントのペイロードがnumber型であることを検証することができます:
 
 ```js
 export default {
@@ -194,20 +194,20 @@ export default {
 }
 ```
 \begin{center}
-Validating the emitted event.
+emitされたイベントをバリデートします。
 \end{center}
 
-If the validator returns `false`, the event will not be emitted.
+バリデーターが`false`を返す場合、イベントはemitされません。
 
-## More Robust Event Validation
+## より頑健なイベントバリデーション
 
-Depending on your application, you may want to have more thorough validation. I tend to favor defensive programming; I don't like taking chances, not matter how unlikely the scenario might seem. 
+アプリケーションによっては、より徹底的なバリデーションが必要かもしれません。私は防御的プログラミングを好みます。起きそうもないシナリオであっても、危ない橋を渡りたくはありません。
 
-Getting burned by a lack of defensive programming and making assumptions like "this will never happen in production" is something everyone has experienced. It's almost a rite of passage. There is a reason more experienced developers tend to be more cautious, write defensive code, and write lots of tests.
+防御的プログラミングの欠如、及び「本番でこんなことは決して起こらないだろう」という見立てによって痛い目に合うというのは、誰もが経験することです。ほとんど通過儀礼とも言えます。この点にこそ、経験豊富な開発者がより注意深く、防御的なコードを書き、テストをたくさん書く傾向にある理由があります。
 
-I also have a strong emphasis on testing, separation of concerns, and keeping things simple and modular. With these philosophies in mind, let's extract this validator, make it more robust, and add some tests.
+同時に、テスト、関心の分離、物事をシンプルかつモジュール式に保つことも強調したいです。これらのコンセプトを頭に入れて、このバリデーターを抽出し、より頑強なものにして、いくつかテストを加えてみましょう。
 
-The first step is to move the validation out of the component definition. For brevity, I am just going to export it from the component file, but you could move it to another module entirely (for example, a `validators` module).
+最初のステップとして、バリデーションをコンポーネントの定義の外に移しましょう。簡潔のため、コンポーネントファイル内からexportしていますが、別のモジュール（例えば、`validators`モジュール）に完全に移すこともできます。
 
 ```html
 <script>
@@ -233,12 +233,12 @@ export default {
 </script>
 ```
 \begin{center}
-A more robust validator with a custom validator function.
+カスタムのvaridator関数を用いた、より頑健なバリデーター。
 \end{center}
 
-Another convention is emerging: I like to call event validators `xxxValidator`.
+新しい慣習が登場しました。イベントのバリデーターを`xxxValidator`と呼ぶことです。
 
-I am also going to make a change to `submitValidator`; the argument *must* be a number; if not, bad things will happen. So instead of waiting for bad things to happen, I am going to throw an error:
+また、`submitValidator`に変更を加えたいと思います。引数は数字で*なければなりません*。そうでなければ、良くないことが起こるでしょう。そのため、悪いことが起こるのを待つのではなく、エラーをスローしたいと思います:
 
 ```js
 export function submitValidator(count) {
@@ -252,37 +252,37 @@ export function submitValidator(count) {
 }
 ```
 \begin{center}
-Defensive programming; failing loudly is good.
+防御的プログラミング: 大げさに失敗することは良いことです。
 \end{center}
 
-`submitValidator` is just a plain old JavaScript function. It's also a pure function - it's output is solely dependant on it's inputs. This means writing tests is trivial:
+`submitValidator`は単に普通のJavaScript関数にすぎません。また、純粋関数でもあります－アウトプットはインプットのみに依存します。これは、テストを書くのは簡単だということを意味します:
 
 ```js
 describe('submitValidator', () => {
-  it('throws and error when count isNaN', () => {
+  it('countがNaNの場合、エラーをスローすること', () => {
     const actual = () => submitValidator('1')
     expect(actual).toThrow()
   })
 
-  it('returns true when count is a number', () => {
+  it('countが数字の場合、trueを返すこと', () => {
     const actual = () => submitValidator(1)
     expect(actual).not.toThrow()
   })
 })
 ```
 \begin{center}
-Testing submitValidator in isolation.
+submitValidatorを分離してテストする。
 \end{center}
 
-A lot of these type specific validations can be partially mitigated with TypeScript. TypeScript won't give you runtime validation, though. If you are using an error logging service (like Sentry), throwing an error like this can give you valuable information for debugging.
+これらの型を特定するバリデーションは、TypeScriptを使うことで部分的に軽減することができます。ただし、TypeScriptは実行時のバリデーションを提供しません。仮に（Sentryのような）エラーロギングサービスを使っているのなら、このようにエラーを投げることで、デバッグにおける有益な情報を得ることができます。
 
-## With the Composition API 
+## Composition APIを用いる
 
-The `<counter>` example used the Options API. All the topics discussed here translate to the Composition API, too.
+`<counter>`の例では、Options APIを用いてきました。これまで議論してきたことは全てCompsition APIにも当てはまります。
 
-A good way to see if you are testing inputs and outputs, as opposed to implementation details, is to refactor your component from the Options API to the Composition API, or vice versa; good tests are resilient to refactor. 
+実装の詳細ではなく、インプットとアウトプットをテストしているかをチェックするには、Options APIからCompsition APIに（又はその逆方向に）リファクタリングしてみるのが良いでしょう。良いテストはリファクタリングに強いものです。
 
-Let's see the refactor:
+早速リファクタリングを見ていきましょう:
 
 ```html
 <template>
@@ -327,21 +327,21 @@ export default {
 </script>
 ```
 \begin{center}
-The completed counter component with validation.
+完成した、バリデーションを伴うcounterコンポーネント。
 \end{center}
 
-Everything still passes - great news!
+全ては依然パスします－グッドニュースです！
 
-## Conclusion
+## 結論
 
-We discussed emitting events, and the various features Vue provides to keep our components clean and testable. We also covered some of my favorite conventions and best practices to keep things maintainable in the long run, as well as bring consistency to your code base. 
+本章では、イベントのemitについて、そしてコンポーネントをクリーンかつテストしやすい状態に保つためにVueが提供する様々な方法について論じてきました。また、長期的に保守性を維持し、コードベースに一貫性をもたらすために、お勧めの慣習やベストプラクティスについても、いくつかカバーしました。
 
-Finally, we saw how our tests was focused on inputs and outputs (in this case, the input is the user interation via the buttons, and the output is the emitted `submit` event).
+最後に、テストにおいていかにインプットとアウトプットに焦点を置くかということを見てきました（今回のケースでは、ボタンを通したユーザーインタラクションがインプットで、アウトプットはemitされた`submit`イベントです）。
 
-We touch on events again later on, in the `v-model` chapter - stay tuned.
+eventsについては、`v-model`の章の中で再び触れます－乞うご期待！
 
-You can find the completed source code in the [GitHub repository under examples/events](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
+完全なソースコードは[GitHubリポジトリのexamples/events配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります: 
 \newline
-https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
+https://github.com/lmiller1990/design-patterns-for-vuejs-source-code
 
 \pagebreak

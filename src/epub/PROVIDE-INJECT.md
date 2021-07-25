@@ -1,16 +1,18 @@
-# Dependency Injection with Provide and Inject
+# ProvideとInjectを用いた依存性の注入
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
+完全なソースコードは[GitHubリポジトリのexamples/provide-inject配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 
-In this section we discuss a pair of functions, `provide` and `inject`. These facilitate *dependency injection* in Vue. This feature was available in Vue 2. In Vue 2, it was common to attach global variables to this Vue prototype and access them via the `this.$`. A common example of this is `this.$router` or `this.$store`. For this reason, `provide` and `inject` were not as commonly used. With Vue 3 and the Composition API discouraging mutating the global Vue prototype, dependency injection with `provide` and `inject` is more common.
+この章ではペアとなる2つの関数、`provide`と`inject`について論じます。これらを用いることで、Vueにおける*依存性の注入*※が促進されます。この機能はVue 2から利用できるようになりました。Vue 2では、Vueプロトタイプのthisにグローバル変数を加え、`this.$`を通してアクセスするのが一般的でした。これの良く知られた例としては、`this.$router`や`this.$store`があります。このため、`provide`や`inject`は一般的にはあまり用いられてきませんでした。Vue 3とCompsition APIはグローバルのVueプロトタイプを操作することを非推奨にしているため、`provide`と`inject`を用いた依存性の注入はより一般的になものになりました。
 
-Instead of providing a toy example, we will see a real use case by building a simple store (like Vuex) and making it available via a `useStore` composable. This will use `provide` and `inject` under the hood. There are other ways to implement a `useStore` function, for example simply importing and exporting a global singleton. We will see why `provide` and `inject` are a better way of sharing a global variable.
+※【訳者註】コンポーネント間の依存関係をプログラムのソースコードから排除するために、外部の設定ファイルなどでオブジェクトを注入できるようにするソフトウェアパターンのこと（[ウィキペディア](https://ja.wikipedia.org/wiki/%E4%BE%9D%E5%AD%98%E6%80%A7%E3%81%AE%E6%B3%A8%E5%85%A5)）。
 
-![Completed demo app](ss-complete.png)
+トイ・サンプルを作る代わりに、シンプルなストア（Vuexのような）を作って、`useStore`コンポーサブルを通して利用できるようにすることで、実際のユースケースを見ていきましょう。これは内部で`provide`と`inject`を用います。`useSore`関数を実装する方法は他にもいくつかあります。例えば、単にグローバルシングルトンをインポート/エクスポートする方法です。なぜ、`provide`と`inject`がグローバル変数を共有するためのより優れた方法であるかを見ていきましょう。
 
-## A Simple Store
+![完成したデモアプリ](ss-complete.png)
 
-Let's quickly define a dead simple store. We won't have a complex API like Vuex - just a class with some methods. Let's start with a reactive state, and expose it in readonly fashion via a `getState` function.
+## シンプルなストア
+
+それでは早速、極めてシンプルなストアを定義してみましょう。Vuexのような複雑なAPIは作成しません－単に、いくつかのメソッドを持つクラスとして定義します。まずはリアクティブなstateを作り、`getState`関数を通してreadonly形式でアクセスできるようにしてみましょう。
 
 ```js
 import { reactive, readonly } from 'vue'
@@ -28,20 +30,20 @@ export class Store {
 }
 ```
 \begin{center}
-A simple store with private state and a readonly accessor.
+プライベートなstateとreadonlyのアクセサーを伴ったシンプルなストア。
 \end{center}
 
-If you haven't seen the `#state` syntax before, this is a private property - one of the newer features to classes in JavaScript. At the time of writing this, it only works in Chrome natively. You can omit the `#` if you like - it will still work just fine. 
+もし`#state`という構文を見たことがなければ、これはプライベートプロパティと呼ばれるものです－JavaScriptのクラスにおける比較的新しい機能の一つです。これを書いている現時点では、これはコンパイルなしにはChromeでしか動作しません。お望みでしたら、`#`を省略してください－それでも問題なく動作します。
 
-The `#` means that the property can only be accessed inside the class instance. So `this.#state` works for methods declared inside the `Store` class, but `new Store({ count: 1 }).#state.count` is not allowed. Instead, we will access the state in a readonly manner using `getState()`.
+この`#`は、プロパティがクラスインスタンスの内部からしかアクセスできないことを意味します。そのため`this.#state`は、`Store`クラス内で宣言されたメソッド内では使えますが、`new Store({ count: 1 }).#state.count`は許可されません。その代わりに、`getState()`を用いることでREADONLY形式でstateにアクセスします。
 
-We pass `state` to the constructor to let the user seed the initial state. We will take the disciplined approach and write a test.
+コンストラクタに`state`を渡して、ユーザーがstateの初期値を設定できるようにしましょう。規律の取れたアプローチをとり、テストを書きましょう。
 
 ```js
 import { Store } from './store.js'
 
 describe('store', () => {
-  it('seeds the initial state', () => {
+  it('stateの初期値を設定すること', () => {
     const store = new Store({
       users: []
     })
@@ -51,12 +53,12 @@ describe('store', () => {
 })
 ```
 \begin{center}
-The tests verifies everything is working correctly.
+テストによって全てが正しく動作していることを検証します。
 \end{center}
 
-## Usage via import
+## importを用いた使用法
 
-Let's get something rendering before we go. Export a new instance of the store:
+それでは先に進む前に、何か表示してみましょう。まず、ストアの新しいインスタンスをエクスポートします:
 
 ```js
 import { reactive, readonly } from 'vue'
@@ -70,10 +72,10 @@ export const store = new Store({
 })
 ```
 \begin{center}
-Exporting the store as a global singleton with some initial state.
+初期値を伴ったグローバルシングルトンとしてストアをエクスポート。
 \end{center}
 
-Next, import it into your component and iterate over the users:
+次に、コンポーネントにこれをインポートし、usersに対して反復処理を行います:
 
 ```html
 <template>
@@ -101,16 +103,16 @@ export default {
 </script>
 ```
 \begin{center}
-accessing the state via the the imported store.
+インポートされたstore経由でstateにアクセスします。
 \end{center}
 
-![Displaying a user from the store state.](ss-basic.png)
+![ストアのstateからuserを表示。](ss-basic.png)
 
-It works! Good progress - I added a tiny bit of CSS as well, grab that from the source code. 
+うまくいきました！素晴らしい進歩です－若干のCSSも追加しましたが、そちらはソースコードをご覧ください。
 
-This single shared `store` is known as a *global singleton*.
+この共有された唯一の`store`は*グローバルシングルトン*として知られています。
 
-We will allowing adding more users via a form - but first let's add a UI test using Testing Library.
+フォームを通してさらにuserを追加できるようにしましょう－が、まずはTesting Libraryを用いてUIテストを追加しましょう。
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
@@ -118,11 +120,11 @@ import { Store } from './store.js'
 import Users from './users.vue'
 
 describe('store', () => {
-  it('seeds the initial state', () => {
+  it('stateの初期値を設定すること', () => {
     // ...
   })
 
-  it('renders a user', async () => {
+  it('userを表示すること', async () => {
     render(Users, {
       global: {
         provide: {
@@ -140,14 +142,14 @@ describe('store', () => {
 })
 ```
 \begin{center}
-UI test with Testing Library
+Testing Libraryを用いたUIテスト
 \end{center}
 
-Working great! We do not want to hard code any users in the store, though. This highlights one of the downsides of a global singleton - no easy way to initialize or update the state for testing purposes. Let's add a feature to create new users via a form, and them that way.
+うまくいきました！しかし、ストアの中にusersをハードコードしたくありません。このことは、グローバルシングルトンの短所の一つを表しています－テスト目的でstateを初期化したり更新する、簡単な方法がないことです。フォーム経由で新しいusersを作成する機能を追加してみましょう。
 
-## Adding a users forms
+## usersフォームを追加する
 
-To add a user, we will first create a `addUser` function to the store:
+userを追加するため、まずはstoreに`addUser`関数を追加してみましょう:
 
 ```js
 import { reactive, readonly } from 'vue'
@@ -167,22 +169,22 @@ export const store = new Store({
 })
 ```
 \begin{center}
-addUser can access the private state because it is declared in the Store class.
+addUserはStoreクラスの中で宣言されているので、プライベートなstateにアクセスできます。
 \end{center}
 
-I also removed the initial user, Alice, from the store. Update the tests - we can test `addUser` in isolation.
+また、初期ユーザーのAliceはstoreから除外しました。テストを更新して、`addUser`を分離してテストできるようにしてみましょう。
 
 ```js
 describe('store', () => {
-  it('seeds the initial state', () => {
+  it('stateの初期値を設定すること', () => {
     // ...
   })
 
-  it('renders a user', async () => {
+  it('userを表示すること', async () => {
     // ...
   })
 
-  it('adds a user', () => {
+  it('userを追加すること', () => {
     const store = new Store({
       users: []
     })
@@ -196,10 +198,10 @@ describe('store', () => {
 })
 ```
 \begin{center}
-Testing addUser in isolation - no component, no mounting.
+addUserを独立してテスト－コンポーネントもマウントもありません。
 \end{center}
 
-The UI test is now failing. We need to implement a form that calls `addUser`:
+今はまだ、UIテストは失敗します。`addUser`を呼ぶフォームを実装する必要があります:
 
 ```html
 <template>
@@ -239,24 +241,24 @@ export default {
 </script>
 ```
 \begin{center}
-A form to create new users.
+新しいuserを作るためのフォーム。
 \end{center}
 
-Great! The test now passes - again, I added a tiny bit of CSS and a nice title, which you can get in the source code if you like.
+素晴らしい！今度はテストをパスしました－今度も、多少のCSSといい感じのタイトルを加えましたので、興味があればソースコードをご覧ください。
 
-![Completed app](ss-complete.png)
+![完成したアプリ](ss-complete.png)
 
-## Provide/Inject to Avoid Cross Test Contamination
+## クロステスト汚染を回避するためのProvide/Inject
 
-Everything looks to be working on the surface, but we will eventually run into a problem as our application grows: shared state across tests. We have a *single* store instance for all of our tests - when we mutate the state, this change will impact all the other tests, too.
+表面上は全てうまくいっているようですが、アプリケーションが大きくなるにつれて問題に直面することになるでしょう: テストをまたいでstateが共有されることです。全てのテストに*唯一の*storeインスタンスを用いています－stateを操作すると、その変更は他の全てのテストにも影響を与えます。
 
-Ideally each test should run in isolation. We can't isolate the store if we are importing the same global singleton into each of our tests. This is where `provide` and `inject` come in handy.
+理想的には、全てのテストは分離的に行われるべきです。それぞれのテストに同じグローバルシングルトンをインポートしてしまうと、ストアを個別に管理できなくなります。ここに`provide`と`inject`の便利な点があります。
 
-This diagram, taken from this official documentation, explains it well:
+以下の図は公式ドキュメントから持ってきたものですが、このことをよく説明しています:
 
-![Provide/Inject diagram. Credit: Vue documentation.](ss-provde-inject.png)
+![Provide/Inject図。クレジット: Vue公式ドキュメント](ss-provde-inject.png)
 
-Let's say you have a component, `Parent.vue`, that looks like something this:
+例えば、`Parent.vue`コンポーネントがあるとしましょう。それは以下のようなものです:
 
 ```html
 <template>
@@ -275,7 +277,7 @@ export default {
 </script>
 ```
 
-We are making a `color` variable available to *any* child component that might want access to it, no matter how deep in the component hierarchy it appears. `Child.vue` might look like this:
+`color`変数にアクセスしたい*いかなる*子コンポーネントからでも、変数にアクセスできるようになりました。コンポーネントの階層がどれだけ深くても問題ありません。`Child.vue`は以下のようになります:
 
 ```html
 <template>
@@ -297,7 +299,7 @@ export default {
 </script>
 ```
 
-You can pass anything to `provide` - including a reactive store. Let's do that. Head to the top level file where you create your app (mine is `index.js`; see the source code for a complete example):
+`provide`にはリアクティブなストアを含め、何でも渡すことができます。実際にやってみましょう。appを作成した最上位のファイルに移動してください（私の場合は`index.js`です。完全な例はソースコードをご覧ください）:
 
 ```js
 import { createApp } from 'vue'
@@ -309,12 +311,12 @@ app.provide('store', store)
 app.mount('#app')
 ```
 \begin{center}
-Using provide to make the store available in all the components.
+ストアを全てのコンポーネントで利用可能にするためにprovideを使用。
 \end{center}
 
-You can call `provide` in a component's `setup` function. This makes the provided value available to all that component's children (and their children, etc). You can also call provide on `app`. This will make your value available to all the components, which is what we want to do in this example.
+コンポーネント内の`setup`関数で`provide`を呼ぶことができます。そうすることで、provideされた値はコンポーネントの全ての子供（とその子供…以下略）から利用可能となります。`provide`を`app`上で呼ぶこともできます。そうすることで、値は全てのコンポーネントから利用可能となり、この例でやりたいことと一致します。
 
-Instead of importing the store, we can now just call `const store = inject('store')`:
+これで、storeをインポートする代わりに、`const store = inject('store')`を呼び出すだけでよくなります:
 
 ```html
 <template>
@@ -343,12 +345,12 @@ export default {
 </script>
 ```
 \begin{center}
-Using inject to access the store.
+ストアにアクセスするためにinjectを利用します。
 \end{center}
 
-## Provide in Testing Library
+## Testing LibraryにおけるProvide
 
-The final UI test is failing. We did `provide('store', store)` when we created our app, but we didn't do it in the test. Testing Library has a mounting option specifically for `provide` and `inject`: `global.provide`:
+最後のUIテストは失敗します。appを作成した際には`provide('store', store)`しましたが、テスト上では行っていません。Testing Libraryは特に`provide`と`inject`のためのマウンティングオプションを持っています－`global.provide`です:
 
 ```js
 import { render, screen, fireEvent } from '@testing-library/vue'
@@ -356,15 +358,15 @@ import { Store } from './store.js'
 import Users from './users.vue'
 
 describe('store', () => {
-  it('seeds the initial state', () => {
+  it('stateの初期値を設定すること', () => {
     // ...
   })
 
-  it('adds a user', () => {
+  it('userを追加すること', () => {
     // ...
   })
 
-  it('renders a user', async () => {
+  it('userを表示すること', async () => {
     render(Users, {
       global: {
         provide: {
@@ -382,16 +384,16 @@ describe('store', () => {
 })
 ```
 \begin{center}
-Using the global.provide mounting option.
+global.provideのマウンティングオプションを利用します。
 \end{center}
 
-Everything is passing again. We now can avoid cross test contamination - it's easy to provide a new store instance using `global.provide`.
+再び全てのテストが通りました。これで、クロステスト汚染を避けることができました－`global.provide`を用いて新しいstoreインスタンスを供給することは簡単です。
 
-## A useStore composable
+## useStoreコンポーサブル
 
-We can write a little abstraction to make using our store a bit more ergonomic. Instead of typing `const store = inject('store')` everywhere, it would be nice to just type `const store = useStore()`.
+ストアの使用方法をもう少し人間工学に適ったものとするため、多少のリファクターをしてみましょう。全ての箇所で`const store = inject('store')`と書く代わりに、`const store = useStore()`とだけ書く方がいいでしょう。
 
-Update the store:
+storeを更新してみましょう:
 
 ```js
 import { reactive, readonly, inject } from 'vue'
@@ -409,10 +411,10 @@ export function useStore() {
 }
 ```
 \begin{center}
-A useStore composable.
+useStoreコンポーサブル。
 \end{center}
 
-Now update the component:
+次はコンポーネントです:
 
 ```html
 <template>
@@ -443,18 +445,18 @@ export default {
 </script>
 ```
 \begin{center}
-Using the useStore composable.
+useStoreコンポーザブルを使用します。
 \end{center}
 
-All the test are still passing, so we can be confident everything still works.
+全てのテストは依然パスしますので、全ては依然うまくいっていると確信できます。
 
-Now anywhere you need access to the store, just call `useStore`. This is the same API Vuex uses. It's a common practice to make global singletons available via a useXXX function, which uses `provide` and `inject` under the hood.
+storeにアクセスが必要な全ての場所で、`useStore`を呼ぶだけで良くなります。これはVuexが使用するのと同じAPIです。useXXX関数を通してグローバルシングルトンにアクセスする（その背景では`provide`と`inject`を利用する）というのは、一般的なやり方です。
 
-## Exercises
+## エクササイズ
 
-1. Update the store to have a `removeUser` function. Test it in isolation.
-2. Add a button next to each user - clicking the button should remove them from the store. Use the `removeUser` function here.
-3. Write a UI test to verify this works using Testing Library. You can set up the store with a user by using `globals.provide` and passing in a store with a user already created.
+1. ストアを更新して、`removeUser`関数を追加してください。それを分離してテストしてください。
+2. 各userの隣にボタンを追加してください－ボタンを押すとストアから該当のuserを削除します。ここで`removeUser`関数を使用してください。
+3. Testing Libraryを用いて、上記がうまくいっているかUIテストを書いて確かめてください。`globals.provide`を使って既に作成済みのuserをストアに渡すことで、userが入ったストアをセットアップできます。
 
-You can find the completed source code in the [GitHub repository under examples/provide-inject](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/provide-inject配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 

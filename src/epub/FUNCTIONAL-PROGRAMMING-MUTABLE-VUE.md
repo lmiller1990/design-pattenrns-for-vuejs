@@ -1,14 +1,14 @@
-# Functional Core, Imperative Shell - Immutable Logic, Mutable Vue
+# Functional CoreとImperative Shell－不変のロジックと可変のVue
 
-You can find the completed source code in the [GitHub repository under examples/composition-functional](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code). 
+完全なソースコードは[GitHubリポジトリのexamples/composition-functional配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 
-In the previous chapter, we build a Tic Tac Toe game, encapsulating the logic in a composable. We consciously decided to couple our implementation to Vue, when we used reactivity APIs like `computed` and `ref` in the business logic. 
+前の章では、五目並べゲームを作成し、ロジックをコンポーザブルの中にカプセル化しました。ビジネスロジックの中で`computed`や`ref`といったリアクティブなAPIを使う際には、意図してビジネスロジックの実装とVueを結びつけることにしました。
 
-In this chapter, we will explore an paradigm best characterized as "functional core, imperative shell". We will come back to this name and explain what it means soon.
+この章では、"functional core, imperative shell"が最大の特徴であるパラダイムについて考察します。この命名とそれが何を意味するかは、後ほどすぐに説明します。
 
-The goal is to refactor the Tic Tic Toe logic to be more in line with the functional programming paradigm - this means pure functions and no mutation. Since we are avoiding mutation, this mean we will decoupled the logic from Vue's reactivity system, which relies on mutation and side effects.
+本章の目的は、Tic Tac Toeロジックをより関数プログラミングのパラダイムに沿ったものにすることです－つまり、純粋関数と値の不変性のことです。値の変更を避けるというのは、ロジックを（値の操作と副次的効果に依存した）Vueのリアクティブシステムから分離するということです。
 
-Let's start with `makeMove`, which is full of mutation. In our previous implementation, `makeMove` looks like this:
+まずは、値の操作だらけの`makeMove`から始めましょう。前章の実装では、`makeMove`は以下のようになりました:
 
 ```js
 function makeMove({ row, col }) {
@@ -19,10 +19,10 @@ function makeMove({ row, col }) {
 }
 ```
 \begin{center}
-Original makeMove implemented using mutation.
+値の操作を用いて実装された、オリジナルのmakeMove。
 \end{center}
 
-On line 3, we mutation the `newBoard` variable. We then mutate `boards` on line 4, by pushing a new value in. We are also using two global variables: `boards` and `currentPlayer`. If we want to approach this in a functional manner, the function needs include all the required data as arguments, and not rely on global variables. If we rely on global variables, the function will no longer be deterministic (we won't be able to know the return value without knowing the value of the global variables. This means `makeMove` needs to have the following signature:
+3行目で`newBoard`変数を操作しています。次に4行目で、新しい値をプッシュして`boards`を操作しています。また、2つのグローバル変数: `boards`と`currentPlayer`を使用しています。関数指向的な方法でアプローチするには、関数が必要とする全てのデータを引数として持ち、グローバル変数に依存しないようにする必要があります。グローバル変数に依存してしまうと、関数はもはや決定論的なものでなくなってしまいます（つまり、グローバル変数の値を知ることなしに返却される値を知ることができなくなります）。つまり、`makeMove`は以下の用法に従う必要があります:
 
 ```ts
 type Board = string[][]
@@ -35,28 +35,28 @@ type Options {
 function makeMove(board: Board, { col, row, counter }: Options): Board
 ```
 \begin{center}
-The new makeMove will return an updated board based on it's arguments.
+新しいmakeMoveは、引数に基づき更新された表を返却します。
 \end{center}
 
-In other words, `makeMove` needs to receive all required arguments to create a new board, and should return a new board. This makes it pure; the return value is determined exclusively by the inputs.
+言い換えると、`makeMove`は新しい表を作るのに必要な全ての引数を受け取る必要があり、新しい表を返却すべきということです。こうすることで`makeMove`は純粋関数になります。返却値はインプットによってのみ決定されます。
 
-You may be wondering: if we cannot mutate anything, how do we get anything done? How will we update the UI?
+もしかしたら、「何も値を操作することができないとすれば、どうやってコーディングすればいいのか？どうやってUIを更新したらいいのか？」と疑問をお感じかもしれません。
 
-## Functional Core, Imperative Shell
+## Functional CoreとImperative Shell
 
-The answer is that while we only avoid mutation in the business logic. This is the "functional core" part of the paradigm. All side effects, mutation and unpredictable actions, such as updating the DOM and listening for user input will be handled in a thin layer. This thin layer is the  *imperative shell* part of the paradigm. The imperative shell wraps the functional core (the business logic) with Vue's reactivity APIs. All mutation will occur in the imperative shell. 
+答えは、値の変更を避けるのはビジネスロジックの中でのみ、という点にあります。これがパラダイムにおける"functional core"の部分です。DOMの更新やユーザーによる入力のリスニングといった、あらゆる副次的作用や操作、予測不能な行動は、薄いレイヤーで取り扱われます。この薄いレイヤーこそが、パラダイムにおける*imperative shell*の部分です。imperative shellはfunctional core（すなわちビジネスロジック）をVueのリアクティブシステムでラップします。全ての値の操作はimperative shellの中で起こります。
 
-![Functional Core, Imperative Shell. Image Credit: mokagio (Twitter)](functional-core-imperative-shell.jpg)
+![Functional CoreとImperative Shell。クレジット: mokagio (Twitter)](functional-core-imperative-shell.jpg)
 
-In this diagram the solid white circles represents the "functional core". These are a collection of pure functions that are written in plain JavaScript - no reactivity and no global variables. This includes methods like the new `makeMove` function we are about to write.
+この図の中で、複数の白い円が"functional core"を表しています。これは単純なJavaScriptで書かれた純粋関数の集合で、リアクティブでなく、グローバル変数も存在しません。これは、これから書き直す新しい`makeMove`関数のようなメソッドを含みます。
 
-The thin layer surrounding the solid circles represents the "imperative shell". In this system, it is the `useTicTacToe` composable - a thin layer written using Vue's reactivity system, marrying the functional business logic and the UI layer.
+円を囲む薄い層は"imperative shell"を表します。このシステムでは、`useTicTacToe`コンポーザブルが該当します－Vueのリアクティブシステムを用いて書かれたレイヤーで、純粋関数のビジネスロジックとUIレイヤーを結びつけます。
 
-The solid rectangles on the right represent interactions between the system and the outside world - things like user input, updating the DOM, the response to a HTTP request to a third party system or a push notification.
+右側の四角は、システムと外部の世界とのやり取りを表現しています－ユーザーの入力やDOMの更新、サードパーティーのシステムへのHTTPリクエストに対するレスポンス、通知のプッシュなどです。
 
-By making the business logic mutation free, it's very easy to test. We will then test the imperative shell, or the Vue integration, using Testing Library - a library designed for this very purpose - to test Vue components. We won't need too many tests, since all the complexity and edge cases will be covered in the functional core tests.
+ビジネスロジックを値の操作から分離することで、テストは非常に容易になります。次にimperative shell、あるいはVueとの統合をテストします。その際は、（まさにそのために設計されたライブラリである）Testing Libraryを使い、Vueコンポーネントをテストします。複雑な部分やエッジケースは全てfunctional coreのテストでカバーされているので、そんなに多くのテストは不要です。
 
-The final API is going to be the same:
+最終的なAPIは同じ形となります:
 
 ```js
 import { useTicTacToe } from './tic-tac-toe.js'
@@ -73,17 +73,17 @@ export default {
 }
 ```
 \begin{center}
-Final API does not change - only the implementation details.
+最終的にAPIは変わりません－実装の詳細が変わるだけです。
 \end{center}
 
-## Business Logic - The Functional Core
+## ビジネスロジック－Functional Core
 
-Let's start with the functional core, starting with a `createGame` function:
+まずはfunctional coreである`createGame`関数から始めましょう:
 
 ```js
 /**
- * Core Logic
- * Framework agnostic
+ * フレームワークに依存しない
+ * 中核のロジック
  */
 export const initialBoard = [
   ['-', '-', '-'],
@@ -96,16 +96,16 @@ export function createGame(initialState) {
 }
 ```
 \begin{center}
-So far, no mutation.
+これまでのところ、値の操作はありません。
 \end{center}
 
-While we could have just done `createGame` without passing any arguments, this makes it easy to seed an initial state for testing. Also, we avoid relying on a global variable.
+`createGame`を引数を渡さずに作ることもできましたが、引数を渡すことでテスト用の初期状態の設定が容易になります。また、グローバル変数に依存するのを避けました。
 
-A test is so trivial it's almost pointless to write, but let's do it anyway:
+テストは些細なものでほとんど記載の必要もありませんが、ひとまずやってみましょう:
 
 ```js
 describe('useTicTacToe', () => {
-  it('initializes state to an empty board', () => {
+  it('空の表に対して状態を初期化すること', () => {
     const expected = [
       ['-', '-', '-'],
       ['-', '-', '-'],
@@ -116,30 +116,30 @@ describe('useTicTacToe', () => {
 })
 ```
 \begin{center}
-A simple for the initial game state.
+ゲームの初期状態のためのシンプルなテスト。
 \end{center}
 
-## Immutable `makeMove`
+## 不変の`makeMove`
 
-Then bulk of the logic is in the `makeMove` function. To update the board, we need the current game state, the column and row to update, and the counter (`x` or `o`). So those will be the arguments we pass to the function.
+ほとんどのロジックは`makeMove`関数の中にあります。表をアップデートするためには、現在のゲームの状態、アップデートする行と列、順番（`x`または`o`）が必要です。そのため、これらは関数に渡す引数となります。
 
 ```js
 export function makeMove(board, { col, row, counter }) {
-  // copy current board
-  // return copy with updated cell
+  // 現在の表をコピー
+  // マスを更新したコピーを返却
 }
 ```
 \begin{center}
-The new makeMove function (without implementation).
+新しいmakeMove関数（実装を除く）。
 \end{center}
 
-I decided to have two arguments: the first is the `board`, which I consider the "main" argument. I decided to implement `col`, `row` and `counter` as an object, since I consider those to be "options", which will change depending on the move the player makes.
+2つの引数を持つようにしたいと思います。最初の引数は`board`で、"主要な"引数と考えます。`col`, `row`, `counter`はオブジェクトとして実装することとしました。というのも、それらは"オプション"であると考えられ、プレイヤーが行った操作により変化するものだからです。
 
-Before going any further, a test will be useful. I'm going to write a verbose implementation of `makeMove` and then refactor it; the test will help ensure nothing breaks during the refactor.
+先に進める前に、テストは有益です。最初に`makeMove`を冗長な方法で実装し、それをリファクターします。テストすることでリファクターの間、何も壊れていないことを確かめることができます。
 
 ```js
 describe('makeMove', () => {
-  it('returns a new updated board', () => {
+  it('更新された新しい表を返却すること', () => {
     const board = createGame()
     const updatedBoard = makeMove(board, {
       row: 0, 
@@ -156,37 +156,37 @@ describe('makeMove', () => {
 })
 ```
 \begin{center}
-A test to guide us.
+道しるべとなるテスト。
 \end{center}
 
-Let's start with a verbose implementation. We will use `map` to iterate over each row. For each row, we will `map` each column. If we encounter the row and column the user has chosen, we will update the cell. Otherwise, we just return the current cell.
+冗長な実装から始めてみましょう。`map`を使って各行に対して繰り返し処理を行います。さらに各行において、各列に対して`map`処理を行います。ユーザーが選択した行と列に当たった場合は、マスを更新します。そうでなかった場合は、単に現在のマスを返却します。
 
 ```js
 export function makeMove(board, { col, row, counter }) {
-  // loop each row with map. 
+  // mapを用いて各行に対してループ処理をする
   return board.map((theRow, rowIdx) => {
     
-    // for each row, loop each column with map.
+    // 各行において、mapを用いて各列に対してループ処理をする
     return theRow.map((cell, colIdx) => {
 
-      // if we are on the row and column the user
-      // has chosen, return the counter (o or x).
+      // ユーザーが選択した行と列に当たった場合、
+      // 順番(oまたはx)を返却する。
       if (rowIdx === row && colIdx === col) {
         return counter
       }
-      // otherwise just return the current cell.
+      // それ以外の場合、単に現在のマスを返却する。
       return cell
     })
   })
 }
 ```
 \begin{center}
-A verbose and heavily commented makeMove.
+冗長でコメントを多用したmakeMove。
 \end{center}
 
-The test passes! I left some comments to make it clear what's going on. If you haven't seen this type of code before, it can be a little difficult to understand - it was for me. Once I got used to using tools like `map` and `reduce` instead of a for loop and mutation, I started to find this style of code more concise, and more importantly, less prone to bugs.
+テストがパスしました！何が起こっているか明確にするためにコメントを書きました。今までにこういったタイプのコードを見たことがなければ、少し理解しづらいかも知れません－私も以前はそうでした。forを用いた繰り返し処理の代わりに、`map`や`reduce`といったツールを使うことに一度慣れると、こちらのスタイルの方がより簡潔で、（さらに重要なことには）バグが発生しづらいと考えるようになりました。
 
-We can make this a lot more concise! This is optional; there is some merit to verbose, explicit code too. Let's see the concise version. You can make a decision which one you think is more readable.
+上記をはるかに簡潔にすることができます！しかしこれはオプションです。冗長だが明瞭なコードにも一定のメリットがあります。簡潔なバージョンを見てみましょう。どちらの方がより読みやすいと思うか、ご自身で決めてください。
 
 ```js
 export function makeMove(board, { col, row, counter }) {
@@ -200,21 +200,21 @@ export function makeMove(board, { col, row, counter }) {
 }
 ```
 \begin{center}
-Functional code can be very concise. Careful - readability can suffer.
+中核となるコードは極めて簡潔にできます。が、注意してください－可読性が犠牲になる可能性もあります。
 \end{center}
 
-We avoided making a new variable by returning the result of `board.map`. We also removed the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. The test still passes, so we can be confident the refactor was successfully. I think both implementations are fine; pick the one that you like best.
+`board.map`の結果を返却することで、新しい変数を作ることを避けました。また、三項演算子を用いることで`if`ステートメントを除外し、`map`関数から`return`キーワードを除外しています。テストは依然パスしますので、リファクターはうまくいったと確信を持つことができます。私はどちらの実装も問題ないと考えます。望ましいと思う方を選択してください。
 
-## Vue Integration - Imperative Shell
+## Vueとの統合－Imperative Shell
 
-Most of the business logic is encapsulated in the `createGame()` and `makeMove()` functions. They are stateless. All the values required are received as arguments. We do need some persisted state somewhere, as well as some mutation to update the DOM; that comes in the form of Vue's reactivity - the *imperative shell*.
+ほとんどのビジネスロジックは`createGame()`や`makeMove()`の中にカプセル化されています。これらはステートレスです。必要な全ての値は引数として受け取ります。どこかで永続的なステートを持ち、DOMを更新する操作が必要となります。これらはVueのリアクティブシステムの形式をとります－つまり、*imperative shell*です。
 
-Let's start with the composable, `useTicTacToe()`, and get something rendering:
+`useTicTacToe()`コンポーザブルから始めて、何か表示してみましょう:
 
 ```js
 /**
- * Vue integration layer
- * State here is mutable
+ * Vueとのインテグレーション層
+ * ここでのステートは可変です
  */
 export function useTicTacToe() {
   const boards = ref([initialBoard])
@@ -233,12 +233,12 @@ export function useTicTacToe() {
 }
 ```
 \begin{center}
-The composable integrates the functional core with Vue's reactivity system - the "imperative shell" around the functional core.
+コンポーザブルがfunctional coreとVueのリアクティブシステムを統合します－functional coreを囲む"imperative shell"です。
 \end{center}
 
-I added an empty `move` function, assigning it to `makeMove` in the return value of `useTicTacToe`. We will be implementing that soon. 
+空の`move`関数を加え、`useTicTacToe`の返却値の中で`makeMove`に割り当てましたが、後ほどすぐに実装します。
 
-Let's get something rendering:
+何か表示してみましょう:
 
 ```html
 <template>
@@ -282,14 +282,14 @@ export default {
 </style>
 ```
 \begin{center}
-Testing out the implementation.
+実装を行っていきます。
 \end{center}
 
-![Rendered game board](ttt-1.png)
+![表示されたゲームの表](ttt-1.png)
 
-## Integrating makeMove
+## makeMoveの統合
 
-The last thing we need to do is wrap the functional, stateless `makeMove` function from the functional core. This is easy:
+最後にやるべきことは、純粋関数的でステートレスな`makeMove`関数をfunctional coreから取り出してラップすることです。実装は簡単です:
 
 ```js
 const move = ({ col, row }) => {
@@ -306,21 +306,21 @@ const move = ({ col, row }) => {
 }
 ```
 \begin{center}
-move is just a wrapper around the functional `makeMove`.
+moveは、中核となる`makeMove`を囲むラッパーに過ぎません。
 \end{center}
 
-Everything now works in it's functional, loosely coupled, immutable glory.
+これですべてが純粋関数的、疎結合、不変な状態で動作するようになりました。
 
-![Rendered game board](ttt-2.png)
+![表示されたゲームの表](ttt-2.png)
 
-From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
+ユーザーの視点から見ると、何も変わっていません。このことはUIテストを再利用することで検証できます（前章の最初のエクササイズです）:
 
 ```js
 import { render, fireEvent, screen } from '@testing-library/vue'
 import TicTacToeApp from './tic-tac-toe-app.vue'
 
 describe('TicTacToeApp', () => {
-  it('plays a game', async () => {
+  it('ゲームをプレイすること', async () => {
     render(TicTacToeApp)
 
     await fireEvent.click(screen.getByTestId('row-0-col-0'))
@@ -334,12 +334,12 @@ describe('TicTacToeApp', () => {
 })
 ```
 \begin{center}
-The UI test from previous section, ensuring the behavior has not changed.
+前章から持ってきたUIテスト。振る舞いが変わっていないことを確かめます。
 \end{center}
 
-## Pushing Business Logic into the Functional Core
+## ビジネスロジックをFunctional Coreに移動させる
 
-There is one last improvement we can make. We currently wrap the stateless `makeMove` function:
+最後に一つ、改善できる点があります。現在、ステートレスな`makeMove`関数をラップしました:
 
 ```js
 const move = ({ col, row }) => {
@@ -356,9 +356,9 @@ const move = ({ col, row }) => {
 }
 ```
 
-Ideally all the business logic should be in the functional core. This includes changing the counter after each move. I think this is part of the core gameplay - not the UI. For this reason I would like to move `counter.value === 'o' ? 'x' : 'o'` into the functional core.
+理想的には、全てのビジネスロジックはfunctional coreの中にあるべきです。これには各操作後の順番の変更も含まれます。これはUIではなく、ゲームプレイの中核の一部だと考えられます。このため、`counter.value === 'o' ? 'x' : 'o'`をfunctional core内に移動させたいと思います。
 
-Update `makeMove` to change the counter after updating the board, and return an object representing the new board as well as the updated counter:
+`makeMove`を更新して、表を更新した後に順番を変更し、新しい表と更新された順番を表すオブジェクトを返却するようにしましょう:
 
 ```js
 export function makeMove(board, { col, row, counter }) {
@@ -374,7 +374,7 @@ export function makeMove(board, { col, row, counter }) {
 }
 ```
 
-Now `makeMove` handles updating the counter, as well as the board. Update `move` to use the new return value:
+これで`makeMove`は、表に加えて順番の更新を取り扱えるようになりました。新しい返却値を用いて`move`を更新しましょう:
 
 ```js
 const move = ({ col, row }) => {
@@ -391,11 +391,11 @@ const move = ({ col, row }) => {
 }
 ``` 
 
-Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Testing Library still passes, since the actual behavior from the user's point of view has not changed):
+最後に、返却値を変更したので、`makeMove`のテストを更新する必要があります（Testing Libraryを用いたUIテストは依然パスします。というのも、ユーザー視点からみた実際の振る舞いは変わっていないからです）:
 
 ```js
 describe('makeMove', () => {
-  it('returns a new updated board and counter', () => {
+  it('新しい表と順番を返却すること', () => {
     const board = createGame(initialBoard)
     const { newBoard, newCounter } = makeMove(board, {
       row: 0, 
@@ -413,28 +413,28 @@ describe('makeMove', () => {
 })
 ```
 
-All the tests are now passing. I think this refactor is a good one; we pushed the business logic into the functional core, where it belongs.
+これですべてのテストが通ります。このリファクターはいいことだと思います。ビジネスロジックを本来所属すべきfunctional core内に移動させたからです。
 
-## Reflections and Philosophy
+## 考察と哲学
 
-This section explores concepts that I think separates greate developers from everyone else. Separation of concerns is really about understanding what a function should do, and where to draw the lines between the different parts of a system.
+この章では、偉大な開発者をその他大勢と区別する（と私が考える）コンセプトについて考察しました。関心の分離とはまさに、関数は何をすべきで、システムの異なる部分のどこに線を引くべきかを理解することです。
 
-There are some easy ways to see if you are separating your Vue UI logic from your business logic, or in a more general sense, your imperative shell from your functional core: 
+VueのUIロジックがビジネスロジックから分離しているか、より一般的にはimperative shellがfunctional coreから分離しているか、見分ける簡単な方法があります:
 
-- are you accessing Vue reactivity APIs in your business logic? This usually comes in the form of `.value` for accessing the values of `computed` and `ref`.
-- are you relying on global or pre-defined state?
+- ビジネスロジックの中でVueのリアクティブなAPIにアクセスしているか？これは一般的に`computed`や`ref`の値にアクセスするための`.value`という形式をとります。
+- グローバルな、あるいは前もって定義された状態に依存しているか？
 
-This also prompts another question: what and how should we be testing in our functional core and imperative shell? In the previous section, we tested both in one go - they were so tightly coupled together, so this was the natural way to test them. This worked out fine for that very simple composable, but can quickly become complex. I like to have lots of tests around my business logic. If you write them like we did here - pure functions - they are very easy to test, and the tests run really quickly.
+これはさらなる疑問をもたらします。functional coreやimperative shellの中で、何に対するどのようなテストを行うべきか？という疑問です。前の章では、両方をいっぺんに行いました－双方は固く結びついていたので、このようなテストは自然な方法でした。非常にシンプルなコンポーザブルではうまくいきましたが、コンポーザブルはすぐに複雑になってしまうかもしれません。ビジネスロジック周りでは多くのテストをしておきたいです。ビジネスロジックをこの章で行ったように純粋関数として書けば、テストは非常に簡単となり、とても早く動作します。
 
-When testing the imperative shell (in this case the Vue UI layer using Testing Library) I like to focus on more high level tests from a user point of view - clicking on buttons and asserting the correct text and DOM elements are rendered. The imperative shell doesn't (and shouldn't) know about how the functional core works - these tests focus on asserting the behavior of the application from the user's perspective.
+imperative shellのテスト（この場合はTesting Libraryを用いたVueのUIレイヤーのテスト）をする際には、ユーザーの視点に立ったより高度なレベルのテストに注力したいです－つまり、ボタンをクリックして、正しいテキストやDOM要素が表示されているかをアサートする、といったテストです。imperative shellはfunctional coreがどのように動作するかを知りません（また、知るべきではありません）－これらのテストは、ユーザーの視点からアプリケーションのふるまいをアサートすることに注力します。
 
-There is no one true way to write applications. It is also very hard to transition an application from a mutation heavy paradigm to the style discussed in this chapter.. I am more and more of the opinion that coupling Vue's reactivity to your composables and business logic is generally not a good idea - this simple separate makes things a whole lot more easy to reason about, test, and has very little downside (maybe a bit more code, but I don't see this is a big deal).
+アプリケーションを書くのに唯一正しい方法というのは存在しません。また、アプリケーションを値の操作に非常に依存したパラダイムから、この章で議論したようなスタイルに移行することは非常に難しいです。Vueのリアクティブシステムをコンポーザブルやビジネスロジックと結びつける方法は一般的に良いアイデアではないと、私は近年ますます考えるようになりました－このシンプルな分離によって、予測やテストがはるかに容易になり、一方で欠点は非常に少ないです（多少コードは増えるでしょうが、大した問題ではないと考えています）。
 
-I think you should extract your logic into a functional core that is immutable and does not rely on shared state. Test this in isolation. Next, you write and test your imperative shell - in this case the `useTicTacToe` composable, in the context of this chapter - an test is using something like Testing Library (or a similar UI testing framework). These test are not testing business logic as such, but that your integration layer (the composable and Vue's reactivity) is correctly hooked up to your functional core. 
+ロジックは、不変であり共有されたステートに依存しないfunctional coreに抽出すべきです。そしてこれを個別にテストします。次に、imperative shellを実装してテストします－この章の文脈では、`useTicTacToe`コンポーザブルになります。テストはTesting Library（または似たようなUIテストフレームワーク）を用いることになります。これらのテストはビジネスロジックはあまり検証せず、インテグレーション層（コンポーザブルやVueのリアクティブシステム）がfunctional coreと正しく連動しているかを検証します。
 
-## Exercises
+## エクササイズ
 
-Repeat the exercises from the last chapter - undo/redo, defensive checks to prevent illegal moves, check if a player has won the game and display it on the UI.
+前章のエクササイズを繰り返してみましょう－「元に戻す／やり直す」機能、不正な操作を防ぐ防御的なチェック、プレイヤーが勝利したことをチェックしてそれをUI上に表示すること、です。
 
-You can find the completed source code in the [GitHub repository under examples/composition-functional](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code).
+完全なソースコードは[GitHubリポジトリのexamples/composition-functional配下](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code)にあります。
 
