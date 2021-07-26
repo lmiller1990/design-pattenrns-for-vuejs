@@ -147,7 +147,7 @@ emitロジックをテンプレートからスクリプトに移動します。
 
 Vue 3では、propsを宣言するように、コンポーネントがemitするイベントを宣言することができ（、また推奨され）ます。これは、コンポーネントが何をしているのかを読者に伝える良い方法です。また、TypeScriptを使用するならば、より良い自動補完や型安全が利用できるでしょう。
 
-もし上記を行わないと、ブラウザコンソールに以下の警告が表示されます: *"Component emitted event "<event name>" but it is neither declared in the emits option nor as an "<event name> prop"*. *(コンポーネントはイベントをemitしましたが、イベントはemitオプション内においても"<event name>prop"としても宣言されていません)*
+もし上記を行わないと、ブラウザコンソールに以下の警告が表示されます: *"Component emitted event "[event name]" but it is neither declared in the emits option nor as an "[event name] prop"*. *(コンポーネントはイベントをemitしましたが、イベントはemitオプション内においても"[event name]prop"としても宣言されていません)*
 
 コンポーネントがemitするイベントを宣言することで、他の開発者にとって（あるいは半年後のあなたにとって）、コンポーネントが何を行っていて、どのように使用するのかを理解しやすくなります。
 

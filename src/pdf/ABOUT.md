@@ -15,9 +15,9 @@ Vue.jsを採用したのは2016年で、すぐに夢中になりました。そ�
 
 また、YouTubeチャンネルを所有しており、本書のテーマに類似した発展的なコンテンツを投稿しています。長編のUdemy講座を2つ作成し、13000以上の受講者がいます。
 
-ラクランのWebSite: https://lachlan-miller.me. \newline
-ラクランのYouTubeチャンネル: https://www.youtube.com/c/LachlanMiller. \newline
-ラクランのUdemyプロフィール: https://www.udemy.com/user/lachlan-miller-4/
+LachlanのWebSite: https://lachlan-miller.me. \newline
+LachlanのYouTubeチャンネル: https://www.youtube.com/c/LachlanMiller. \newline
+LachlanのUdemyプロフィール: https://www.udemy.com/user/lachlan-miller-4/
 
 ## 訳者コメント
 
