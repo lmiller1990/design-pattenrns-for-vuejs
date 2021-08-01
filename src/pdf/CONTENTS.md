@@ -6,7 +6,7 @@ header-includes:
   \usepackage{graphicx}
   \usepackage{float}
   \usepackage{xeCJK}
-  \setCJKmainfont[BoldFont=STKaiti,ItalicFont=STKaiti]{STSong}
+  \setCJKmainfont[BoldFont=Hiragino Mincho Pro,ItalicFont=Hiragino Mincho Pro]{STSong}
 
 output:
     pdf_document
