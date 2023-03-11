@@ -68,7 +68,7 @@ We need two types of validations:
 1. A required field. Both the patient's name and weight are required fields.
 2. Minimum and maximum constraints. This is for the weight field - it has to be within a specific range. It also needs to support metric and imperial units.
 
-As well as validating the fields, our form validation framework should also return an error messages for each invalid input.
+As well as validating the fields, our form validation framework should also return an error messages for each invalid input. Finally, it should be *composable* - I expect to write many more forms, and most of the valdiation requirements are some combination of existing rules - required, minimum/maximum length, etc.
 
 We will write two validation functions: `required` and `isBetween`. While test driven development (abbreviated to TDD - where you write the tests first, and let the failing tests guide the implementation) isn't always the right tool, for writing these two functions I believe it is. This is because we know the inputs and outputs, and all the possible states of the system, it's just a matter of writing the tests and then making them pass.
 
@@ -87,29 +87,25 @@ This will be the format our two validators (and any future ones) will need to co
 ## The `required` validator
 
 ```js
-import {
-  required,
-} from './form.js'
+import { describe, it, expect } from "vitest";
+import { required } from "./form.js";
 
-describe('required', () => {
-  it('is invalid when undefined', () => {
-    expect(required(undefined)).toEqual({ 
-      valid: false, 
-      message: 'Required' 
-    })
-  })
+describe("required", () => {
+  it("is invalid when undefined", () => {
+    expect(required(undefined)).toEqual({ valid: false, message: "Required" });
+  });
 
-  it('is invalid when empty string', () => {
-    expect(required('')).toEqual({ 
-      valid: false, 
-      message: 'Required' 
-    })
-  })
+  it("is invalid when empty string", () => {
+    expect(required("")).toEqual({
+      valid: false,
+      message: "Required",
+    });
+  });
 
-  it('returns true false value is present', () => {
-    expect(required('some value')).toEqual({ valid: true })
-  })
-})
+  it("returns true false value is present", () => {
+    expect(required("some value")).toEqual({ valid: true });
+  });
+});
 ```
 \begin{center}
 Tests for the required validator.
@@ -118,15 +114,17 @@ Tests for the required validator.
 Basically, anything that does not evaluated to `true` is invalid; anything else is considered valid. We can get all the tests passing with this implementation:
 
 ```js
-export function required(value) {
+export function required(
+  value?: string | number
+): ValidationResult {
   if (!value) {
     return {
       valid: false,
-      message: 'Required'
-    }
+      message: "Required",
+    };
   }
 
-  return { valid: true }
+  return { valid: true };
 }
 ```
 \begin{center}
@@ -162,38 +160,39 @@ describe('required' () => {
   // ...
 })
 
-describe('isBetween', () => {
-  it('returns true when value is equal to min', () => {
-    expect(isBetween(5, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
-  })
+describe("isBetween", () => {
+  it("returns true when value is equal to min", () => {
+    expect(isBetween(5, { min: 5, max: 10 })).toEqual({
+      valid: true,
+    });
+  });
 
-  it('returns true when value is between min/max', () => {
-    expect(isBetween(7, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
-  })
+  it("returns true when value is between min/max", () => {
+    expect(isBetween(7, { min: 5, max: 10 })).toEqual({
+      valid: true,
+    });
+  });
 
-  it('returns true when value is equal to max', () => {
-    expect(isBetween(10, { min: 5, max: 10 }))
-    .toEqual({ valid: true })
-  })
+  it("returns true when value is equal to max", () => {
+    expect(isBetween(10, { min: 5, max: 10 })).toEqual({
+      valid: true,
+    });
+  });
 
-  it('returns false when value is less than min', () => {
-    expect(isBetween(4, { min: 5, max: 10 }))
-      .toEqual({ 
-        valid: false, 
-        message: 'Must be between 5 and 10' 
-      })
-  })
+  it("returns false when value is less than min", () => {
+    expect(isBetween(4, { min: 5, max: 10 })).toEqual({
+      valid: false,
+      message: "Must be between 5 and 10",
+    });
+  });
 
-  it('returns false when value is greater than max', () => {
-    expect(isBetween(11, { min: 5, max: 10 }))
-      .toEqual({ 
-        valid: false, 
-        message: 'Must be between 5 and 10' 
-      })
-    })
-})
+  it("returns false when value is greater than max", () => {
+    expect(isBetween(11, { min: 5, max: 10 })).toEqual({
+      valid: false,
+      message: "Must be between 5 and 10",
+    });
+  });
+});
 ```
 \begin{center}
 Tests for the isBetween validator.
@@ -204,15 +203,18 @@ I think the tests are simple enough to have everything in a single `expect` stat
 The implementation is much less code than the tests; this is not unusual.
 
 ```js
-export function isBetween(value, { min, max }) {
-  if (value < min || value > max) {
+export function isBetween(
+  value: number,
+  options: { min: number; max: number }
+) {
+  if (value < options.min || value > options.max) {
     return {
       valid: false,
-      message: `Must be between ${min} and ${max}`
-    }
+      message: `Must be between ${options.min} and ${options.max}`,
+    };
   }
 
-  return { valid: true }
+  return { valid: true };
 }
 ```
 \begin{center}

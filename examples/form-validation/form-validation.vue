@@ -1,19 +1,19 @@
 <template>
   <div class="form-wrapper">
-    <h3>Patient Data</h3>
+    <h3>patient data</h3>
     <form @submit.prevent="submit">
       <div class="field">
-        <div v-if="!validatedForm.name.valid" class="error" role="error">
-          {{ validatedForm.name.message }}
+        <div v-if="!validatedform.name.valid" class="error" role="error">
+          {{ validatedform.name.message }}
         </div>
-        <label for="name">Name</label>
+        <label for="name">name</label>
         <input id="name" name="name" role="name" v-model="form.name" />
       </div>
       <div class="field">
-        <div v-if="!validatedForm.weight.valid" class="error" role="error">
-          {{ validatedForm.weight.message }}
+        <div v-if="!validatedform.weight.valid" class="error" role="error">
+          {{ validatedform.weight.message }}
         </div>
-        <label for="weight">Weight</label>
+        <label for="weight">weight</label>
         <input id="weight" role="weight" name="weight" v-model.number="form.weight.value" />
         <select id="weight-units" role="weight-units" v-model="form.weight.units">
           <option value="kg">kg</option>
@@ -21,18 +21,18 @@
         </select>
       </div>
       <div class="field">
-        <button role="submit" :disabled="!valid">Submit</button>
+        <button role="submit" :disabled="!valid">submit</button>
       </div>
     </form>
     <div>
 <pre>
-Patient Data
+patient data
 {{ form }}
 </pre>
 
 <pre>
-Form State
-{{ validatedForm }}
+form state
+{{ validatedform }}
 </pre>
     </div>
   </div>
