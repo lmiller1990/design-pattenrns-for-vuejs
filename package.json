@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@testing-library/vue": "6.6.1",
+    "@types/luxon": "^3.2.0",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "@vue/babel-plugin-jsx": "^1.1.1",
@@ -8,7 +9,7 @@
     "cypress": "^12.8.1",
     "flush-promises": "1.0.2",
     "jsdom": "^21.1.1",
-    "luxon": "3.3.0",
+    "luxon": "^3.3.0",
     "moment": "2.29.4",
     "msw": "1.1.0",
     "node-request-interceptor": "0.6.3",
