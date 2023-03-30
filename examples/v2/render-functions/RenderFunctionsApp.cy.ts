@@ -1,8 +1,8 @@
-import App from './App.vue'
+import RenderFunctionsApp from './RenderFunctionsApp.vue'
 
-describe('<App />', () => {
+describe('<RenderFunctionsApp />', () => {
   it('renders', () => {
-    cy.mount(App)
+    cy.mount(RenderFunctionsApp)
     cy.get('.active').contains('Tab #1')
     cy.contains('Content #1').should('exist')
     cy.contains('Content #2').should('not.exist')

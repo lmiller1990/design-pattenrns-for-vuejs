@@ -1,21 +1,24 @@
 <template>
-  <h3>Luxon</h3>
-  <DateTimeC
-    v-model="dateLuxon"
-    :deserialize="deserialize"
-    :serialize="serialize"
-  />
-  {{ dateLuxon }}
-
-  <h3>Moment</h3>
-  <DateTimeC
-    v-model="dateMoment"
-    :deserialize="deserializeMoment"
-    :serialize="serializeMoment"
-  />
-  {{
-    dateMoment.format ? dateMoment.format("YYYY-MM-DD") : dateMoment
-  }}
+  <div id="luxon">
+    <h3>Luxon</h3>
+    <DateTimeC
+      v-model="dateLuxon"
+      :deserialize="deserialize"
+      :serialize="serialize"
+    />
+    {{ dateLuxon }}
+  </div>
+  <div id="moment">
+    <h3>Moment</h3>
+    <DateTimeC
+      v-model="dateMoment"
+      :deserialize="deserializeMoment"
+      :serialize="serializeMoment"
+    />
+    {{
+      dateMoment.format ? dateMoment.format("YYYY-MM-DD") : dateMoment
+    }}
+  </div>
   <hr />
 </template>
 

@@ -1,16 +1,16 @@
 <template>
   <input
-    role="year"
+    id="year"
     :value="date.year"
     @input="update($event, 'year')"
   />
   <input
-    role="month"
+    id="month"
     :value="date.month"
     @input="update($event, 'month')"
   />
   <input
-    role="day"
+    id="day"
     :value="date.day"
     @input="update($event, 'day')"
   />

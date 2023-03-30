@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
-import TestComponent from './App.vue'
+import TestComponent from './RenderlessPasswordApp.vue'
 import AppWithCustomValidator from './AppWithCustomValidator.vue'
 import { isMatching, calcComplexity } from './renderless-password.js'
 
