@@ -35,5 +35,7 @@ declare global {
 
 Cypress.Commands.add('mount', mount)
 
+import '@testing-library/cypress/add-commands'
+
 // Example use:
 // cy.mount(MyComponent)
