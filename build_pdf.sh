@@ -2,9 +2,6 @@ cat \
   src/pdf/CONTENTS.md \
   src/pdf/ABOUT.md \
   src/pdf/INTRO.md \
-  src/pdf/PROPS.md \
-  src/pdf/EVENTS.md \
-  src/pdf/FORMS.md \
   src/pdf/API-REQUESTS.md \
   src/pdf/RENDERLESS-COMPONENTS.md \
   src/pdf/RENDER-FUNCTIONS.md \
@@ -16,3 +13,7 @@ cat \
   --highlight-style tango \
   --pdf-engine /Library/TeX/texbin/pdflatex \
   -o build/design_patterns_for_vuejs.pdf 
+
+  # src/pdf/PROPS.md \
+  # src/pdf/EVENTS.md \
+  # src/pdf/FORMS.md \

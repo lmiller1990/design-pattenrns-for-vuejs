@@ -1,14 +1,13 @@
 import {
   describe,
   it,
-  afterAll,
   beforeEach,
   afterEach,
 } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
 import { rest } from "msw";
 import { SetupServer, setupServer } from "msw/node";
-import Login from "./Login.vue";
+import Login from "../Login.vue";
 import { createPinia, Pinia, setActivePinia } from "pinia";
 
 describe("login", () => {
@@ -19,10 +18,10 @@ describe("login", () => {
     setActivePinia(pinia);
   });
 
-  let server: SetupServer 
+  let server: SetupServer;
 
   afterEach(() => {
-    server.close()
+    server.close();
   });
 
   it("successfully authenticates", async () => {
@@ -34,12 +33,17 @@ describe("login", () => {
           })
         );
       })
-    )
+    );
     server.listen();
 
-    const { container } = render(Login, { global: { plugins: [pinia] } });
+    const { container } = render(Login, {
+      global: { plugins: [pinia] },
+    });
 
-    await fireEvent.update(container.querySelector('#username')!, "Lachlan");
+    await fireEvent.update(
+      container.querySelector("#username")!,
+      "Lachlan"
+    );
     await fireEvent.update(
       container.querySelector("#password")!,
       "secret-password"
@@ -59,7 +63,7 @@ describe("login", () => {
           })
         );
       })
-    )
+    );
     server.use(
       rest.post("/login", (req, res, ctx) => {
         return res(ctx.status(403), ctx.json({ error }));
@@ -67,13 +71,18 @@ describe("login", () => {
     );
     server.listen();
 
-    const { container } = render(Login, { global: { plugins: [pinia] } });
+    const { container } = render(Login, {
+      global: { plugins: [pinia] },
+    });
 
-    await fireEvent.update(container.querySelector('#username')!, "Lachlan");
+    await fireEvent.update(
+      container.querySelector("#username")!,
+      "Lachlan"
+    );
     await fireEvent.update(
       container.querySelector("#password")!,
       "secret-password"
-    )
+    );
     await fireEvent.click(screen.getByText("Click here to sign in"));
 
     await screen.findByText(error);

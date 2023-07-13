@@ -1,4 +1,4 @@
-import { useSlots, defineComponent, h, computed } from "vue";
+import { useSlots, defineComponent, h, computed, watchEffect } from "vue";
 
 export const Tab = defineComponent({
   setup() {
@@ -53,13 +53,14 @@ export const TabContainer = defineComponent({
 
     const contentFilter = (
       component: any
-    ): component is typeof TabContent =>
-      component.type === TabContent &&
+    ): component is typeof TabContent => {
+      return component.type === TabContent &&
       component.props.tabId === props.modelValue;
+    }
 
     const tabContent = computed(() => {
       const slot = content.find(contentFilter)!;
-      return h(slot);
+      return h(slot, { key: slot.props.tabId });
     });
 
     return () => [

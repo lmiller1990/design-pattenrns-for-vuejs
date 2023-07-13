@@ -9,7 +9,7 @@ interface UsersState {
   user?: User;
 }
 
-export const useUsersStore = defineStore("users", {
+export const useUsers = defineStore("users", {
   state(): UsersState {
     return {
       user: undefined,

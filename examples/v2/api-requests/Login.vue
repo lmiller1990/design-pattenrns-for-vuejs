@@ -1,6 +1,6 @@
 <template>
   <h1 v-if="store.user">Hello, {{ store.user.username }}</h1>
-  <form @submit.prevent="handleAuth">
+  <form @submit.prevent="handleAuth" name="login">
     <input v-model="formData.username" id="username" />
     <input
       v-model="formData.password"
@@ -13,11 +13,11 @@
 </template>
 
 <script lang="ts" setup>
-import { AxiosError, AxiosResponse } from "axios";
+import type { AxiosError } from "axios";
 import { reactive, ref } from "vue";
-import { useUsersStore } from "./usersStore.js";
+import { useUsers } from "./store.js";
 
-const store = useUsersStore();
+const store = useUsers();
 
 const formData = reactive({
   username: "",
