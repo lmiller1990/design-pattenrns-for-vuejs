@@ -2,6 +2,9 @@ cat \
   src/pdf/CONTENTS.md \
   src/pdf/ABOUT.md \
   src/pdf/INTRO.md \
+  src/pdf/PROPS.md \
+  src/pdf/FORMS.md \
+  src/pdf/EVENTS.md \
   src/pdf/API-REQUESTS.md \
   src/pdf/RENDERLESS-COMPONENTS.md \
   src/pdf/RENDER-FUNCTIONS.md \
@@ -15,5 +18,3 @@ cat \
   -o build/design_patterns_for_vuejs.pdf 
 
   # src/pdf/PROPS.md \
-  # src/pdf/EVENTS.md \
-  # src/pdf/FORMS.md \

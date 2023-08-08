@@ -3,10 +3,17 @@ import { createApp } from "vue";
 // import App from "./examples/v2/api-requests/Login.vue";
 // import App from "./examples/v2/renderless-password/App.vue";
 // import App from "./examples/v2/renderless-password/AppWithCustomValidator.vue";
-import App from "./examples/v2/render-functions/RenderFunctionsApp.vue";
+// import Counter from "./examples/v2/events/PatientForm.vue";
+// import App from "./examples/v2/render-functions/RenderFunctionsApp.vue";
 // emport App from "./examples/v2/reusable-date-time/DateTimeApp.vue";
 import { createPinia } from "pinia";
+import Sum from "./examples/v2/props/Sum.vue"
+// import List from "./examples/v2/generics/List.vue"
 
-const app = createApp(App);
+const app = createApp(Sum, {
+  // onCreatePatient: (...patient) => {
+  //   console.log(patient)
+  // }
+});
 app.use(createPinia());
 app.mount("#app");
