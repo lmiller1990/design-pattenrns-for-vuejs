@@ -10,7 +10,7 @@ Vue's primary mechanic for passing data *down* to components is `props`. In cont
 
 ## Defining Events
 
-When using Script Setup, events are defined with the `defineEmits` compiler macro, and emitted using the returned value (traditionally called `emit` or `emits`):
+When using Script Setup, events are defined with the `defineEmits` compiler macro:
 
 ```ts
 const emits = defineEmits<{
@@ -18,13 +18,15 @@ const emits = defineEmits<{
 }>()
 ```
 
-You can then emit the event:
+Traditionally this is assigned to a variable name `emit` or `emits`.
+
+You can then emit an event:
 
 ```ts
 emits('greet', 'hello!')
 ```
 
-The nice thing about `defineEmits` is it's type safe; as long as you are using TypeScript (which you should be!) you will get a compiler error.
+The nice thing about `defineEmits` is type safety; as long as you are using TypeScript (which you should be!) you will get a compiler error if you emit a event that isn't defined, or emit an event with an incorrect payload.
 
 You can provide any number of positional arguments:
 
@@ -34,7 +36,7 @@ const emits = defineEmits<{
 }>();
 ```
 
-Although if there is a large number (2 or more) or some logic grouping (in this case, a user) I much prefer to group them:
+Although if there is a large number of values in the payload (say, 3 or more) or some logical grouping (in this case, a user) I much prefer to group them using an object:
 
 ```ts
 const emits = defineEmits<{
@@ -42,13 +44,13 @@ const emits = defineEmits<{
 }>();
 ```
 
-I find this both less error prone and easier to understand. More often than not, I end up extracting an `interface` or `type` based on these arguments.
+I find this both less error prone and easier to understand. More often than not, I end up extracting an `interface` or `type` based on these arguments, as you will soon see.
 
 ## Responding to Events
 
 Defining and emitting events is all good and well, but in general you won't just do this arbitrarily, but in response to a user doing something, like clicking, typing, or something else. 
 
-You can listen for an event using `v-on:event`, or better yet, the shorthand - `@event`. Most people reading this book wil know this - but there's some more intricacies that are worth understanding. There are *hundreds* of events. You've probably `@click` before:
+You can listen for an event using `v-on:event`, or better yet, the shorthand - `@event`. Most people reading this book wil know this - but there's some more intricacies that are worth understanding. There are *hundreds* of events defined by the Web API. You've probably encountered some of the more common events, like `click`:
 
 ```html
 <button @click="foo()">Button</button>
@@ -60,9 +62,9 @@ But how about `canplaythrough`?
 <video @canplaythrough="autoplay()"></video>
 ```
 
-Once the `<video>` is ready, you can autoplay it! That's annoying, though, so don't do that. There are lots of events available for `HTMLVideoElement`, though, so making a really clean video player that uses the native events would be a good learning project. You can find a full list of native events [here](https://developer.mozilla.org/en-US/docs/Web/Events#event_listing): https://developer.mozilla.org/en-US/docs/Web/Events#event_listing.
+Once the `<video>` is ready, as indicated by the `canplaythrough` event, you can respond appropriately. There are lots of events available for `HTMLVideoElement`. Making a really clean video player that uses the native events would be a good learning project. You can find a full list of native events [here](https://developer.mozilla.org/en-US/docs/Web/Events#event_listing): https://developer.mozilla.org/en-US/docs/Web/Events#event_listing.
 
-You can also listen to custom events. Before we get into those, let's talk native events a little more.
+You can responde to custom events in the same way as standard HTML events. Before we get into custom events, let's talk about native events a little more.
 
 ## The Secret Life of `@event` 
 
@@ -111,9 +113,13 @@ function Counter () {
 
 Both frameworks do the same thing, at least conceptually. If you pass a callback function to a native event, you get the native event as the first argument (unless you pass something else).
 
-Vue will a native event. A `PointerEvent`, in fact, with `type: "click"`, `x` and `y` values, and various other interesting things. React will surface a `SyntheticBaseEvent` - React has it's own event system - but it does give you native event under the `nativeEvent` property.
+Vue will pass a native event. A `PointerEvent`, in fact, with `type: "click"`, `x` and `y` values, and various other interesting things. There isn't anything Vue specific about it. It's the raw HTML event from the underyling `<input>`. 
 
-Vue and React don't do what you'd expect, not really! Take this snippet of plain old HTML:
+React is a little different. React will pass something they calla a `SyntheticBaseEvent`. React has it's own event system that wraps the native events. It does give you native event under the `nativeEvent` property, so it's there if you want it.
+
+If you are familiar with standard JavaScript, Vue and React might actually surprise you. That's because Vue and React don't necessarily do what you'd expect, based on your knowledge of plain old HTML and JavaScript. 
+
+Given this snippet of plain old HTML:
 
 ```html
 <!-- Not a template. This is just HTML-->
@@ -141,7 +147,6 @@ Let's see how a component with events compiles. We can take a look at Vue with t
 <script setup>
 function count () {}
 </script>
-
 
 <template>
   <button @click="count">Count</button>
@@ -176,7 +181,7 @@ __sfc__.__file = "src/App.vue"
 export default __sfc__
 ```
 
-If you have written Vue without Script Setup, you'll see this is a regular component definition using `setup`. It returns a (somewhat verbose) render function. The key is `{ onClick: count }`, which is the second argument to `_createElementBlock`. A more human readable version is:
+If you have written Vue without Script Setup, you'll see this is a regular component definition using `setup`. It returns a (somewhat verbose) render function. The thing to notic is `{ onClick: count }`, which is the second argument to `_createElementBlock`. A more human readable version is:
 
 ```js
 export default {
@@ -223,7 +228,8 @@ They are very similar. The only difference is the first one is called with no ar
 This is mostly academic, but it's good to know how things work under the hood. I like the second option better, since it's more explicit, and closer to standard JavaScript. I like this parallel:
 
 ```js
-document.querySelector('button').addEventListener('click', $event => { ... })
+document.querySelector('button')
+  .addEventListener('click', $event => { ... })
 
 <button @click="$event => count($event)">Count</button>
 ```
@@ -240,7 +246,7 @@ So, three ways to handle events:
 </template>
 ```
 
-There isn't a "best" way, but my in my experience, I've come up with some guidelines I like to use.
+There isn't a "best" way. I've come up with some guidelines I like to use, though, based on my experience. 
 
 If I am not passing any arguments, I use the first style - `@event="handler"`. For example:
 
@@ -279,7 +285,7 @@ If I am passing any arguments, I use the third style - `@event="$event => handle
 </script>
 ```
 
-The only reason is I like to think of `@click` as taking a *callback*. If you do pass a function invocation, eg `@click="handleComplete(todo)"`, Vue converts it to the `$event => handleComplete(todo)` syntax under the hood anyway. I just like to be consistent. 
+The only reason for this preference is that I like to think of `@click` as taking a *callback*. If you do pass a function invocation, eg `@click="handleComplete(todo)"`, Vue converts it to the `$event => handleComplete(todo)` syntax under the hood anyway. I just like to be consistent. 
 
 I've also found that using this consistent style helps greatly when onboarding developers from other frameworks, such as React, to be helpful. Even though *you* know how Vue the invocation style will be transformed by Vue under the hood, not everyone else will, nor should they need to.
 
@@ -318,11 +324,11 @@ const patient = reactive({
 </script>
 ```
 
-This works - but the template is going to get difficult to work with as we add more fields. In general, I recommend keeping templates clean and simple, and opt to move as much as possible into the `<script>` tag. For this reason, unless it's a very simple event, I prefer to avoid using `emits` in `<template>`. It's a personal preference, but once I've found to help keep my code bases in good shape. 
+This works - but the template is going to become difficult to work with as we add more fields. In general, I recommend keeping templates clean and simple, and opt to move as much as possible into the `<script>` tag. For this reason, unless it's a very simple event, I prefer to avoid using `emits` in `<template>`. It's a personal preference, but once I've found to help keep my code bases in good shape. 
 
 In addition, I like to have a convention for naming event handlers. The name isn't really important; having a good convention is, though. I like to use `handle` or `on`. So, in this case, I'm going to add a `handleCreatePatient` or `onCreatePatient` function. Alternatively, if you like to be concise, and since the component is focused on one thing - creating patients - `handleCreate` works well, too.
 
-I'm not interested in passing any arguments, so I'm going to go for the `@click="handleCreate"` syntax.
+I'm not interested in passing any arguments, so I'm going to go use the `@click="handleCreate"` syntax.
 
 ```html
 <template>
@@ -426,7 +432,7 @@ Now `<PatientForm>` looks like this:
 ```html
 <script lang="ts" setup>
 import { reactive } from 'vue';
-import type { Patient } from './patient';
+import type { Patient } from './patient.js';
 
 const emits = defineEmits<{
   (event: 'createPatient', patient: Patient): void
@@ -444,7 +450,7 @@ More importantly, I can do the same pattern where I use `<PatientForm>`:
 </template>
 
 <script lang="ts" setup>
-import type { Patient } from './patient';
+import type { Patient } from './patient.js';
 
 function handleCreate (patient: Patient) {
   // fully type safe!
@@ -456,7 +462,7 @@ Or, like many large projects, if you extract your HTTP calls to some kind of mod
 
 ```ts
 // api.ts
-import type { Patient } from './patient';
+import type { Patient } from './patient.js';
 
 export const API = {
   createPatient: (patient: Patient) => {

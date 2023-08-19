@@ -40,11 +40,13 @@ A impure function - it has a side effect. Not ideal, but necessary for most syst
 
 This is *not* a pure function because it relies on an external resource - in this case an API and a database. Depending on what is in the database when it is called, we might get a different result. If the database is offline, we might get an error. Who knows? That's the whole point - you don't know. It's *unpredictable*. It's *non deterministic*. That's not good. We want our applications to be predicable and reliable. 
 
-Unforunately, the type of software that is useful does tend do need things like databases, and APIs, and various other side effects. It's not a lost cause, though. We can design our applications in such a way all the side effects are in a single location, and have uniform ways to handle the inevitable unexpected cases.
+Unforunately, the type of software that people want to use tends to need things like databases, and APIs, and various other side effects. It's not a lost cause, though. We can design our applications in such a way all the side effects are in a single location, and have uniform ways to handle the inevitable unexpected cases.
 
-So, how does this relate to components and `props`? Well, it turns out that most of the time, user interfaces generally *are* deterministic. Given an error, they'll do the same thing each time, assuming you handle the error correctly. 
+So, how does this relate to components and `props`? Well, it turns out that most of the time, user interfaces generally *are* deterministic. Even in error states - given an error, they'll do the same thing each time, assuming you handle the error correctly. 
 
-Think of a component that decides what to render based on its `props` (don't worry about `data`, `computed` or `setup` for now - but the same ideas apply, as you'll see throughout the book). If you think of a component as a *function* and the `props` as the *arguments*, you'll realize that given the same `props`, the component will always render the same thing. It's output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
+Enough talk - let's write some code. If you think of a component that does nothing but take some props and render some data, you'll see it's determinstic in the same way our `sum()` function is. That's because it's more or less the same thing, if you consider the component as a *function* and the `props` as the *arguments*. This is what components really are - and we will see this is more detail in the "Render Functions" chapter. 
+
+Either way, given this parallel, it's clear that given the same `props`, the component will always render the same thing. Its output is deterministic. Since you decide what `props` are passed to the component, it's easy to test, since we know all the possible states the component can be in.
 
 How about the `sum()` example, as a component? No props yet, but there will be.
 
@@ -102,18 +104,20 @@ watchEffect(async () => {
 </template>
 ```
 
-We introduced a side effect: a network request. `<Sum>` is no longer deterministic. We also don't have any loading state, so our component doesn't provide a good user experience. 
+We introduced a side effect: a network request. `<Sum>` is no longer deterministic. We also don't have any loading state, so our component doesn't provide a good user experience. No error state - if (when?) the API call fails, the user won't know, since we don't handle that, either.
 
-There is a few things here *scream* "side effect":
+There are a few things here *scream* "side effect":
 
-- using `watch` or `watchEffect`. The whole point of these is to react to side effects. This is different to `computed`, which cannot be marked as `async` (well, you probably *can*, but you shouldn't. `computed` should always be synchronous and deterministic).
+- using `watch` or `watchEffect`. The whole point of these is to do something in reaction to a side effect. This is different to `computed`, which cannot be marked as `async` (well, you probably *can*, but you shouldn't. `computed` should always be synchronous and deterministic).
 - `async` and `await`. It is very rare that pure functions (and pure components) use `async` - anything that can be deterministic can usually be determined immediately, no `await` required.
 
-Of course, these are not only useful but necessary tools. They do prevent you from writing tests (or, at least, they make it a little more difficult) and from using a tool like Storybook to iterate on your design and the various states of your component. We can use our knowledge of props and pure components to avoid all these pitfalls, though!
+Of course, these are not only useful but necessary tools. Side effects can make writing tests a little more difficult, and also make it more difficult to use a tool like Storybook to iterate on your design and the various states of your component, since you'll need to mock our an API call. 
+
+We can use our knowledge of props and pure components to avoid all these pitfalls, though, and make our components simple to develop and test.
 
 ## Refactoring: Props Only
 
-Let's quickly refactor the `<Sum>` component - if we don't do it now, our manager will drop some new feature work on our desk, and we will never get a chance to. We want to identify all the side effects, and transform them to use props. The side effect here is the API request, which is inside of `watchEffect`. In addition, we still want `<Sum>` to contain the UI concerns - so, rendering the `<input>` and maintaining the state of the numbers. We just want it to be pure and deterministic. 
+Let's quickly refactor the `<Sum>` component - if we don't do it now, our manager will drop some new feature work on our desk, and we will never get a chance to. We want to identify all the side effects, and transform them to use props. The side effect here is the API request, which is inside of `watchEffect`. We still want `<Sum>` to contain the UI concerns - so, rendering the `<input>` and maintaining the state of the numbers. We just want it to be pure and deterministic. 
 
 We can rewrite `<Sum>` to use `props`:
 
@@ -144,16 +148,16 @@ watchEffect(() => {
 </template>
 ```
 
-There is quite a bit going on here. We still maintain the state of `n1` and `n2`. We also kept `watchEffect`. The difference is `watchEffect` is now deterministic - no `async` and no API call. Given a state where `n1` and `n2` are known, `watchEffect` will always emit the same event, `calculate`, with the same payload.
+There is quite a bit going on here. The `<Sum>` component still maintains the state of `n1` and `n2`. `watchEffect` also sticks around. The difference is `watchEffect` is now deterministic - no `async` and no API call. Given a state where `n1` and `n2` are known, `watchEffect` will always emit the same event, `calculate`, with the same payload.
 
-`<Sum>` is now dead simple to reason able, to pull into your design tool (Storybook, etc) and test (Test Utils, Cypress, Playwright).
+`<Sum>` is now dead simple to reason about, to pull into your design tool (Storybook, etc) and test (Vue Test Utils, Cypress, Playwright).
 
 We still need to make the API request. That would look something like this:
 
 ```html
 <script lang="ts" setup>
 import { ref } from 'vue'
-import SumWithProps from './SumWithProps.vue'
+import Sum from './Sum.vue'
 
 const result = ref(0)
 
@@ -168,13 +172,13 @@ async function fetchSum({ n1, n2 }: { n1: number, n2: number }) {
 </script>
 
 <template>
-  <SumWithProps :result="result" @calculate="fetchSum" />
+  <Sum :result="result" @calculate="fetchSum" />
 </template>
 ```
 
-It's a bit more code to write, but drawing the lines between concerns can be tremendously valuable for the longevity of a code base. I like to keep my user interface components (eg, the components that render things, and that the user interacts with) pure. It makes them more reusable, easy to test, and works well with various developer tooling, like test runners and design tools.
+It is a bit more code to write. We now have two components - the simple `<Sum>` component, and this one with the side effects (call it `<SumContainer>` for now). That said, I think this trade off is worth it. Drawing the lines between concerns (UI and data fetching, in this case) can be tremendously valuable for the longevity of a code base. I like to keep my user interface components (eg, the components that render things, and that the user interacts with) simple, and if possible, as pure components (pure meaning no side effects). It makes them more reusable, easy to test, and works well with various developer tools, like test runners and design tools.
 
-Vue makes this simple, but you still need to think carefully about what you are doing and how you might go about structuring your components.
+Vue makes maintaining this separation simple, but you still need to think carefully about what you are doing and how you might go about structuring your components.
 
 ## Separation of Concerns - Case Study
 
@@ -270,7 +274,8 @@ import { resistorCost, resistorPrice } from './logic.js'
 
 const amount = ref(0)
 
-const totalCost = computed(() => resistorCost(resistorPrice, amount.value))
+const totalCost = computed(() => 
+  resistorCost(resistorPrice, amount.value))
 </script>
 ```
 

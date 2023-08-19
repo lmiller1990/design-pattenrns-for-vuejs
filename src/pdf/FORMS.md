@@ -140,7 +140,7 @@ export const required: Validator = (value: any): ValidationResult => {
 required validator implementation.
 \end{center}
 
-I like to check for the null case first, when `value` is not defined. That's just a personal preference. If I see an `if` statement, boardly speaking, it means one of two things:
+I like to check for the null case first, when `value` is not defined. That's just a personal preference. When I see an `if` statement, boardly speaking, it means one of two things:
 
 1. A `return` statement is coming.
 2. Mutation - if you don't return something, and you don't have some sort of side effect (usually mutating or assigning something) the `if` statement can't possibly be doing anything.
@@ -163,6 +163,7 @@ This means we need 5 tests:
 For this function, it is safe to assume that only numbers can be passed as the input value; this validation is something we will handle at a higher level.
 
 ```ts
+import { describe, it, expect } from "vitest";
 import {
   required,
   validateRange
@@ -342,7 +343,7 @@ export function applyRules(
 Composing multiple validators with `applyRules`.
 \end{center}
 
-
+If `results` contains at least one entry where `!valid`, the form is in an error state. Otherwise, we assume everything is correct and return `{ valid: true }`.
 
 
 
@@ -426,6 +427,7 @@ We will need two functions:
 Let's start with the tests for `isFormValid`. The form is considered valid when all fields are `valid`, so we only need two tests: the case where all fields are valid, and the case where at least one field is not: 
 
 ```ts
+import { describe, it, expect } from "vitest";
 import {
   required,
   validateRange,
@@ -485,9 +487,9 @@ isFormValid implementation.
 
 This solution is a bit tricky - it uses `T extends Record<...>`. We are saying this function can work with *any* form, as long as all the properties use the `ValidationResult` interface we defined earlier.
 
-Amazingly, our `form.ts` still does not contain any application specific logic - we are still working on our form layer. It's generic and reusable, which is great!
+We've written a good amount of code by this piont - but we are still yet to write any application specific logic! We are still working on our form validation logic. It's generic and reusable, which is great!
 
-The last test we need to (finally) complete the business logic is `patientForm`. This function takes an object with the `Patient` interface we defined earlier. It returns the validation result of each field. 
+The last piece of code we need to (finally) complete the actual business requirement is going to be named `patientForm`. It's a function takes an object the shape of the `Patient` interface we defined earlier. It returns the validation result for each field. 
 
 We will want to have quite a few tests here, to make sure we don't miss anything. The cases I can think of are:
 
@@ -562,7 +564,7 @@ describe("patientForm", () => {
 Testing patientForm.
 \end{center}
 
-The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real-world system, you would likely get these from an API and pass them down to the `patientForm` function.
+The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real-world system, you would likely get these from an API and pass them down to the `patientForm` function. I would definitely keep this in a separate place to the component that renders the actual form, for the reasons the previous chapter abot props discussed.
 
 ```ts
 const limits = {
@@ -595,7 +597,9 @@ This completes the business logic for the patient form - noticed we haven't writ
 
 `patientForm` is the "glue" code - the line between our application logic (something to do with patients) and our generic form logic (which knows nothing about the outside word, just about forms and validation).
 
-In general, I like to push complexity down and keep the business logic as a simple and thin layer on top. You do need to exercise some caution, though; making your core logic *too* generic and reusable can be problematic in terms of types (you end up writing incredibly complex and difficult to understand type definitions, with heavy use of generics) and difficult to maintain or patch if a bug occurs.
+In general, if there is any kind of generic complexity (such a form validation), I will write this separately and be careful to keep in generic. Or - more realstically - use a prebuild solution from npm - those are always generic by nature. 
+
+Either way, npm module or otherwise, I like to keep the business logic as a simple and thin layer on top of any generic complexity. You do need to exercise some caution, though; making your logic *too* generic and reusable can be problematic in terms of TypeScript usage (you end up writing incredibly complex and difficult to understand type definitions, with heavy use of generics) and difficult to maintain or patch if a bug occurs.
 
 ## Writing the UI Layer
 
@@ -717,7 +721,8 @@ describe("Form", () => {
 
     cy.get('#weight-units').select("lb")
     // 30 lb is not valid! Error shown
-    cy.get('[role="error"]').should('have.length', 1).should('have.text', 'Must be between 66 and 440')
+    cy.get('[role="error"]').should('have.length', 1)
+      .should('have.text', 'Must be between 66 and 440')
 
     cy.get("input[name='weight']").clear().type("100")
     cy.get("button[type='submit']").should('be.enabled')
@@ -761,7 +766,7 @@ describe("Form.vue", () => {
 Testing the component layer with Testing Library.
 \end{center}
 
-Since these tests are a little larger, I am making the separation between each step clear. I like to write my tests like this:
+Since these tests are a little larger, I am making the separation between each part clear. I like to write my tests in this structure (I don't actually include "Arrange" and "Act" and "Assert" in my tet code - those comments are just to make this example clear):
 
 ```ts
 it('...', async () => {
