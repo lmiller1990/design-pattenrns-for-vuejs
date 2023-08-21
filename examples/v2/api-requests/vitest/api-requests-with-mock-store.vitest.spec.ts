@@ -9,7 +9,7 @@ import Login from "../Login.vue";
 
 const mockLogin = vi.fn();
 
-vi.mock("./usersStore", () => {
+vi.mock("../store", () => {
   return {
     useUsers: () => {
       return {

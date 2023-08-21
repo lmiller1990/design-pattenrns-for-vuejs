@@ -72,23 +72,52 @@ We probably want to test:
 A test where the user successfully authenticates might look like this:
 
 ```js
-import Login from './Login.vue'
+import { describe, it, beforeEach, vi } from "vitest";
+import { render, fireEvent, screen } from "@testing-library/vue";
+import Login from "../Login.vue";
+import { createPinia, Pinia, setActivePinia } from "pinia";
 
-it('works by stubbing axios', () => {
-  cy.stub(axios, "post").resolves({
-    data: {
-      username: "Lachlan",
-    }
-  })
-
-  cy.mount(Login);
-
-  cy.get("#username").type("Lachlan");
-  cy.get("#password").type("secret-password");
-  cy.get("button").contains("Click here to sign in").click();
-
-  cy.contains("Hello, Lachlan");
+vi.mock("axios", () => {
+  return {
+    default: {
+      post: () =>
+        Promise.resolve({
+          data: {
+            username: "Lachlan",
+            password: "this-is-the-password",
+          },
+        }),
+    },
+  };
 });
+
+describe("login", () => {
+  let pinia: Pinia;
+
+  beforeEach(() => {
+    pinia = createPinia();
+    setActivePinia(pinia);
+  });
+
+  it("successfully authenticates", async () => {
+    const { container } = render(Login, {
+      global: { plugins: [pinia] },
+    });
+
+    await fireEvent.update(
+      container.querySelector("#username")!,
+      "Lachlan"
+    );
+    await fireEvent.update(
+      container.querySelector("#password")!,
+      "secret-password"
+    );
+    await fireEvent.click(screen.getByText("Click here to sign in"));
+
+    await screen.findByText("Hello, Lachlan");
+  });
+});
+
 ```
 \begin{center}
 Using a mock implementation of axios to test the login workflow.
@@ -218,14 +247,14 @@ What if you are using a different library, like Vue Testing Library, which does 
 
 Let me illustrate my concern with mocking major dependencies, like Vuex or Pinia. This will show why I prefer to use a real store and real dependencies as much as possible in my tests. This example uses `vi.mock()`, but the same idea applies for `cy.stub()` and `jest.mock()`.
 
-```js
+```ts
+import { describe, it, vi, expect } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
-import Login from "./Login.vue";
+import Login from "../Login.vue";
 
-const mockLogin = jest.fn();
+const mockLogin = vi.fn();
 
-// Mock store! Not ideal, read on...
-jest.mock("./store.js", () => {
+vi.mock("./store.js", () => {
   return {
     useUsers: () => {
       return {
@@ -264,7 +293,6 @@ describe("login with mocking pinia", () => {
     await screen.findByText("Hello, Lachlan");
   });
 });
-
 ```
 \begin{center}
 Mocking Piina. 
@@ -272,15 +300,15 @@ Mocking Piina.
 
 Since we are mocking the Piina store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also have fine grained control over the state of the store - in the snippet above.
 
-Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't have `mockPost` any more - instead we have `mockDispatch`. The assertion against `mockDispatch` became an assertion that a `login` action was dispatched with the correct payload, as opposed to a HTTP call to the correct endpoint.
+Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't mock `axios` any more - instead we have `mockLogin`. We are asserting the correct action was called. 
 
-There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken.
+There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken. More often than not, you end up rebuilding your module inside your test - at this point, you've got a lot of code to maintain for relatively little test coverage. More code - but less value. A low quality test suite - which can lead to false confidence, which is argubly worse than having no test suite at all.
 
 This is not the case with the test using a real Pinia store - breaking the store correctly breaks the tests. There is only one thing worse than a code-base with no tests - a code-base with *bad* tests. At least if you have not tests, you have no confidence, which generally means you spend more time testing by hand. Tests that give false confidence are actually worse - they lure you into a false sense of security. Everything seems okay, when really it is not.
 
-## Mock Less - mock the lowest dependency in the chain
+## Mock Less - Mock the Lowest Dependency in the Chain
 
-The problem with the above example is we are mocking too far up the chain. Good tests are as production like as possible. This is the best way to have confidence in your test suite. This diagram shows the dependency chain in the `<Login>` component:
+The problem with the above example is we are mocking too far up the dependency tree. Good tests are as production like as possible. This is the best way to have confidence in your test suite. This diagram shows the dependency chain in the `<Login>` component:
 
 \begin{figure}[H]
   \centering
@@ -308,22 +336,26 @@ The axios test is slightly better - it mocks one layer lower:
   \caption{Mocking Axios}
   \label{fig}
 \end{figure}
-Pinia
+
 This is better. If something breaks in either the `<Login>` or Pinia, the test will fail.
 
 Wouldn't it be great to avoid mocking `axios`, too? This way, we could not need to do:
 
 ```js
-let mockPost = jest.fn()
+let mockPost = vi.fn()
 
-jest.mock('axios', () => ({
-  post: (url, data) => {
-    mockPost(url, data)
-    return Promise.resolve({
-      data: { name: 'Lachlan' }
-    })
+vi.mock('axios', () => {
+  return {
+    default: {
+      post: (url, data) => {
+        mockPost(url, data)
+        return Promise.resolve({
+          data: { name: 'Lachlan' }
+        })
+      }
+    }
   }
-}))
+})
 ```
 \begin{center}
 Boilerplate code to mock axios.
@@ -424,8 +456,8 @@ I like this one, because all the information is contain in the `it` block. No ne
 
 One thing we are not doing in these tests that we were doing previously is asserting the expected payload is sent to the server. If you want to do that, you can just keep track of the posted data with an array, for example:
 
-```js
-const postedData = []
+```ts
+const postedData: any[] = []
 const server = setupServer(
   rest.post('/login', (req, res, ctx) => {
     postedData.push(req.body)
@@ -469,7 +501,7 @@ Asserting post data is as expected.
 
 Again, all in one block - looking good!
 
-Mock Service Work and Cypress can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where these approaches really shine compared to the using `jest.mock` to mock `axios`. Let's add another test for this exact case:
+Mock Service Work and Cypress can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where these approaches really shine compared to the using `vi.mock` to mock `axios`. Let's add another test for this exact case:
 
 ```js
 describe('login', () => {
@@ -508,7 +540,7 @@ A test for a failed request.
 
 The Cypress version is included in the final source code. 
 
-It's easy to extend the mock server on a test by test basis, or add additional `cy.intercept()` calls. Writing these two tests using `jest.mock` to mock `axios` would be very messy!
+It's easy to extend the mock server on a test by test basis, or add additional `cy.intercept()` calls. Writing these two tests using `vi.mock` to mock `axios` would be very messy!
 
 Another very cool feature about `msw` is you can use it in a browser during development. It isn't showcased here, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
 
