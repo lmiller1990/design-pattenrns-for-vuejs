@@ -25,8 +25,8 @@
       </div>
     </div>
 
-    <p>Matches: {{ matching }}</p>
-    <p>Complexity: {{ complexity }}</p>
+    <p data-testid="matches">Matches: {{ matching }}</p>
+    <p data-testid="complexity">Complexity: {{ complexity }}</p>
   </RenderlessPassword>
 </template>
 
