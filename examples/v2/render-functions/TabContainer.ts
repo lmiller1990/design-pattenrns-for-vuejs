@@ -1,31 +1,38 @@
-import { useSlots, defineComponent, h, computed, watchEffect } from "vue";
+import {
+  useSlots,
+  defineComponent,
+  h,
+  computed,
+  watchEffect,
+} from "vue";
 
-export const Tab = defineComponent({
-  setup() {
-    const slots = useSlots() as any;
-    return () => h("div", slots.default?.());
-  },
-});
+function withTabId() {
+  return defineComponent({
+    props: {
+      tabId: {
+        type: String,
+        required: true
+      }
+    },
+    setup() {
+      const slots = useSlots() as any;
+      return () => h("div", slots.default?.());
+    },
+  });
+}
 
-export const TabContent = defineComponent({
-  setup() {
-    const slots = useSlots() as any;
-    return () => h("div", slots.default?.());
-  },
-});
+export const Tab = withTabId();
+export const TabContent = withTabId();
 
 export const TabContainer = defineComponent({
   props: {
     modelValue: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   emits: {
-    "update:modelValue": (activeTabId: string) => {
-      return true;
-      // return typeof activeTabId === 'string'
-    },
+    "update:modelValue": (activeTabId: string) => true
   },
   setup(props, { emit }) {
     const slots = useSlots() as any;
@@ -39,6 +46,7 @@ export const TabContainer = defineComponent({
     const tabs = computed(() =>
       content.filter(tabFilter).map((tab) => {
         return h(tab, {
+          ...tab.props,
           class: {
             key: tab.props.tabId,
             tab: true,
@@ -54,13 +62,15 @@ export const TabContainer = defineComponent({
     const contentFilter = (
       component: any
     ): component is typeof TabContent => {
-      return component.type === TabContent &&
-      component.props.tabId === props.modelValue;
-    }
+      return (
+        component.type === TabContent &&
+        component.props.tabId === props.modelValue
+      );
+    };
 
     const tabContent = computed(() => {
       const slot = content.find(contentFilter)!;
-      return h(slot, { key: slot.props.tabId });
+      return h(slot, { ...slots.props, key: slot.props.tabId });
     });
 
     return () => [
