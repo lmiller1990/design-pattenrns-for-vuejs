@@ -2,35 +2,8 @@ import { describe, it, expect, test } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/vue";
 import TestComponent from "./RenderlessPasswordApp.vue";
 import AppWithCustomValidator from "./AppWithCustomValidator.vue";
-import { isMatching, calcComplexity } from "./renderless-password.js";
 
-describe("isMatching", () => {
-  it("returns true when matching", () => {
-    expect(isMatching("a", "b")).toBe(false);
-  });
-
-  it("returns true when matching", () => {
-    expect(isMatching("a", "a")).toBe(true);
-  });
-});
-
-describe("calcComplexity", () => {
-  const results: Array<[string, number]> = [
-    ["a".repeat(3), 0],
-    ["a".repeat(6), 1],
-    ["a".repeat(8), 2],
-    ["a".repeat(11), 3],
-  ];
-
-  test.each(results)(
-    "return correct complexity based on length",
-    (input, output) => {
-      expect(calcComplexity(input)).toBe(output);
-    }
-  );
-});
-
-describe("component using renderless-password", () => {
+describe("component using RenderlessPassword", () => {
   it("supports custom validator", async () => {
     const { container } = render(AppWithCustomValidator);
 
@@ -43,7 +16,9 @@ describe("component using renderless-password", () => {
       "this is a long password"
     );
 
-    expect(screen.getByText<HTMLInputElement>("Submit").disabled).toBeTruthy();
+    expect(
+      screen.getByText<HTMLInputElement>("Submit").disabled
+    ).toBeTruthy();
   });
 
   it("meets default requirements", async () => {
@@ -58,8 +33,12 @@ describe("component using renderless-password", () => {
       "this is a long password"
     );
 
-    expect(screen.getByTestId('complexity').textContent).toContain('Complexity: 3')
-    expect(screen.getByText<HTMLInputElement>("Submit").disabled).toBeFalsy();
+    expect(screen.getByTestId("complexity").textContent).toContain(
+      "Complexity: 3"
+    );
+    expect(
+      screen.getByText<HTMLInputElement>("Submit").disabled
+    ).toBeFalsy();
   });
 
   it("does not meet complexity requirements", async () => {
@@ -74,8 +53,12 @@ describe("component using renderless-password", () => {
       "shorty"
     );
 
-    expect(screen.getByTestId('complexity').textContent).toContain('Complexity: 1')
-    expect(screen.getByText<HTMLInputElement>("Submit").disabled).toBeTruthy();
+    expect(screen.getByTestId("complexity").textContent).toContain(
+      "Complexity: 1"
+    );
+    expect(
+      screen.getByText<HTMLInputElement>("Submit").disabled
+    ).toBeTruthy();
   });
 
   it("password and confirmation does not match", async () => {
@@ -87,7 +70,9 @@ describe("component using renderless-password", () => {
       "def"
     );
 
-    expect(screen.getByText<HTMLInputElement>("Submit").disabled).toBeTruthy();
+    expect(
+      screen.getByText<HTMLInputElement>("Submit").disabled
+    ).toBeTruthy();
   });
 });
 
@@ -98,10 +83,10 @@ describe("component using renderless-password", () => {
     const wrapper = mount(AppWithCustomValidator);
 
     await wrapper
-      .find('#password')
+      .find("#password")
       .setValue("this is a long password");
     await wrapper
-      .find('#confirmation')
+      .find("#confirmation")
       .setValue("this is a long password");
 
     // customValidator in AppWithCustomValidator return false no matter what
@@ -127,8 +112,8 @@ describe("component using renderless-password", () => {
   it("does not meet complexity requirements", async () => {
     const wrapper = mount(TestComponent);
 
-    await wrapper.find('#password').setValue("shorty");
-    await wrapper.find('#confirmation').setValue("shorty");
+    await wrapper.find("#password").setValue("shorty");
+    await wrapper.find("#confirmation").setValue("shorty");
 
     expect(wrapper.find("button").element.disabled).toBe(true);
     expect(wrapper.find(".complexity.high").exists()).not.toBe(true);
@@ -138,8 +123,8 @@ describe("component using renderless-password", () => {
   it("password and confirmation does not match", async () => {
     const wrapper = mount(TestComponent);
 
-    await wrapper.find('#password').setValue("abc");
-    await wrapper.find('#confirmation').setValue("def");
+    await wrapper.find("#password").setValue("abc");
+    await wrapper.find("#confirmation").setValue("def");
 
     expect(wrapper.find("button").element.disabled).toBe(true);
   });

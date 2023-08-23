@@ -2,7 +2,11 @@
   <RenderlessPassword
     :password="input.password"
     :confirmation="input.confirmation"
-    v-slot="{ matching, complexity, valid }"
+    v-slot="{ 
+      matching,
+      complexity,
+      valid
+    }"
   >
     <div class="wrapper">
       <div class="field">
@@ -13,20 +17,23 @@
         <label for="confirmation">Confirmation</label>
         <input v-model="input.confirmation" id="confirmation" />
       </div>
-      <div class="complexity-field">
-        <div
-          id="password-complexity"
-          class="complexity"
-          :class="complexityStyle(complexity)"
-        />
-      </div>
       <div class="field">
         <button :disabled="!valid">Submit</button>
       </div>
     </div>
 
-    <p data-testid="matches">Matches: {{ matching }}</p>
+    <div class="complexity-field">
+      <div
+        class="complexity"
+        :class="complexityStyle(complexity)"
+      />
+    </div>
+
+    <p>Matches: {{ matching }}</p>
     <p data-testid="complexity">Complexity: {{ complexity }}</p>
+
+    <p>Matches: {{ matching }}</p>
+
   </RenderlessPassword>
 </template>
 
@@ -41,17 +48,17 @@ const input = reactive({
 
 const complexityStyle = (complexity: number) => {
   if (complexity >= 3) {
-    return "high";
+    return 'high'
   }
   if (complexity >= 2) {
-    return "mid";
+    return 'mid'
   }
   if (complexity >= 1) {
-    return "low";
+    return 'low'
   }
 
-  return "low"
-};
+  return 'low'
+}
 </script>
 
 <style>
