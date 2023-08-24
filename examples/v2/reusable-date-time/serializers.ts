@@ -8,10 +8,9 @@ export interface InternalDateTime {
 }
 
 export function serializeMoment(value: InternalDateTime) {
-  const toString = `${value.year}-${value.month.toString().padStart(
-    2,
-    "0"
-  )}-${value.day.toString().padStart(2, "0")}`;
+  const toString = `${value.year}-${value.month
+    .toString()
+    .padStart(2, "0")}-${value.day.toString().padStart(2, "0")}`;
   const toObject = moment(toString, "YYYY-MM-DD", true);
   if (toObject.isValid()) {
     return toObject;
@@ -26,7 +25,7 @@ export function deserializeMoment(value: Moment): InternalDateTime {
 
   return {
     year: value.year(),
-    month: (value.month() + 1),
+    month: value.month() + 1,
     day: value.date(),
   };
 }

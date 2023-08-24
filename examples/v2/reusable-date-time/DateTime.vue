@@ -1,33 +1,33 @@
 <template>
   <input
-    id="year"
+    name="year"
     :value="date.year"
-    @input="update($event, 'year')"
+    @input="($event) => update($event, 'year')"
   />
   <input
-    id="month"
+    name="month"
     :value="date.month"
-    @input="update($event, 'month')"
+    @input="($event) => update($event, 'month')"
   />
   <input
-    id="day"
+    name="day"
     :value="date.day"
-    @input="update($event, 'day')"
+    @input="($event) => update($event, 'day')"
   />
   <pre>
-    date is:
-    {{ date }} 
-    </pre
+Internal date is:
+{{ modelValue }} 
+</pre
   >
 </template>
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { InternalDateTime } from "./date-time-serializers.js";
+import { InternalDateTime } from "./serializers.js";
 
 const props = defineProps<{
   modelValue: any;
-  serialize: (val: any) => any;
+  serialize: (val: InternalDateTime) => any;
   deserialize: (val: any) => InternalDateTime;
 }>();
 
@@ -39,8 +39,8 @@ const date = computed(() => {
   return props.deserialize(props.modelValue);
 });
 
-const update = (event: Event, field: "year" | "month" | "day") => {
-  const target = event.target as HTMLInputElement;
+function update($event: Event, field: "year" | "month" | "day") {
+  const target = $event.target as HTMLInputElement;
 
   let newValue: InternalDateTime = props.deserialize(
     props.modelValue
@@ -56,12 +56,12 @@ const update = (event: Event, field: "year" | "month" | "day") => {
     newValue.day = parseInt(target.value);
   }
 
-  const asObject = props.serialize(newValue);
+  const obj = props.serialize(newValue);
 
-  if (!asObject) {
+  if (!obj) {
     return;
   }
 
-  emit("update:modelValue", asObject);
-};
+  emit("update:modelValue", obj);
+}
 </script>
