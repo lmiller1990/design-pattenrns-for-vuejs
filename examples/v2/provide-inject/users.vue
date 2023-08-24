@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper">
     <form @submit.prevent="handleSubmit">
-      <input v-model="username" role="username" />
-      <button role="submit">Add User</button>
+      <input v-model="username" id="username" />
+      <button id="add-user">Add User</button>
     </form>
 
     <ul>
