@@ -673,23 +673,55 @@ It works!
 
 ## Testing Non SFC Components
 
-Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `render` function from Testing Library works fine with non SFC components (`vue` files are compiled into `setup` functions anyway, so all the tests we've been writing have been using `setup` functions returning `h` under the hood).
+Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `mount` function in Cypress or the `render` function from Testing Library works fine with non SFC components (`vue` files are compiled into `setup` functions anyway, so all the tests we've been writing have been using `setup` functions returning `h` under the hood).
 
-```js
-import { render, screen, fireEvent } from '@testing-library/vue'
-import App from './app.vue'
+With Cypress (my favorite - the syntax is really nice):
 
-test('tabs', async () => {
-  render(App)
-  expect(screen.queryByText('Content #2')).toBeFalsy()
+```ts
+import RenderFunctionsApp from './RenderFunctionsApp.vue'
 
-  fireEvent.click(screen.getByText('Tab #2'))
-  await screen.findByText('Content #2')
+describe('<RenderFunctionsApp />', () => {
+  it('renders and changes tabs', () => {
+    cy.mount(RenderFunctionsApp)
+    cy.get('.active').contains('Tab #1')
+    cy.contains('Content #1').should('exist')
+    cy.contains('Content #2').should('not.exist')
+
+    cy.contains('Tab #2').click()
+
+    cy.contains('Content #1').should('not.exist')
+    cy.contains('Content #2').should('exist')
+  })
 })
 ```
+
+Or Testing Library:
+
+```ts
+import RenderFunctionsApp from "./RenderFunctionsApp.vue";
+import { render, fireEvent } from "@testing-library/vue";
+import { expect } from "vitest";
+
+describe("<RenderFunctionsApp />", () => {
+  it("with testing-library", async () => {
+    const { container } = render(RenderFunctionsApp);
+    expect(container.querySelector('[data-testid="tab-1"]')).toBeTruthy()
+    expect(container.querySelector('[data-testid="tab-2"]')).toBeTruthy()
+
+    expect(container.outerHTML).toContain('Content #1')
+    expect(container.outerHTML).not.toContain('Content #2')
+
+    await fireEvent.click(container.querySelector('[data-testid="tab-2"]')!);
+
+    expect(container.outerHTML).not.toContain('Content #1')
+    expect(container.outerHTML).toContain('Content #2')
+  });
+```
 \begin{center}
-Testing render function components is the same as template components.
+Testing the component with Cypress and Testing Library
 \end{center}
+
+Vue Test Utils works fine, too. You can see the source code for an example using Vue Test Utils.
 
 ## Exercises
 
@@ -698,12 +730,3 @@ Testing render function components is the same as template components.
 You can find the completed source code in the [GitHub repository under examples/render-functions](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline
 https://github.com/lmiller1990/design-patterns-for-vuejs-source-code.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{ss-ts.png}
-  \caption{Typesafe Component with Render Function}
-  \label{fig}
-\end{figure}
-\pagebreak
-
