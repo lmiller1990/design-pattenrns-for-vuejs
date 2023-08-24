@@ -11,8 +11,8 @@ function withTabId() {
     props: {
       tabId: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
     setup() {
       const slots = useSlots() as any;
@@ -28,11 +28,11 @@ export const TabContainer = defineComponent({
   props: {
     modelValue: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: {
-    "update:modelValue": (activeTabId: string) => true
+    "update:modelValue": (activeTabId: string) => true,
   },
   setup(props, { emit }) {
     const slots = useSlots() as any;
@@ -43,8 +43,8 @@ export const TabContainer = defineComponent({
     const tabFilter = (component: any): component is typeof Tab =>
       component.type === Tab;
 
-    const tabs = computed(() =>
-      content.filter(tabFilter).map((tab) => {
+    const tabs = computed(() => {
+      return content.filter(tabFilter).map((tab) => {
         return h(tab, {
           ...tab.props,
           class: {
@@ -56,8 +56,8 @@ export const TabContainer = defineComponent({
             emit("update:modelValue", tab.props.tabId);
           },
         });
-      })
-    );
+      });
+    });
 
     const contentFilter = (
       component: any
@@ -65,7 +65,7 @@ export const TabContainer = defineComponent({
       return (
         component.type === TabContent &&
         component.props.tabId === props.modelValue
-      );
+      )
     };
 
     const tabContent = computed(() => {

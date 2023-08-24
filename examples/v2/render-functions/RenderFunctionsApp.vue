@@ -1,7 +1,7 @@
 <template>
   <TabContainer v-model="activeTabId">
-    <Tab tabId="1" data-test="1">Tab #1</Tab>
-    <Tab tabId="2" data-test="2">Tab #2</Tab>
+    <Tab tabId="1" data-testid="tab-1">Tab #1</Tab>
+    <Tab tabId="2" data-testid="tab-2">Tab #2</Tab>
 
     <TabContent tabId="1">Content #1</TabContent>
     <TabContent tabId="2">Content #2</TabContent>

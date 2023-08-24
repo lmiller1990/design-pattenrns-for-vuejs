@@ -1,17 +1,31 @@
-import { render } from '@testing-library/vue'
-import RenderFunctionsApp from './RenderFunctionsApp.vue'
-import { expect } from 'vitest'
+import { render, fireEvent } from "@testing-library/vue";
+import RenderFunctionsApp from "./RenderFunctionsApp.vue";
+import { mount } from "@vue/test-utils";
+import { expect } from "vitest";
 
-// describe('<RenderFunctionsApp />', () => {
-//   it('renders', () => {
-//     const { container } = render(RenderFunctionsApp)
-//     expect(container.querySelector('.active')).toContain('Tab #1')
-//     expect(container.querySelector('Content #1').should('exist')
-//     cy.contains('Content #2').should('not.exist')
+describe("<RenderFunctionsApp />", () => {
+  it("with testing-library", async () => {
+    const { container } = render(RenderFunctionsApp);
+    expect(container.querySelector('[data-testid="tab-1"]')).toBeTruthy()
+    expect(container.querySelector('[data-testid="tab-2"]')).toBeTruthy()
 
-//     cy.contains('Tab #2').click()
+    expect(container.outerHTML).toContain('Content #1')
+    expect(container.outerHTML).not.toContain('Content #2')
 
-//     cy.contains('Content #1').should('not.exist')
-//     cy.contains('Content #2').should('exist')
-//   })
-// })
+    await fireEvent.click(container.querySelector('[data-testid="tab-2"]')!);
+
+    expect(container.outerHTML).not.toContain('Content #1')
+    expect(container.outerHTML).toContain('Content #2')
+  });
+
+  it("with test utils", async () => {
+    const wrapper = mount(RenderFunctionsApp);
+    expect(wrapper.html()).toContain("Content #1");
+    expect(wrapper.html()).not.toContain("Content #2");
+
+    await wrapper.find('[data-testid="tab-2"]').trigger("click");
+
+    expect(wrapper.html()).not.toContain("Content #1");
+    expect(wrapper.html()).toContain("Content #2");
+  });
+});
