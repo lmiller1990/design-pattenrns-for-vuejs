@@ -41,21 +41,21 @@ One way to handle this would be to pick a simple format of our own, for example 
 ```html
 <!-- DateTimeLuxon.vue -->
 <template>
-  <DateTime
-    :modelValue="date"
-    @update:modelValue="updateDate"
+  <DateTime 
+    :modelValue="date" 
+    @update:modelValue="updateDate" 
   />
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import Luxon from 'luxon'
+<script setup lang="ts">
+import { ref } from "vue";
+import Luxon from "luxon";
 
-const date = ref(Luxon.DateTime.local())
+const date = ref(Luxon.DateTime.local());
 const updateDate: (value: string) => {
   // some logic to turn value which is
   // YYYY-MM-DD into Luxon DateTime
-}
+};
 </script>
 ```
 \begin{center}
@@ -66,7 +66,7 @@ This might work okay - now you can put your `<DateTimeLuxon>` on npm to share, l
 
 The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. The `<DateTime>` component doesn't need to know the specifics of the Date library that it is working with.
 
-Here is the API I am proposing to make `<DateTime>` truly agnostic, not needing to know the implementation details of the date library:
+Here is the API I am proposing to make `<DateTime>` truly date time library agnostic, not needing to know the implementation details of the date library:
 
 ```html
 <DateTime 
@@ -106,9 +106,9 @@ I'm going to have a file named `serializers.ts` where I define my types, and a f
 
 ```ts
 export interface InternalDateTime {
-  year: string;
-  month: string;
-  day: string;
+  year: number;
+  month: number;
+  day: number;
 }
 ```
 
@@ -176,19 +176,21 @@ Usage is like this:
 
 ```html
 <template>
-  <DateTimeBasic v-model="dateLuxon" />
+  <DateTime
+    v-model="dateLuxon"
+  />
   {{ dateLuxon }}
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import DateTimeBasic from './DateTimeBasic.vue'
+import { ref } from "vue";
+import DateTime from "./DateTime.vue";
 
 const dateLuxon = ref({
   year: 2020,
   month: 1,
   day: 1,
-})
+});
 </script>
 ```
 \begin{figure}[H]
@@ -206,9 +208,9 @@ We have established the internal API. This is how the `<DateTime>` component wil
 
 ```ts
 interface InternalDateTime {
-  year: string
-  month: string
-  day: string
+  year: number;
+  month: number;
+  day: number;
 }
 ```
 
@@ -223,19 +225,20 @@ export function deserialize(inputDateTime) {
   // do whatever needs to be done to convert
   // the inputDateTime to a JS object with
   // { year, month, day }
-  return yearMonthDateObject
+  return yearMonthDateObject;
+}
 ```
 
 I will use Luxon's `DateTime` to demonstrate. You can create a new `DateTime` like this:
 
 ```ts
-import Luxon from 'luxon'
+import Luxon from "luxon";
 
 const date = Luxon.DateTime.fromObject({
   year: 2020,
   month: 10,
-  day: 2
-})
+  day: 2,
+});
 ```
 
 The goal is to get from our input from `v-model`, in this case a Luxon `DateTime`, to our internal representation, `InternalDateTime`. This conversion is trivial in the case of Luxon's DateTime. You can just do `date.get()` passing in `year`, `month` or `day`. So our `deserialize` function looks like this:
@@ -266,17 +269,19 @@ Let's update the usage:
   {{ dateLuxon.toISODate() }}
 </template>
 
-<script>
-import { ref } from 'vue'
-import dateTime from './DateTime.vue'
-import Luxon from 'luxon'
+<script lang="ts" setup>
+import { ref } from "vue";
+import dateTime from "./DateTime.vue";
+import Luxon from "luxon";
 import { deserialize } from "./serializers.js";
 
-const dateLuxon = ref(Luxon.DateTime.fromObject({
-  year: 2019,
-  month: 1,
-  day: 1,
-}))
+const dateLuxon = ref(
+  Luxon.DateTime.fromObject({
+    year: 2019,
+    month: 1,
+    day: 1,
+  })
+);
 </script>
 ```
 
@@ -294,7 +299,7 @@ Internal date is:
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed } from "vue";
 import { InternalDateTime } from "./serializers.js";
 
 const props = defineProps<{
@@ -307,8 +312,8 @@ const emit = defineEmits<{
 }>();
 
 const date = computed(() => {
-  return props.deserialize(props.modelValue)
-})
+  return props.deserialize(props.modelValue);
+});
 
 function update($event: Event, field: "year" | "month" | "day") {
   const target = $event.target as HTMLInputElement;
@@ -316,7 +321,7 @@ function update($event: Event, field: "year" | "month" | "day") {
   let newValue: InternalDateTime = {
     year,
     month,
-    day
+    day,
   };
 
   if (field === "year") {
@@ -381,8 +386,8 @@ Again, update the usage.
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import DateTime from './DateTime.vue'
+import { ref } from "vue";
+import DateTime from "./DateTime.vue";
 import { serialize, deserialize } from "./serializers.js";
 
 // ...
@@ -421,7 +426,7 @@ function update($event: Event, field: "year" | "month" | "day") {
   // ... 
 
   // Call `props.serialize` when emitting the new value
-  emit("update:modelValue", props.serialize(newValue!));
+  emit("update:modelValue", props.serialize(newValue));
 }
 </script>
 ```
