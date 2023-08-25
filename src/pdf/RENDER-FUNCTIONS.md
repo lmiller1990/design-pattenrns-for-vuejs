@@ -69,7 +69,7 @@ This example shows a great use case for render functions. Without them, you migh
 Alternative, less flexible syntax.
 \end{center}
 
-As far as general development goes, I think the former is much cleaner and lends itself to a better development experience. 
+As far as general development goes, I think the former is much cleaner and lends itself to a better development experience. For this simple example, you can clean it up a bit using `v-for`, but as you start to build more abstract, generic components, the flexibility of writing your own render functions can be tremendously useful.
 
 Another common use case for render functions is when you are writing a general component library (such as Vuetify). In these cases, you will not know how many tabs the user is going to use, so using `v-if` like above isn't an option. You will need something more generic and generalizable. There are other alternatives, but I've found render functions really useful for writing reusable components.
 
@@ -77,17 +77,17 @@ Another common use case for render functions is when you are writing a general c
 
 One of the nice things about render function components is you can create multiple in the same file. Although I generally like to have one component per file, in this particular case I have no problem putting `<TabContainer>`, `<TabContent>` and `<Tab>` in the same file. The main reason for this is both `<Tab>` and `<TabContent>` are very simple, and I don't see any use case where you would want to use them outside of nesting them in `<TabContainer>`.
 
-Start by creating those two components. We won't be using a `vue` file, but just a plain old `ts` file. The two components, `<Tab>` and `<TabContent>` have something in common:
+Start by creating those two components. We won't be using an SFC or `vue` file. Just a plain old `ts` file. The two components, `<Tab>` and `<TabContent>` have something in common:
 
 ```ts
-import { h, defineComponent, useSlots } from 'vue'
+import { h, defineComponent, useSlots } from "vue";
 
 export const Tab = defineComponent({
   props: {
     tabId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
     const slots = useSlots() as any;
@@ -99,8 +99,8 @@ export const TabContent = defineComponent({
   props: {
     tabId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
     const slots = useSlots() as any;
@@ -119,16 +119,16 @@ Since this is not an SFC using `<script setup>`, we cannot use `defineProps`. We
 ```ts
 type ComplexType = {
   a: {
-    b: string
-  }
-}
+    b: string;
+  };
+};
 
 const Component = defineComponent({
   props: {
     complexType: {
       type: Object as () => ComplexType,
-      required: true
-    }
+      required: true,
+    },
   },
 });
 ```
@@ -142,8 +142,8 @@ export const TabContent = defineComponent({
   props: {
     tabId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
     const slots = useSlots() as any;
@@ -169,15 +169,15 @@ export const TabContainer = defineComponent({
   props: {
     modelValue: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: {
-    "update:modelValue": (activeTabId: string) => true
+    "update:modelValue": (activeTabId: string) => true,
   },
   setup(props, { emit }) {
     const slots = useSlots() as any;
-    console.log(slots.default?.())
+    console.log(slots.default?.());
   },
 });
 ```
@@ -201,15 +201,11 @@ The first thing we need to do is separate the slots. I will use the following ex
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-import { 
-  Tab,
-  TabContent,
-  TabContainer
-}  from './tabs.js'
+import { Tab, TabContent, TabContainer } from "./tabs.js";
 
-const activeTabId = ref('1')
+const activeTabId = ref("1");
 </script>
 ```
 \begin{center}
@@ -262,7 +258,7 @@ export const TabContainer = defineComponent({
   setup(props, { emit }) {
     const slots = useSlots() as any;
 
-    console.log(slots.default?.())
+    console.log(slots.default?.());
 
     const content: Array<typeof Tab | typeof TabContent> =
       slots.default?.() ?? [];
@@ -271,15 +267,16 @@ export const TabContainer = defineComponent({
     const tabFilter = (component: any): component is typeof Tab =>
       component.type === Tab;
 
-    const contentFilter = (component: any): component is typeof TabContent =>
-      component.type === Tab;
+    const contentFilter = (
+      component: any
+    ): component is typeof TabContent => component.type === Tab;
 
-    const tabs = computed(() => content.filter(tabFilter))
-    const contents = computed(() => content.filter(contentFilter))
+    const tabs = computed(() => content.filter(tabFilter));
+    const contents = computed(() => content.filter(contentFilter));
 
-    console.log(tabs.value, contents.value)
-  }
-})
+    console.log(tabs.value, contents.value);
+  },
+});
 ```
 \begin{center}
 Separating the different slots using filter.
@@ -304,10 +301,9 @@ The next goal will be to render the tabs. We will also add some classes to get s
 First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy (amazing?) `h` function afterwards:
 
 ```ts
-import { h } from 'vue'
+import { h } from "vue";
 
 export const TabContainer = defineComponent({
-
   // ...
 
   setup(props, { emit }) {
@@ -319,11 +315,11 @@ export const TabContainer = defineComponent({
     const tabFilter = (component: any): component is typeof Tab =>
       component.type === Tab;
 
-    const tabs = computed(() => content.filter(tabFilter))
+    const tabs = computed(() => content.filter(tabFilter));
 
-    return () => h(() => tabs.value)
-  }
-})
+    return () => h(() => tabs.value);
+  },
+});
 ```
 \begin{center}
 Rendering the tabs using h.
@@ -678,21 +674,21 @@ Now that we finished the implementation, we should write a test to make sure eve
 With Cypress (my favorite - the syntax is really nice):
 
 ```ts
-import RenderFunctionsApp from './RenderFunctionsApp.vue'
+import RenderFunctionsApp from "./RenderFunctionsApp.vue";
 
-describe('<RenderFunctionsApp />', () => {
-  it('renders and changes tabs', () => {
-    cy.mount(RenderFunctionsApp)
-    cy.get('.active').contains('Tab #1')
-    cy.contains('Content #1').should('exist')
-    cy.contains('Content #2').should('not.exist')
+describe("<RenderFunctionsApp />", () => {
+  it("renders and changes tabs", () => {
+    cy.mount(RenderFunctionsApp);
+    cy.get(".active").contains("Tab #1");
+    cy.contains("Content #1").should("exist");
+    cy.contains("Content #2").should("not.exist");
 
-    cy.contains('Tab #2').click()
+    cy.contains("Tab #2").click();
 
-    cy.contains('Content #1').should('not.exist')
-    cy.contains('Content #2').should('exist')
-  })
-})
+    cy.contains("Content #1").should("not.exist");
+    cy.contains("Content #2").should("exist");
+  });
+});
 ```
 
 Or Testing Library:
@@ -725,7 +721,7 @@ Vue Test Utils works fine, too. You can see the source code for an example using
 
 ## Exercises
 
-- Attempt to refactor the other examples throughout this book to use setup functions that render using `h` instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and `setup`).
+- Attempt to refactor the other examples in this book to use setup functions that render using `h` instead of `vue` files (these are not included in the solutions - you can email me if you want help writing a specific example using TypeScript and `setup`).
 
 You can find the completed source code in the [GitHub repository under examples/render-functions](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline
