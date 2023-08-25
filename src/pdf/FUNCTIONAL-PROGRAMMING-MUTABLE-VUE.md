@@ -15,14 +15,15 @@ The goal is to refactor the Tic Tic Toe logic to be more in line with the functi
 Let's start with `makeMove`, which is full of mutation. In our previous implementation, `makeMove` looks like this:
 
 ```ts
-function makeMove(move: { row: number, col: number }) {
-  const newBoard = JSON.parse(JSON.stringify(boards.value))[currentMove.value] as Board
-  newBoard[move.row][move.col] = currentPlayer.value
-  currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
-  boards.value.push(newBoard)
-  currentMove.value += 1
+function makeMove(move: { row: number; col: number }) {
+  const newBoard = JSON.parse(JSON.stringify(boards.value))[
+    currentMove.value
+  ] as Board;
+  newBoard[move.row][move.col] = currentPlayer.value;
+  currentPlayer.value = currentPlayer.value === "o" ? "x" : "o";
+  boards.value.push(newBoard);
+  currentMove.value += 1;
 }
-
 ```
 \begin{center}
 Original makeMove implemented using mutation.
@@ -33,16 +34,16 @@ We mutate the `newBoard` variable. We then mutate `boards`, by pushing a new val
 f we want to approach this in a functional manner, the function needs include all the required data as arguments, and not rely on global variables. If we rely on global variables, the function will no longer be deterministic. We won't be able to know the return value without knowing the value of the global variables. This means `makeMove` needs to have the following signature:
 
 ```ts
-type Marker = 'x' | 'o' | '-'
-type Board = Array<Marker[]>
+type Marker = "x" | "o" | "-";
+type Board = Array<Marker[]>;
 
 interface Options {
-  col: number
-  row: number
-  counter: Marker
+  col: number;
+  row: number;
+  counter: Marker;
 }
 
-function makeMove(board: Board, { col, row, counter }: Options): Board
+function makeMove(board: Board, { col, row, counter }: Options): Board;
 ```
 \begin{center}
 The new makeMove will return an updated board based on it's arguments.
@@ -75,7 +76,7 @@ The final API is going to be the same:
 
 ```html
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { currentBoard, makeMove } = useTicTacToe();
 </script>
@@ -112,16 +113,16 @@ While we could have just done `createGame` without passing any arguments, this m
 A test is so trivial it's almost pointless to write, but let's do it anyway:
 
 ```ts
-describe('useTicTacToe', () => {
-  it('initializes state to an empty board', () => {
+describe("useTicTacToe", () => {
+  it("initializes state to an empty board", () => {
     const expected: Board = [
-      ['-', '-', '-'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ]
-    expect(createGame([initialBoard])).toEqual([expected])
-  })
-})
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ];
+    expect(createGame([initialBoard])).toEqual([expected]);
+  });
+});
 ```
 \begin{center}
 A simple for the initial game state.
@@ -149,22 +150,22 @@ I decided to have two arguments: the first is the `board`, which I consider the 
 Before going any further, a test will be useful. I'm going to write a verbose implementation of `makeMove` and then refactor it; the test will help ensure nothing breaks during the refactor.
 
 ```ts
-describe('makeMove', () => {
-  it('returns a new updated board and counter', () => {
-    const board = createGame([initialBoard])
+describe("makeMove", () => {
+  it("returns a new updated board and counter", () => {
+    const board = createGame([initialBoard]);
     const newBoard = makeMove(board[0], {
-      row: 0, 
-      col: 0, 
-      counter: 'o'
-    })
+      row: 0,
+      col: 0,
+      counter: "o",
+    });
 
     expect(newBoard).to.eql([
-      ['o', '-', '-'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ])
-  })
-})
+      ["o", "-", "-"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ]);
+  });
+});
 ```
 \begin{center}
 A test to guide us.
@@ -177,23 +178,21 @@ export function makeMove(
   board: Board,
   { col, row, counter }: { col: number; row: number; counter: Marker }
 ) {
-  // loop each row with map. 
+  // loop each row with map.
   const newBoard = board.map((theRow, rowIdx) => {
-    
     // for each row, loop each column with map.
     return theRow.map((cell, colIdx) => {
-
       // if we are on the row and column the user
       // has chosen, return the counter (o or x).
       if (rowIdx === row && colIdx === col) {
-        return counter
+        return counter;
       }
       // otherwise just return the current cell.
-      return cell
-    })
-  })
+      return cell;
+    });
+  });
 
-  return newBoard
+  return newBoard;
 }
 ```
 \begin{center}
@@ -239,16 +238,16 @@ export function useTicTacToe() {
   const boards = ref<Board[]>([initialBoard]);
   const counter = ref<Marker>("o");
 
-  const move = ({ col, row }) => {}
+  const move = ({ col, row }) => {};
 
   const currentBoard = computed(() => {
-    return boards.value[boards.value.length - 1]
-  })
+    return boards.value[boards.value.length - 1];
+  });
 
   return {
     currentBoard,
-    makeMove: move
-  }
+    makeMove: move,
+  };
 }
 ```
 \begin{center}
@@ -280,7 +279,7 @@ Let's get something rendering. As per usual, you can find the CSS in the source 
 </template>
 
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { currentBoard, makeMove } = useTicTacToe();
 </script>
@@ -302,17 +301,14 @@ The last thing we need to do is wrap the functional, stateless `makeMove` functi
 
 ```ts
 const move = ({ col, row }: { col: number; row: number }) => {
-  const newBoard = makeMove(
-    currentBoard.value,
-    {
-      col,
-      row,
-      counter: counter.value
-    }
-  )
-  boards.value.push(newBoard)
-  counter.value = counter.value === 'o' ? 'x' : 'o'
-}
+  const newBoard = makeMove(currentBoard.value, {
+    col,
+    row,
+    counter: counter.value,
+  });
+  boards.value.push(newBoard);
+  counter.value = counter.value === "o" ? "x" : "o";
+};
 ```
 \begin{center}
 move is just a wrapper around the functional `makeMove`.
@@ -332,11 +328,11 @@ From a user point of view, nothing has changed, and we can verify this by reusin
 ```ts
 import { describe, it, expect } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
-import TicTacToeApp from "./tic-tac-toe-app.vue";
+import TicTacToe from "../TicTacToe.vue";
 
 describe("TicTacToeApp", () => {
   it("plays a game", async () => {
-    render(TicTacToeApp);
+    render(TicTacToe);
 
     await fireEvent.click(screen.getByTestId("row-0-col-0"));
     await fireEvent.click(screen.getByTestId("row-0-col-1"));
@@ -353,6 +349,7 @@ describe("TicTacToeApp", () => {
     );
   });
 });
+
 ```
 \begin{center}
 The UI test from previous section, ensuring the behavior has not changed.
@@ -364,17 +361,14 @@ There is one last improvement we can make. We currently wrap the stateless `make
 
 ```ts
 const move = ({ col, row }: { col: number; row: number }) => {
-  const newBoard = makeMove(
-    currentBoard.value,
-    {
-      col,
-      row,
-      counter: counter.value
-    }
-  )
-  boards.value.push(newBoard)
-  counter.value = counter.value === 'o' ? 'x' : 'o'
-}
+  const newBoard = makeMove(currentBoard.value, {
+    col,
+    row,
+    counter: counter.value,
+  });
+  boards.value.push(newBoard);
+  counter.value = counter.value === "o" ? "x" : "o";
+};
 ```
 
 Ideally all the business logic should be in the functional core. This includes changing the counter after each move. I think this is part of the core gameplay - not the UI. For this reason I would like to move `counter.value === 'o' ? 'x' : 'o'` into the functional core.
@@ -418,23 +412,23 @@ const move = ({ col, row }: { col: number; row: number }) => {
 Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Testing Library still passes, since the actual behavior from the user's point of view has not changed):
 
 ```ts
-describe('makeMove', () => {
-  it('returns a new updated board and counter', () => {
-    const board = createGame(initialBoard)
+describe("makeMove", () => {
+  it("returns a new updated board and counter", () => {
+    const board = createGame(initialBoard);
     const { newBoard, newCounter } = makeMove(board, {
-      row: 0, 
-      col: 0, 
-      counter: 'o'
-    })
+      row: 0,
+      col: 0,
+      counter: "o",
+    });
 
-    expect(newCounter).toBe('x')
+    expect(newCounter).toBe("x");
     expect(newBoard).toEqual([
-      ['o', '-', '-'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ])
-  })
-})
+      ["o", "-", "-"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ]);
+  });
+});
 ```
 
 All the tests are now passing. I think this refactor is a good one; we pushed the business logic into the functional core, where it belongs.
