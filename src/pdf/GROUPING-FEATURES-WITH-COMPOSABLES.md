@@ -19,7 +19,7 @@ The API we will end with looks like this:
 
 ```html
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { currentBoard, makeMove, undo, redo } = useTicTacToe();
 </script>
@@ -68,11 +68,14 @@ We will also support undo and redo, so you can go back and see see how the game 
 Let's start with some way to maintain the game state. I will call this variable `initialBoard`, and it will go in a file named `tic-tac-toe.ts`.
 
 ```ts
-const initialBoard = [
-  ['-', '-', '-'],
-  ['-', '-', '-'],
-  ['-', '-', '-']
-]
+type Marker = "x" | "o" | "-";
+export type Board = Array<Marker[]>;
+
+const initialBoard: Board = [
+  ["-", "-", "-"],
+  ["-", "-", "-"],
+  ["-", "-", "-"],
+];
 ```
 \begin{center}
 Initial board.
@@ -81,20 +84,23 @@ Initial board.
 Before diving too far into the game logic, let's get something rendering. We want to keep a history of the game for undo/redo? This means instead of overriding the current game state each move, we should just create a new game state and push it into an array. Each entry will represent a move in the game. We also need the board to be reactive, so Vue will update the UI. We can use `ref` for this. Update the code:
 
 ```ts
-import { ref, readonly } from 'vue'
+import { ref, readonly } from "vue";
+
+type Marker = "x" | "o" | "-";
+export type Board = Array<Marker[]>;
 
 export function useTicTacToe() {
   const initialBoard: Board = [
-    ['-', '-', '-'],
-    ['-', '-', '-'],
-    ['-', '-', '-']
-  ]
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+  ];
 
-  const boards = ref<Board[]>([initialBoard])
+  const boards = ref<Board[]>([initialBoard]);
 
   return {
-    boards: readonly(boards)
-  }
+    boards: readonly(boards),
+  };
 }
 ```
 \begin{center}
@@ -118,7 +124,7 @@ Let's try it out! Create a new component and use the `useTicTacToe` function.
 </template>
 
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { boards } = useTicTacToe();
 </script>
@@ -141,21 +147,21 @@ Great! It works (get the CSS in the source code - I'm omitting it for brevity):
 Currently the component is hard coded to use `boards[0]`. What we want to do is use the last element, which is the latest game state. We can use a `computed` property for this. Update the composable:
 
 ```ts
-import { ref, readonly, computed } from 'vue'
+import { ref, readonly, computed } from "vue";
 
 export function useTicTacToe() {
   const initialBoard: Board = [
-    ['-', '-', '-'],
-    ['-', '-', '-'],
-    ['-', '-', '-']
-  ]
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+  ];
 
-  const boards = ref<Board[]>([initialBoard])
+  const boards = ref<Board[]>([initialBoard]);
 
   return {
     boards: readonly(boards),
-    currentBoard: computed(() => boards.value[boards.value.length - 1])
-  }
+    currentBoard: computed(() => boards.value[boards.value.length - 1]),
+  };
 }
 ```
 \begin{center}
@@ -177,7 +183,7 @@ Update the component to use the new `currentBoard` computed property:
 </template>
 
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { currentBoard } = useTicTacToe();
 </script>
@@ -193,21 +199,21 @@ Everything is still working correctly. Let's make sure everything continues to w
 We've written a little too much code without any tests for my liking. Now is a good time to write some, which will reveal some (potential) problems with our design.
 
 ```ts
-import { describe, it, expect } from 'vitest'
-import { useTicTacToe } from './tic-tac-toe.js'
+import { describe, it, expect } from "vitest";
+import { useTicTacToe, Board } from "./TicTacToe.js";
 
-describe('useTicTacToe', () => {
-  it('initializes state to an empty board', () => {
+describe("useTicTacToe", () => {
+  it("initializes state to an empty board", () => {
     const initialBoard: Board = [
-      ['-', '-', '-'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ]
-    const { currentBoard } = useTicTacToe()
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ];
+    const { currentBoard } = useTicTacToe();
 
-    expect(currentBoard.value).toEqual(initialBoard)
-  })
-})
+    expect(currentBoard.value).toEqual(initialBoard);
+  });
+});
 ```
 \begin{center}
 Testing the initial game state.
@@ -220,20 +226,20 @@ It passes! Great. As it stands, there is no easy way to pre-set the game state -
 Update `useTicTacToe` to receive an `initialState` argument to facilitate easier testing:
 
 ```ts
-import { ref, readonly, computed } from 'vue'
+import { ref, readonly, computed } from "vue";
 
 export function useTicTacToe(initialState?: Board[]) {
   const initialBoard: Board = [
-    ['-', '-', '-'],
-    ['-', '-', '-'],
-    ['-', '-', '-']
-  ]
-  const boards = ref<Board[]>(initialState || [initialBoard])
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+  ];
+  const boards = ref<Board[]>(initialState || [initialBoard]);
 
   return {
     boards: readonly(boards),
-    currentBoard: computed(() => boards.value[boards.value.length - 1])
-  }
+    currentBoard: computed(() => boards.value[boards.value.length - 1]),
+  };
 }
 ```
 \begin{center}
@@ -243,23 +249,22 @@ Accept an initialState to facilitate testing.
 Add a test to ensure we can seed an initial state:
 
 ```ts
-describe('useTicTacToe', () => {
-
-  it('initializes state to an empty board', () => {
+describe("useTicTacToe", () => {
+  it("initializes state to an empty board", () => {
     // ...
-  })
+  });
 
-  it('supports seeding an initial state', () => {
+  it("supports seeding an initial state", () => {
     const initialState: Board = [
-      ['o', 'o', 'o'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ]
-    const { currentBoard } = useTicTacToe([initialState])
+      ["o", "o", "o"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ];
+    const { currentBoard } = useTicTacToe([initialState]);
 
-    expect(currentBoard.value).toEqual(initialState)
-  })
-})
+    expect(currentBoard.value).toEqual(initialState);
+  });
+});
 ```
 \begin{center}
 A test for initial state.
@@ -272,20 +277,20 @@ Notice we pass in `[initialState]` as an array - we are representing the state a
 The final feature we will add is the ability for a player to make a move. We need to keep track of the current player, and then update the board by pushing the next game state into `boards`. Let's start with a test:
 
 ```ts
-describe('makeMove', () => {
-  it('updates the board and adds the new state', () => {
-    const game = useTicTacToe() 
-    game.makeMove({ row: 0, col: 0 })
+describe("makeMove", () => {
+  it("updates the board and adds the new state", () => {
+    const game = useTicTacToe();
+    game.makeMove({ row: 0, col: 0 });
 
-    expect(game.boards.value).toHaveLength(2)
-    expect(game.currentPlayer.value).toBe('x')
+    expect(game.boards.value).toHaveLength(2);
+    expect(game.currentPlayer.value).toBe("x");
     expect(game.currentBoard.value).toEqual([
-      ['o', '-', '-'],
-      ['-', '-', '-'],
-      ['-', '-', '-']
-    ])
-  })
-})
+      ["o", "-", "-"],
+      ["-", "-", "-"],
+      ["-", "-", "-"],
+    ]);
+  });
+});
 ```
 \begin{center}
 Testing makeMove.
@@ -296,7 +301,7 @@ There isn't anything too surprising here. After making a move, we have two game 
 One thing you should look out for is code like this:
 
 ```ts
-game.makeMove({ row: 0, col: 0 })
+game.makeMove({ row: 0, col: 0 });
 ```
 
 When a function is called without returning anything, it usually means it has a side-effect - for example, mutating some global state. In this case, that is exactly what is happening - `makeMove` mutates the global `board` variable. It's considered global because it is not passed into `makeMove` as an argument. This means the function is not pure - there is no way to know the new state of the game after `makeMove` is called without knowing the previous state.
@@ -308,29 +313,31 @@ Back to the `makeMove` - now we have a test, let's see the implementation. The i
 ```ts
 export function useTicTacToe(initialState?: Board[]) {
   const initialBoard: Board = [
-    ['-', '-', '-'],
-    ['-', '-', '-'],
-    ['-', '-', '-']
-  ]
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+  ];
 
-  const boards = ref<Board[]>(initialState || [initialBoard])
-  const currentPlayer = ref<Marker>('o')
-  const currentMove = ref(0)
+  const boards = ref<Board[]>(initialState || [initialBoard]);
+  const currentPlayer = ref<Marker>("o");
+  const currentMove = ref(0);
 
-  function makeMove(move: { row: number, col: number }) {
-    const newBoard = JSON.parse(JSON.stringify(boards.value))[currentMove.value] as Board
-    newBoard[move.row][move.col] = currentPlayer.value
-    currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
-    boards.value.push(newBoard)
-    currentMove.value += 1
+  function makeMove(move: { row: number; col: number }) {
+    const newBoard = JSON.parse(JSON.stringify(boards.value))[
+      currentMove.value
+    ] as Board;
+    newBoard[move.row][move.col] = currentPlayer.value;
+    currentPlayer.value = currentPlayer.value === "o" ? "x" : "o";
+    boards.value.push(newBoard);
+    currentMove.value += 1;
   }
 
   return {
     makeMove,
     boards: readonly(boards),
     currentPlayer: readonly(currentPlayer),
-    currentBoard: computed(() => boards.value[boards.value.length - 1])
-  }
+    currentBoard: computed(() => boards.value[boards.value.length - 1]),
+  };
 }
 ```
 \begin{center}
@@ -342,7 +349,7 @@ This gets the test to pass. As mentioned above we are using the somewhat dirty `
 What you would need to do is this:
 
 ```ts
-const newState = [...boards.value[boards.value.length - 1]]
+const newState = [...boards.value[boards.value.length - 1]];
 const newRow = [...newState[row]];
 ```
 
@@ -364,7 +371,7 @@ You can pick whichever you like best. Let's continue by updating the usage:
 </template>
 
 <script lang="ts" setup>
-import { useTicTacToe } from "./tic-tac-toe.js";
+import { useTicTacToe } from "./TicTacToe.js";
 
 const { currentBoard, makeMove } = useTicTacToe();
 </script>
