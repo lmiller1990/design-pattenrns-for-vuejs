@@ -15,25 +15,31 @@ The goal is to refactor the Tic Tic Toe logic to be more in line with the functi
 Let's start with `makeMove`, which is full of mutation. In our previous implementation, `makeMove` looks like this:
 
 ```js
-function makeMove({ row, col }) {
-  const newBoard = [...boards.value[boards.value.length - 1]]
-  newBoard[row][col] = currentPlayer.value
-  currentPlayer.value  = currentPlayer.value === 'o' ?  'x' : 'o'
+function makeMove(move: { row: number, col: number }) {
+  const newBoard = JSON.parse(JSON.stringify(boards.value))[currentMove.value] as Board
+  newBoard[move.row][move.col] = currentPlayer.value
+  currentPlayer.value  = currentPlayer.value === 'o' ? 'x' : 'o'
   boards.value.push(newBoard)
+  currentMove.value += 1
 }
+
 ```
 \begin{center}
 Original makeMove implemented using mutation.
 \end{center}
 
-On line 3, we mutation the `newBoard` variable. We then mutate `boards` on line 4, by pushing a new value in. We are also using two global variables: `boards` and `currentPlayer`. If we want to approach this in a functional manner, the function needs include all the required data as arguments, and not rely on global variables. If we rely on global variables, the function will no longer be deterministic (we won't be able to know the return value without knowing the value of the global variables. This means `makeMove` needs to have the following signature:
+We mutate the `newBoard` variable. We then mutate `boards`, by pushing a new value in. We are also using two global variables: `boards` and `currentPlayer`. They are global since they are not declared in the scope of the function, nor are they passed as arguments. I
+
+f we want to approach this in a functional manner, the function needs include all the required data as arguments, and not rely on global variables. If we rely on global variables, the function will no longer be deterministic. We won't be able to know the return value without knowing the value of the global variables. This means `makeMove` needs to have the following signature:
 
 ```ts
-type Board = string[][]
-type Options {
+type Marker = 'x' | 'o' | '-'
+type Board = Array<Marker[]>
+
+interface Options {
   col: number
   row: number
-  counter: 'o' | 'x'
+  counter: Marker
 }
 
 function makeMove(board: Board, { col, row, counter }: Options): Board
@@ -67,19 +73,12 @@ By making the business logic mutation free, it's very easy to test. We will then
 
 The final API is going to be the same:
 
-```js
-import { useTicTacToe } from './tic-tac-toe.js'
+```html
+<script lang="ts" setup>
+import { useTicTacToe } from "./tic-tac-toe.js";
 
-export default {
-  setup() {
-    const { currentBoard, makeMove } = useTicTacToe()
-
-    return {
-      currentBoard,
-      makeMove
-    }
-  }
-}
+const { currentBoard, makeMove } = useTicTacToe();
+</script>
 ```
 \begin{center}
 Final API does not change - only the implementation details.
@@ -94,14 +93,14 @@ Let's start with the functional core, starting with a `createGame` function:
  * Core Logic
  * Framework agnostic
  */
-export const initialBoard = [
-  ['-', '-', '-'],
-  ['-', '-', '-'],
-  ['-', '-', '-']
-]
+export const initialBoard: Board = [
+  ["-", "-", "-"],
+  ["-", "-", "-"],
+  ["-", "-", "-"],
+];
 
-export function createGame(initialState) {
-  return [...initialState]
+export function createGame(initialState: Board[]) {
+  return [...initialState];
 }
 ```
 \begin{center}
@@ -112,15 +111,15 @@ While we could have just done `createGame` without passing any arguments, this m
 
 A test is so trivial it's almost pointless to write, but let's do it anyway:
 
-```js
+```ts
 describe('useTicTacToe', () => {
   it('initializes state to an empty board', () => {
-    const expected = [
+    const expected: Board = [
       ['-', '-', '-'],
       ['-', '-', '-'],
       ['-', '-', '-']
     ]
-    expect(createGame(initialBoard)).toEqual(expected)
+    expect(createGame([initialBoard])).toEqual([expected])
   })
 })
 ```
@@ -133,7 +132,10 @@ A simple for the initial game state.
 Then bulk of the logic is in the `makeMove` function. To update the board, we need the current game state, the column and row to update, and the counter (`x` or `o`). So those will be the arguments we pass to the function.
 
 ```js
-export function makeMove(board, { col, row, counter }) {
+export function makeMove(
+  board: Board,
+  { col, row, counter }: { col: number; row: number; counter: Marker }
+) {
   // copy current board
   // return copy with updated cell
 }
@@ -146,17 +148,17 @@ I decided to have two arguments: the first is the `board`, which I consider the 
 
 Before going any further, a test will be useful. I'm going to write a verbose implementation of `makeMove` and then refactor it; the test will help ensure nothing breaks during the refactor.
 
-```js
+```ts
 describe('makeMove', () => {
-  it('returns a new updated board', () => {
-    const board = createGame()
-    const updatedBoard = makeMove(board, {
+  it('returns a new updated board and counter', () => {
+    const board = createGame([initialBoard])
+    const newBoard = makeMove(board[0], {
       row: 0, 
       col: 0, 
       counter: 'o'
     })
 
-    expect(updatedBoard).toEqual([
+    expect(newBoard).to.eql([
       ['o', '-', '-'],
       ['-', '-', '-'],
       ['-', '-', '-']
@@ -171,9 +173,12 @@ A test to guide us.
 Let's start with a verbose implementation. We will use `map` to iterate over each row. For each row, we will `map` each column. If we encounter the row and column the user has chosen, we will update the cell. Otherwise, we just return the current cell.
 
 ```js
-export function makeMove(board, { col, row, counter }) {
+export function makeMove(
+  board: Board,
+  { col, row, counter }: { col: number; row: number; counter: Marker }
+) {
   // loop each row with map. 
-  return board.map((theRow, rowIdx) => {
+  const newBoard = board.map((theRow, rowIdx) => {
     
     // for each row, loop each column with map.
     return theRow.map((cell, colIdx) => {
@@ -187,6 +192,8 @@ export function makeMove(board, { col, row, counter }) {
       return cell
     })
   })
+
+  return newBoard
 }
 ```
 \begin{center}
@@ -197,22 +204,25 @@ The test passes! I left some comments to make it clear what's going on. If you h
 
 We can make this a lot more concise! This is optional; there is some merit to verbose, explicit code too. Let's see the concise version. You can make a decision which one you think is more readable.
 
-```js
-export function makeMove(board, { col, row, counter }) {
-  return board.map((theRow, rowIdx) =>
-    theRow.map((cell, colIdx) => 
-      rowIdx === row && colIdx === col
-        ? counter
-        : cell
-    )
-  )
+```ts
+export function makeMove(
+  board: Board,
+  { col, row, counter }: { col: number; row: number; counter: Marker }
+) {
+  return board.map((theRow, rowIdx) => {
+    return theRow.map((cell, colIdx) =>
+      rowIdx === row && colIdx === col ? counter : cell
+    );
+  });
 }
 ```
 \begin{center}
 Functional code can be very concise. Careful - readability can suffer.
 \end{center}
 
-We avoided making a new variable by returning the result of `board.map`. We also removed the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. The test still passes, so we can be confident the refactor was successfully. I think both implementations are fine; pick the one that you like best.
+We avoided making a new variable by returning the result of `board.map`. We also removed the `if` statements by using a ternary operator, and the `return` keyword from the `map` functions. We also added `newCounter` - this will be useful when deciding which player's turn comes next.
+
+The test still passes, so we can be confident the refactor was successfully. I think both implementations are fine; pick the one that you like best.
 
 ## Vue Integration - Imperative Shell
 
@@ -220,14 +230,14 @@ Most of the business logic is encapsulated in the `createGame()` and `makeMove()
 
 Let's start with the composable, `useTicTacToe()`, and get something rendering:
 
-```js
+```ts
 /**
  * Vue integration layer
  * State here is mutable
  */
 export function useTicTacToe() {
-  const boards = ref([initialBoard])
-  const counter = ref('o')
+  const boards = ref<Board[]>([initialBoard]);
+  const counter = ref<Marker>("o");
 
   const move = ({ col, row }) => {}
 
@@ -247,14 +257,20 @@ The composable integrates the functional core with Vue's reactivity system - the
 
 I added an empty `move` function, assigning it to `makeMove` in the return value of `useTicTacToe`. We will be implementing that soon. 
 
-Let's get something rendering:
+Let's get something rendering. As per usual, you can find the CSS in the source code, or create your own.
 
 ```html
 <template>
-  <div v-for="(row, rowIdx) in currentBoard" class="row">
-    <div 
-      v-for="(col, colIdx) in row" 
-      class="col" 
+  <div
+    v-for="(row, rowIdx) in currentBoard"
+    :key="rowIdx"
+    class="row"
+  >
+    <div
+      v-for="(col, colIdx) in row"
+      :key="colIdx"
+      class="col"
+      :data-testid="`row-${rowIdx}-col-${colIdx}`"
       :data-test="`row-${rowIdx}-col-${colIdx}`"
       @click="makeMove({ row: rowIdx, col: colIdx })"
     >
@@ -263,32 +279,11 @@ Let's get something rendering:
   </div>
 </template>
 
-<script>
-import { useTicTacToe } from './tic-tac-toe.js'
+<script lang="ts" setup>
+import { useTicTacToe } from "./tic-tac-toe.js";
 
-export default {
-  setup(props) {
-    const { currentBoard, makeMove } = useTicTacToe()
-
-    return {
-      currentBoard,
-      makeMove
-    }
-  }
-}
+const { currentBoard, makeMove } = useTicTacToe();
 </script>
-
-<style>
-.row {
-  display: flex;
-}
-
-.col {
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-}
-</style>
 ```
 \begin{center}
 Testing out the implementation.
@@ -305,8 +300,8 @@ Testing out the implementation.
 
 The last thing we need to do is wrap the functional, stateless `makeMove` function from the functional core. This is easy:
 
-```js
-const move = ({ col, row }) => {
+```ts
+const move = ({ col, row }: { col: number; row: number }) => {
   const newBoard = makeMove(
     currentBoard.value,
     {
@@ -335,22 +330,29 @@ Everything now works in it's functional, loosely coupled, immutable glory.
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 
 ```js
-import { render, fireEvent, screen } from '@testing-library/vue'
-import TicTacToeApp from './tic-tac-toe-app.vue'
+import { describe, it, expect } from "vitest";
+import { render, fireEvent, screen } from "@testing-library/vue";
+import TicTacToeApp from "./tic-tac-toe-app.vue";
 
-describe('TicTacToeApp', () => {
-  it('plays a game', async () => {
-    render(TicTacToeApp)
+describe("TicTacToeApp", () => {
+  it("plays a game", async () => {
+    render(TicTacToeApp);
 
-    await fireEvent.click(screen.getByTestId('row-0-col-0'))
-    await fireEvent.click(screen.getByTestId('row-0-col-1'))
-    await fireEvent.click(screen.getByTestId('row-0-col-2'))
+    await fireEvent.click(screen.getByTestId("row-0-col-0"));
+    await fireEvent.click(screen.getByTestId("row-0-col-1"));
+    await fireEvent.click(screen.getByTestId("row-0-col-2"));
 
-    expect(screen.getByTestId('row-0-col-0').textContent).toContain('o')
-    expect(screen.getByTestId('row-0-col-1').textContent).toContain('x')
-    expect(screen.getByTestId('row-0-col-2').textContent).toContain('o')
-  })
-})
+    expect(screen.getByTestId("row-0-col-0").textContent).toContain(
+      "o"
+    );
+    expect(screen.getByTestId("row-0-col-1").textContent).toContain(
+      "x"
+    );
+    expect(screen.getByTestId("row-0-col-2").textContent).toContain(
+      "o"
+    );
+  });
+});
 ```
 \begin{center}
 The UI test from previous section, ensuring the behavior has not changed.
@@ -360,8 +362,8 @@ The UI test from previous section, ensuring the behavior has not changed.
 
 There is one last improvement we can make. We currently wrap the stateless `makeMove` function:
 
-```js
-const move = ({ col, row }) => {
+```ts
+const move = ({ col, row }: { col: number; row: number }) => {
   const newBoard = makeMove(
     currentBoard.value,
     {
@@ -380,39 +382,42 @@ Ideally all the business logic should be in the functional core. This includes c
 Update `makeMove` to change the counter after updating the board, and return an object representing the new board as well as the updated counter:
 
 ```js
-export function makeMove(board, { col, row, counter }) {
-  const newBoard = board.map((theRow, rowIdx) =>
-    // ...
-  )
-  const newCounter = counter === 'o' ? 'x' : 'o'
+export function makeMove(
+  board: Board,
+  { col, row, counter }: { col: number; row: number; counter: Marker }
+) {
+  const newBoard = board.map((theRow, rowIdx) => {
+    return theRow.map((cell, colIdx) =>
+      rowIdx === row && colIdx === col ? counter : cell
+    );
+  });
+
+  const newCounter: Marker = counter === "o" ? "x" : "o";
 
   return {
     newBoard,
-    newCounter
-  }
+    newCounter,
+  };
 }
 ```
 
 Now `makeMove` handles updating the counter, as well as the board. Update `move` to use the new return value:
 
-```js
-const move = ({ col, row }) => {
-  const { newBoard, newCounter } = makeMove(
-    currentBoard.value,
-    {
-      col,
-      row,
-      counter: counter.value
-    }
-  )
-  boards.value.push(newBoard)
-  counter.value = newCounter
-}
+```ts
+const move = ({ col, row }: { col: number; row: number }) => {
+  const { newBoard, newCounter } = makeMove(currentBoard.value, {
+    col,
+    row,
+    counter: counter.value,
+  });
+  boards.value.push(newBoard);
+  counter.value = newCounter;
+};
 ``` 
 
 Finally, since we changed the return value, the `makeMove` test needs to be updated (the UI test using Testing Library still passes, since the actual behavior from the user's point of view has not changed):
 
-```js
+```ts
 describe('makeMove', () => {
   it('returns a new updated board and counter', () => {
     const board = createGame(initialBoard)

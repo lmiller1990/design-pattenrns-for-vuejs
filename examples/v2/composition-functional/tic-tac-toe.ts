@@ -22,11 +22,12 @@ export function makeMove(
   board: Board,
   { col, row, counter }: { col: number; row: number; counter: Marker }
 ) {
-  const newBoard = board.map((theRow, rowIdx) =>
-    theRow.map((cell, colIdx) =>
+  const newBoard = board.map((theRow, rowIdx) => {
+    return theRow.map((cell, colIdx) =>
       rowIdx === row && colIdx === col ? counter : cell
-    )
-  );
+    );
+  });
+
   const newCounter: Marker = counter === "o" ? "x" : "o";
 
   return {

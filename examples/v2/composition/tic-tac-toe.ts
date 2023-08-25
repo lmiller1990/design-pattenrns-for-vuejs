@@ -2,7 +2,7 @@ import { ref, readonly, computed } from 'vue'
 
 type Marker = 'x' | 'o' | '-'
 
-export type Board = Marker[][]
+export type Board = Array<Marker[]>
 
 export function useTicTacToe(initialState?: Board[]) {
   const initialBoard: Board = [

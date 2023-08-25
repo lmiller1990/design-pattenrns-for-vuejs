@@ -38,7 +38,7 @@ describe('useTicTacToe', () => {
   })
 
   it('initializes state to an empty board', () => {
-    const initialBoard = [
+    const initialBoard: Board = [
       ['-', '-', '-'],
       ['-', '-', '-'],
       ['-', '-', '-']
