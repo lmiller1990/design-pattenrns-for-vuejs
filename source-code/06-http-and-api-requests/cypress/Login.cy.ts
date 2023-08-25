@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 import axios from "axios";
-import Login from "../Login.vue";
+import Login from "../with-pinia/Login.vue"
 import { createPinia, Pinia, setActivePinia } from "pinia";
 
 describe("login", () => {

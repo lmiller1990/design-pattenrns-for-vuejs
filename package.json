@@ -32,8 +32,8 @@
     "vitest": "0.29.2"
   },
   "scripts": {
-    "cypress:run": "cypress run --component",
-    "cypress:open": "cypress open --component -b chrome",
-    "vitest": "vitest --run"
+    "cypress:run": "cypress run --component --spec 'source-code/**/*.cy.ts'",
+    "cypress:open": "cypress open --component -b chrome --spec 'source-code/**/*.cy.ts'",
+    "vitest": "vitest --run source-code"
   }
 }

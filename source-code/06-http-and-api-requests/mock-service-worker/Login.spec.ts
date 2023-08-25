@@ -2,7 +2,7 @@ import { describe, it, beforeEach, afterEach } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
 import { rest } from "msw";
 import { SetupServer, setupServer } from "msw/node";
-import Login from "../Login.vue";
+import Login from "../with-pinia/Login.vue"
 import { createPinia, Pinia, setActivePinia } from "pinia";
 
 describe("login", () => {
