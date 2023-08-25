@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import DateTimeBasic from "./DateTime.vue";
-import Luxon from "luxon";
+import * as Luxon from "luxon";
 import { serialize, deserialize } from "./serializers.js";
 
 const dateLuxon = ref(

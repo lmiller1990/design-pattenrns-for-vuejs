@@ -45,11 +45,11 @@ describe('store', () => {
       }
     })
 
-    cy.get('[role="username"]').type('Alice')
+    cy.get('#username').type('Alice')
     cy.get('button').contains('Add User').click()
     cy.contains('ID: 1. Name: Alice')
 
-    cy.get('[role="username"]').type('Bob')
+    cy.get('#username').type('Bob')
     cy.get('button').contains('Add User').click()
     cy.get('div').contains('ID: 2. Name: Bob')
   })

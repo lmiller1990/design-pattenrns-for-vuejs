@@ -32,6 +32,8 @@
     "vitest": "0.29.2"
   },
   "scripts": {
-    "test-ct": "playwright test -c playwright-ct.config.ts"
+    "cypress:run": "cypress run --component",
+    "cypress:open": "cypress open --component -b chrome",
+    "vitest": "vitest --run"
   }
 }
