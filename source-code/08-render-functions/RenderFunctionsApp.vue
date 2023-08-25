@@ -9,10 +9,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import { Tab, TabContent, TabContainer } from "./tabs.js";
+import { ref } from 'vue'
 
-const activeTabId = ref("1");
+import { 
+  Tab,
+  TabContent,
+  TabContainer
+}  from './tabs.js'
+
+const activeTabId = ref('1')
 </script>
 
 <style>

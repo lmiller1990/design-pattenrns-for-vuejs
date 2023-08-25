@@ -23,11 +23,10 @@ Instead of providing a toy example, we will see a real use case by building a si
 Let's quickly define a dead simple store. We won't have a complex API like Vuex - just a class with some methods. Let's start with a reactive state, and expose it in readonly fashion via a `getState` function.
 
 ```ts
-import { reactive, readonly } from 'vue'
-
+import { reactive, readonly } from "vue";
 
 interface User {
-  id: number
+  id: number;
   name: string;
 }
 
@@ -43,7 +42,7 @@ export class Store {
   }
 
   getState() {
-    return readonly(this.#state)
+    return readonly(this.#state);
   }
 }
 ```
@@ -58,18 +57,18 @@ The `#` means that the property can only be accessed inside the class instance. 
 We pass `state` to the constructor to let the user seed the initial state. We will take the disciplined approach and write a test.
 
 ```ts
-import { describe, it, expect } from 'vitest'
-import { Store } from './store.js'
+import { describe, it, expect } from "vitest";
+import { Store } from "./store.js";
 
-describe('store', () => {
-  it('seeds the initial state', () => {
+describe("store", () => {
+  it("seeds the initial state", () => {
     const store = new Store({
-      users: []
-    })
+      users: [],
+    });
 
-    expect(store.getState()).toEqual({ users: [] })
-  })
-})
+    expect(store.getState()).toEqual({ users: [] });
+  });
+});
 ```
 \begin{center}
 The tests verifies everything is working correctly.
@@ -80,15 +79,15 @@ The tests verifies everything is working correctly.
 Let's get something running before we explore using `provide` and `inject`. Export a new instance of the store:
 
 ```ts
-import { reactive, readonly } from 'vue'
+import { reactive, readonly } from "vue";
 
 export class Store {
   // ...
 }
 
 export const store = new Store({
-  users: [{ id: 1, name: 'Alice' }]
-})
+  users: [{ id: 1, name: "Alice" }],
+});
 ```
 \begin{center}
 Exporting the store as a global singleton with some initial state.
@@ -154,26 +153,27 @@ It works as expected. We do not want to hard code any users in the store, though
 To add a user, we will first create a `addUser` function to the store:
 
 ```ts
-import { reactive, readonly } from 'vue'
+import { reactive, readonly } from "vue";
 
-// ... 
+// ...
 
 export class Store {
-  #state = {}
+  #state = {};
 
   // ...
 
-  addUser(user: Omit<User, 'id'>) {
-    const id = this.#state.users.length === 0 
-      ? 1 
-      : Math.max(...this.#state.users.map(user => user.id)) + 1
+  addUser(user: Omit<User, "id">) {
+    const id =
+      this.#state.users.length === 0
+        ? 1
+        : Math.max(...this.#state.users.map((user) => user.id)) + 1;
     this.#state.users.push({ id, ...user });
   }
 }
 
 export const store = new Store({
-  users: []
-})
+  users: [],
+});
 ```
 \begin{center}
 addUser can access the private state because it is declared in the Store class.
@@ -184,27 +184,27 @@ We are setting the `id` dynamically - for this example, it'll be 1 if there aren
 I also removed the initial user, Alice, from the store. Update the tests - we can test `addUser` in isolation.
 
 ```ts
-describe('store', () => {
-  it('seeds the initial state', () => {
+describe("store", () => {
+  it("seeds the initial state", () => {
     // ...
-  })
+  });
 
-  it('renders a user', async () => {
+  it("renders a user", async () => {
     // ...
-  })
+  });
 
-  it('adds a user', () => {
+  it("adds a user", () => {
     const store = new Store({
-      users: []
-    })
+      users: [],
+    });
 
-    store.addUser({ name: 'Alice' })
+    store.addUser({ name: "Alice" });
 
-    expect(store.getState()).toEqual({ 
-      users: [{ name: 'Alice' }]
-    })
-  })
-})
+    expect(store.getState()).toEqual({
+      users: [{ name: "Alice" }],
+    });
+  });
+});
 ```
 \begin{center}
 Testing addUser in isolation - no component, no mounting.
@@ -290,10 +290,10 @@ Let's say you have a component, `Parent.vue`, that looks like something this:
 </template>
 
 <script setup>
-import { provide } from 'vue'
+import { provide } from "vue";
 
-const theColor = 'blue'
-provide('color', theColor)
+const theColor = "blue";
+provide("color", theColor);
 </script>
 ```
 
@@ -305,23 +305,23 @@ We are making a `color` variable available to *any* child component that might w
   Color is: {{ color }}
 </template>
 
-<script>
-import { inject } from 'vue'
+<script setup>
+import { inject } from "vue";
 
-const color = inject('color')
+const color = inject("color");
 </script>
 ```
 
 You can pass anything to `provide` - including a reactive store. Let's do that. Head to the top level file where you create your app (mine is `index.ts`; see the source code for a complete example):
 
 ```ts
-import { createApp } from 'vue'
-import { store } from './examples/provide-inject/store.js'
-import Users from './examples/provide-inject/users.vue'
+import { createApp } from "vue";
+import { store } from "./examples/provide-inject/store.js";
+import Users from "./examples/provide-inject/users.vue";
 
-const app = createApp(Users)
-app.provide('store', store)
-app.mount('#app')
+const app = createApp(Users);
+app.provide("store", store);
+app.mount("#app");
 ```
 \begin{center}
 Using provide to make the store available in all the components.
@@ -337,16 +337,16 @@ Instead of importing the store, we can now just call `const store = inject('stor
 </template>
 
 <script lang="ts" setup>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed } from "vue";
 
-const store = inject('store')
-const username = ref('')
+const store = inject("store");
+const username = ref("");
 
 const handleSubmit = () => {
   // ...
-}
+};
 
-const users = computed(() => store.getState().users)
+const users = computed(() => store.getState().users);
 </script>
 ```
 \begin{center}
@@ -358,35 +358,35 @@ Using inject to access the store.
 The final UI test where we add a user named Alice to the store is failing. We did `provide('store', store)` when we created our app, but we didn't do it in the test. Testing Library has a mounting option specifically for `provide` and `inject`: `global.provide`:
 
 ```ts
-import { render, screen, fireEvent } from '@testing-library/vue'
-import { Store } from './store.js'
-import Users from './users.vue'
+import { render, screen, fireEvent } from "@testing-library/vue";
+import { Store } from "./store.js";
+import Users from "./users.vue";
 
-describe('store', () => {
-  it('seeds the initial state', () => {
+describe("store", () => {
+  it("seeds the initial state", () => {
     // ...
-  })
+  });
 
-  it('adds a user', () => {
+  it("adds a user", () => {
     // ...
-  })
+  });
 
-  it('renders a user', async () => {
+  it("renders a user", async () => {
     render(Users, {
       global: {
         provide: {
           store: new Store({
-            users: []
-          })
-        }
-      }
-    })
+            users: [],
+          }),
+        },
+      },
+    });
 
-    await fireEvent.update(screen.getByRole('username'), 'Alice')
-    await fireEvent.click(screen.getByRole('submit'))
-    await screen.findByText('Alice')
-  })
-})
+    await fireEvent.update(screen.getByRole("username"), "Alice");
+    await fireEvent.click(screen.getByRole("submit"));
+    await screen.findByText("Alice");
+  });
+});
 ```
 \begin{center}
 Using the global.provide mounting option.
@@ -401,20 +401,19 @@ We can write a little abstraction to make using our store a bit more ergonomic. 
 Let's update the store module to use `provide` and `inject` and expose a `useStore` function:
 
 ```ts
-import { reactive, readonly, inject } from 'vue'
+import { reactive, readonly, inject } from "vue";
 
 export class Store {
   // ...
 }
 
 export const store = new Store({
-  users: []
-})
+  users: [],
+});
 
 export function useStore(): Store {
   return inject("store") as Store;
 }
-
 ```
 \begin{center}
 A useStore composable.
