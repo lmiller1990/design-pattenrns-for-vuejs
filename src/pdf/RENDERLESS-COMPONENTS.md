@@ -104,7 +104,7 @@ We can destructure the object passed received from `v-slot`, and are free to use
 
 The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, to see if the password and confirmation are the same. 
 
-First, update `renderless-password.ts` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
+First, update `isMatching` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
 
 ```ts
 function isMatching(password: string, confirmation: string) {

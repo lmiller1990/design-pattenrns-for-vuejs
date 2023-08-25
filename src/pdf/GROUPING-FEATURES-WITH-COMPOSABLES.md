@@ -38,7 +38,7 @@ Final API.
 ]
 ```
 \begin{center}
-Example game board represented as multi-dmensional array.
+Example game board represented as multi-dimensional array.
 \end{center}
 
 `makeMove` is a function that takes two arguments: `col` and `row`. Given this board:

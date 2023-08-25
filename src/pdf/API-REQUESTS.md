@@ -56,12 +56,12 @@ async function handleAuth() {
 </script>
 ```
 \begin{center}
-A simple login form component, It makes a request using axios.
+A simple login form component, It makes a request using Axios.
 \end{center}
 
-This example uses the axios HTTP library, but the same ideas apply if you are using fetch or another HTTP client.
+This example uses the Axios HTTP library, but the same ideas apply if you are using fetch or another HTTP client.
 
-We mighjt not want to make a request to a real server when testing this component - component tests should (generally) run in isolation. One option here is to mock the `axios` module - most runners will have some sort of module mocking/stubbing feature, such as `jest.mock()` (Jest), `vi.mock()` (Vitest) or `cy.stub()` (Cypress).
+We might not want to make a request to a real server when testing this component - component tests should (generally) run in isolation. One option here is to mock the `axios` module - most runners will have some sort of module mocking/stubbing feature, such as `jest.mock()` (Jest), `vi.mock()` (Vitest) or `cy.stub()` (Cypress).
 
 We probably want to test:
 
@@ -71,7 +71,7 @@ We probably want to test:
 
 A test where the user successfully authenticates might look like this:
 
-```js
+```ts
 import { describe, it, beforeEach, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
 import Login from "../Login.vue";
@@ -117,7 +117,6 @@ describe("login", () => {
     await screen.findByText("Hello, Lachlan");
   });
 });
-
 ```
 \begin{center}
 Using a mock implementation of axios to test the login workflow.
@@ -207,7 +206,7 @@ Using Pinia in the login component.
 
 You now need a Pinia store in your test, too. You have a few options. The two most common are:
 
-- Use a real Pinia store - continue mocking axios.
+- Use a real Pinia store - continue mocking Axios.
 - Use a mock Pinia store.
 
 The first option would look something like this:
@@ -235,13 +234,13 @@ describe('login', () => {
 Updating the test to use Pinia.
 \end{center}
 
-I like this option. We continue to mock `axios`. The only change we made to the test is passing a `store`. The actual user facing behavior has not changed, so the test should not need significant changes either - in fact, the actual test code is the same (entering the username and password and submitting the form). It also shows we are not testing implementation details - we were able to make a significant refactor without changing the test (except for providing the Pinia store - we added this dependency, so this change is expected).
+I like this option. We continue to mock Axios. The only change we made to the test is passing a `store`. The actual user facing behavior has not changed, so the test should not need significant changes either - in fact, the actual test code is the same (entering the username and password and submitting the form). It also shows we are not testing implementation details - we were able to make a significant refactor without changing the test (except for providing the Pinia store - we added this dependency, so this change is expected).
 
-I've used the real store + axios mock strategy for quite a long time in both Vue and React apps and had an *okay* experience. The only downside is you need to mock `axios` a lot - you often end up with a lot of copy-pasting between tests. Fortunately, changing your HTTP client isn't something you do very often, nor your endpoints. This testing strategy can be a little boilerplate heavy, though.
+I've used the real store + Axios mock strategy for quite a long time in both Vue and React apps and had an *okay* experience. The only downside is you need to mock Axios a lot - you often end up with a lot of copy-pasting between tests. Fortunately, changing your HTTP client isn't something you do very often, nor your endpoints. This testing strategy can be a little boilerplate heavy, though.
 
 ## To mock or not to mock?
 
-As your application gets larger and larger, though, using a real store can become complex. Some developers opt to mock the entire store in this scenario. It leads to less boilerplate, for sure, especially if you are using Vue Test Utils, which some convenient methods for mocking things, like `mocks`, or you might opt to use some of the patterns in the [testing](https://pinia.vuejs.org/cookbook/testing.html) section in the Pinia documentaion.
+As your application gets larger and larger, though, using a real store can become complex. Some developers opt to mock the entire store in this scenario. It leads to less boilerplate, for sure, especially if you are using Vue Test Utils, which some convenient methods for mocking things, like `mocks`, or you might opt to use some of the patterns in the [testing](https://pinia.vuejs.org/cookbook/testing.html) section in the Pinia documentation.
 
 What if you are using a different library, like Vue Testing Library, which does not support mocking things so easily - intentionally. Or, another framework? Good foundational concepts are not tied to specific frameworks and libraries. What are our other options?
 
@@ -298,11 +297,11 @@ describe("login with mocking pinia", () => {
 Mocking Piina. 
 \end{center}
 
-Since we are mocking the Piina store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also have fine grained control over the state of the store - in the snippet above.
+Since we are mocking the Pinia store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also have fine grained control over the state of the store - in the snippet above.
 
 Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't mock `axios` any more - instead we have `mockLogin`. We are asserting the correct action was called. 
 
-There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken. More often than not, you end up rebuilding your module inside your test - at this point, you've got a lot of code to maintain for relatively little test coverage. More code - but less value. A low quality test suite - which can lead to false confidence, which is argubly worse than having no test suite at all.
+There is a big problem. Even if you delete the `login` action from the store, the test will *continue to pass*. This is scary! The tests are all green, which should give you confidence everything is working correctly. In reality, your entire application is completely broken. More often than not, you end up rebuilding your module inside your test - at this point, you've got a lot of code to maintain for relatively little test coverage. More code - but less value. A low quality test suite - which can lead to false confidence, which is arguably worse than having no test suite at all.
 
 This is not the case with the test using a real Pinia store - breaking the store correctly breaks the tests. There is only one thing worse than a code-base with no tests - a code-base with *bad* tests. At least if you have not tests, you have no confidence, which generally means you spend more time testing by hand. Tests that give false confidence are actually worse - they lure you into a false sense of security. Everything seems okay, when really it is not.
 
@@ -328,7 +327,7 @@ The previous test, where we mocked Pinia, mocks the dependency chain here:
 
 This means if anything breaks in Pinia, the HTTP call, or the server, our test will not fail.
 
-The axios test is slightly better - it mocks one layer lower:
+The Axios test is slightly better - it mocks one layer lower:
 
 \begin{figure}[H]
   \centering
@@ -339,7 +338,7 @@ The axios test is slightly better - it mocks one layer lower:
 
 This is better. If something breaks in either the `<Login>` or Pinia, the test will fail.
 
-Wouldn't it be great to avoid mocking `axios`, too? This way, we could not need to do:
+Wouldn't it be great to avoid mocking Axios, too? This way, we could not need to do:
 
 ```js
 let mockPost = vi.fn()
@@ -358,16 +357,16 @@ vi.mock('axios', () => {
 })
 ```
 \begin{center}
-Boilerplate code to mock axios.
+Boilerplate code to mock Axios.
 \end{center}
 
 ... in every test. And we'd have more confidence, further down the dependency chain.
 
 ## Mock Service Worker & cy.intercept()
 
-There's a few ways to handle network level mocking. If you are using Cypress, you can use the `cy.intercept()` feature. This is probably my favorite Cypress feature! The downside is it's runner specific. Another neat library has come into the scene in the last few years - Mock Service Worker, or `msw` for short. This one is runner agnostic, and works in Node.js and in the browser. 
+There's a few ways to handle network level mocking. If you are using Cypress, you can use the `cy.intercept()` feature. This is probably my favorite Cypress feature! The downside is it's runner specific. Another neat library has come into the scene in the last few years - Mock Service Worker, or MSW for short. This one is runner agnostic, and works in Node.js and in the browser. 
 
-Both these do exactly what is discussed above - it operates one level lower than `axios`, mocking the actual network request! How `cy.intercept()` and `msw` works will not be explained here, but you can learn more on the [msw website](https://mswjs.io/): https://mswjs.io/ or in the [Cypress documentation](https://docs.cypress.io/api/commands/intercept): https://docs.cypress.io/api/commands/intercept. 
+Both these do exactly what is discussed above - it operates one level lower than Axios, mocking the actual network request! How `cy.intercept()` and MSW works will not be explained here, but you can learn more on the [MSW website](https://mswjs.io/): https://mswjs.io/ or in the [Cypress documentation](https://docs.cypress.io/api/commands/intercept): https://docs.cypress.io/api/commands/intercept. 
 
 Let's try mocking the network layer instead. Basic usage is like this for Mock Service Worker:
 
@@ -389,7 +388,7 @@ const server = setupServer(
 A basic server with Mock Service Worker:
 \end{center}
 
-The nice thing is we are not mocking `axios` anymore. You could change you application to use `fetch` instead - and you wouldn't need to change you tests at all, because we are now mocking at a layer lower than before. 
+The nice thing is we are not mocking Axios anymore. You could change you application to use `fetch` instead - and you wouldn't need to change you tests at all, because we are now mocking at a layer lower than before. 
 
 A full test using Mock Service Worker looks like this:
 
@@ -427,7 +426,7 @@ describe('login', () => {
 })
 ```
 \begin{center}
-Using msw instead of mocking axios.
+Using MSW instead of mocking Axios.
 \end{center}
 
 You can have even less boilerplate by setting up the server in another file and importing it automatically, as suggested [in the documentation](https://mswjs.io/docs/getting-started/integrate/node): https://mswjs.io/docs/getting-started/integrate/node. Then you won't need to copy this code into all your tests - you just test as if you are in production with a real server that responds how you expect it to.
@@ -501,7 +500,7 @@ Asserting post data is as expected.
 
 Again, all in one block - looking good!
 
-Mock Service Work and Cypress can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where these approaches really shine compared to the using `vi.mock` to mock `axios`. Let's add another test for this exact case:
+Mock Service Work and Cypress can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where these approaches really shine compared to the using `vi.mock` to mock Axios. Let's add another test for this exact case:
 
 ```js
 describe('login', () => {
@@ -540,19 +539,19 @@ A test for a failed request.
 
 The Cypress version is included in the final source code. 
 
-It's easy to extend the mock server on a test by test basis, or add additional `cy.intercept()` calls. Writing these two tests using `vi.mock` to mock `axios` would be very messy!
+It's easy to extend the mock server on a test by test basis, or add additional `cy.intercept()` calls. Writing these two tests using `vi.mock` to mock Axios would be very messy!
 
-Another very cool feature about `msw` is you can use it in a browser during development. It isn't showcased here, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
+Another very cool feature about MSW is you can use it in a browser during development. It isn't showcased here, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
 
 ## Conclusion
 
-This chapter introduces various strategies for testing HTTP requests in your components. We saw the advantage of mocking `axios` and using a real Pinia store, as opposed to mocking the Vuex store. We then moved one layer lower, mocking the actual server with `msw`. This can be generalized - the lower the mock in the dependency chain, the more confidence you can be in your test suite.
+This chapter introduces various strategies for testing HTTP requests in your components. We saw the advantage of mocking Axios and using a real Pinia store, as opposed to mocking the Vuex store. We then moved one layer lower, mocking the actual server with MSW. This can be generalized - the lower the mock in the dependency chain, the more confidence you can be in your test suite.
 
-Tests `msw` is not enough - you still need to test your application against a real server to verify everything is working as expected. Tests like the ones described in this chapter are still very useful - they run fast and are very easy to write. I tend to use testing-library and `msw` as a development tool - it's definitely faster than opening a browser and refreshing the page every time you make a change to your code.
+Tests MSW is not enough - you still need to test your application against a real server to verify everything is working as expected. Tests like the ones described in this chapter are still very useful - they run fast and are very easy to write. I tend to use testing-library and MSW as a development tool - it's definitely faster than opening a browser and refreshing the page every time you make a change to your code.
 
 ## Exercises
 
-- Trying using `msw` in a browser. You can use the same mock endpoint handlers for both your tests and development.
-- Explore `msw` more and see what other interesting features it offers.
+- Trying using MSW in a browser. You can use the same mock endpoint handlers for both your tests and development.
+- Explore MSW more and see what other interesting features it offers.
 
 \pagebreak

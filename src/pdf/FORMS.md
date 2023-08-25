@@ -10,7 +10,7 @@ Forms are the primary way a user enters information into any web-based system, s
 
 What exactly is a *good* form? 
 
-We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We don't want to couple our logic to our UI layer. In my experience, user interfaces change a lot (for some reason) and seem to get thrown out every 5 years or so. Businesses, and their logic, tends to stay the same, and also tends to be more important, so we want to make sure the core logic and underyling value is resilient and reliable. Good forms have good errors and good validation. 
+We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We don't want to couple our logic to our UI layer. In my experience, user interfaces change a lot (for some reason) and seem to get thrown out every 5 years or so. Businesses, and their logic, tends to stay the same, and also tends to be more important, so we want to make sure the core logic and underlying value is resilient and reliable. Good forms have good errors and good validation. 
 
 In traditional server-rendered apps, you would only get validation after submitting the form - not a great user experience. Vue allows us to deliver a great user experience by implementing highly dynamic, client-side validation. We will make use of this and implement two levels of validation:
 
@@ -68,7 +68,7 @@ We need two types of validations:
 1. A required field. Both the patient's name and weight are required fields.
 2. Minimum and maximum constraints. This is for the weight field - it has to be within a specific range. It also needs to support metric and imperial units.
 
-As well as validating the fields, our form validation framework should also return an error messages for each invalid input. Finally, it should be *composable* - I expect to write many more forms, and most of the valdiation requirements are some combination of existing rules - required, minimum/maximum length, etc.
+As well as validating the fields, our form validation framework should also return an error messages for each invalid input. Finally, it should be *composable* - I expect to write many more forms, and most of the validation requirements are some combination of existing rules - required, minimum/maximum length, etc.
 
 We will write two validation functions: `required` and `validateRange`. While test driven development (abbreviated to TDD - where you write the tests first, and let the failing tests guide the implementation) isn't always the right tool, for writing these two functions I believe it is. This is because we know the inputs and outputs, and all the possible states of the system, it's just a matter of writing the tests and then making them pass.
 
@@ -487,7 +487,7 @@ isFormValid implementation.
 
 This solution is a bit tricky - it uses `T extends Record<...>`. We are saying this function can work with *any* form, as long as all the properties use the `ValidationResult` interface we defined earlier.
 
-We've written a good amount of code by this piont - but we are still yet to write any application specific logic! We are still working on our form validation logic. It's generic and reusable, which is great!
+We've written a good amount of code by this point - but we are still yet to write any application specific logic! We are still working on our form validation logic. It's generic and reusable, which is great!
 
 The last piece of code we need to (finally) complete the actual business requirement is going to be named `patientForm`. It's a function takes an object the shape of the `Patient` interface we defined earlier. It returns the validation result for each field. 
 
@@ -564,7 +564,7 @@ describe("patientForm", () => {
 Testing patientForm.
 \end{center}
 
-The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real-world system, you would likely get these from an API and pass them down to the `patientForm` function. I would definitely keep this in a separate place to the component that renders the actual form, for the reasons the previous chapter abot props discussed.
+The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real-world system, you would likely get these from an API and pass them down to the `patientForm` function. I would definitely keep this in a separate place to the component that renders the actual form, for the reasons the previous chapter about props discussed.
 
 ```ts
 const limits = {
@@ -671,7 +671,7 @@ Let's add the `<template>` part now - it's very simple, just good old HTML.
         <button type="submit" :disabled="!valid">Submit</button>
       </div>
     </form>
-    <div>
+  <div>
 <pre>
 Patient Data
 {{ form }}
@@ -681,8 +681,6 @@ Patient Data
 Form State
 {{ validatedForm }}
 </pre>
-    </div>
-  </div>
 </template>
 ```
 \begin{center}
@@ -766,7 +764,7 @@ describe("Form.vue", () => {
 Testing the component layer with Testing Library.
 \end{center}
 
-Since these tests are a little larger, I am making the separation between each part clear. I like to write my tests in this structure (I don't actually include "Arrange" and "Act" and "Assert" in my tet code - those comments are just to make this example clear):
+Since these tests are a little larger, I am making the separation between each part clear. I like to write my tests in this structure (I don't actually include "Arrange" and "Act" and "Assert" in my test code - those comments are just to make this example clear):
 
 ```ts
 it('...', async () => {

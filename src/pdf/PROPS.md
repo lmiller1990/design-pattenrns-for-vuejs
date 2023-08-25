@@ -182,7 +182,7 @@ Vue makes maintaining this separation simple, but you still need to think carefu
 
 ## Separation of Concerns - Case Study
 
-One example of poor separation of concerns costing an organzation was an application I worked on for an electrical components supplier. They had an application customers would use to get an approximate quote for the price of components. The ordering process was quite complex - you would go through a form with several steps, and the values from the previous step would impact the fields on the next step.
+One example of poor separation of concerns costing an organization was an application I worked on for an electrical components supplier. They had an application customers would use to get an approximate quote for the price of components. The ordering process was quite complex - you would go through a form with several steps, and the values from the previous step would impact the fields on the next step.
 
 The application was written using jQuery (which is not bad. No framework is bad - only if they are used incorrectly). All of the business logic was mixed in with the UI logic (this is the bad part). They had a quantity based discount model - "If purchasing more than 50 resistors, then apply X discount, otherwise Y" - this kind of thing. They decided to move to something a bit more modern - the UI was very dated, and wasn't mobile friendly at all. The complexity of the jQuery code was high and the code was a mess. 
 
@@ -286,7 +286,7 @@ Understanding and identifying the different concerns in a system and correctly s
 
 ## Conclusion
 
-This chapter discussed props. along with some foundational concepts - separation of concerns, pure components, and user interfaces. We talked about how identifying and separating logic and side effects from pure components can make a code base easier to reason about and to test.
+This chapter discussed props, along with some foundational concepts - separation of concerns, pure components, and user interfaces. We talked about how identifying and separating logic and side effects from pure components can make a code base easier to reason about and to test.
 
 You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline

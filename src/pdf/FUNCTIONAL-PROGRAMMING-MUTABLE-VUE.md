@@ -441,7 +441,7 @@ All the tests are now passing. I think this refactor is a good one; we pushed th
 
 ## Reflections and Philosophy
 
-This section explores concepts that I think separates greate developers from everyone else. Separation of concerns is really about understanding what a function should do, and where to draw the lines between the different parts of a system.
+This section explores the kind of concepts that I think separates junior and senior developers. It is one thing to just write some code that works. It's another entirely to really understand the different parts of your system and how the work together. Separation of concerns is really about understanding what a function should do, and where to draw the lines between the different parts of a system.
 
 There are some easy ways to see if you are separating your Vue UI logic from your business logic, or in a more general sense, your imperative shell from your functional core: 
 

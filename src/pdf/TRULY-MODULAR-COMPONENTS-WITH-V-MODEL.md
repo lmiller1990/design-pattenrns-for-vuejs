@@ -64,7 +64,7 @@ Wrapping `<DateTime>` to provide Luxon integration.
 
 This might work okay - now you can put your `<DateTimeLuxon>` on npm to share, listing `luxon` as a `peerDependency` in `package.json`. But other people may have different ways they'd like to validate the date from v-model before calling `updateValue`, or have a different opinion on the API `<DateTimeLuxon>` should expose. Can we be more flexible? What about moment? Do we need to make a `<DateTimeMoment>` component too? 
 
-The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. The `<DateTime>` component doesn't need to know the specifics of the DateTime object it is dealing with.
+The core problem of the "wrapper" solution is you are adding another abstraction - another layer. Not ideal. The problem that needs solving is *serializing* and *deserializing* `v-model` in a library agnostic way. The `<DateTime>` component doesn't need to know the specifics of the Date library that it is working with.
 
 Here is the API I am proposing to make `<DateTime>` truly agnostic, not needing to know the implementation details of the date library:
 
@@ -81,7 +81,7 @@ Here is the API I am proposing to make `<DateTime>` truly agnostic, not needing 
 
 `date` can be whatever you want - `serialize` and `deserialize` will be the functions that tell `<DateTime>` how to handle the value, which will be some kind of DateTime object. This pattern is generalized as the "strategy" pattern. A textbook definition is as follows:
 
-> In computer programming, the strategy pattern (also known as the policy pattern) is a behavioral software design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of algorithms to use (https://en.wikipedia.org/wiki/Strategy_pattern). The strategy lets the algorithm vary independently from clients that use it.
+> In computer programming, the strategy pattern (also known as the policy pattern) is a behavioral software design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of design patterns to use (https://en.wikipedia.org/wiki/Strategy_pattern). The strategy lets the algorithm vary independently from clients that use it.
 
 The key part is the last sentence. We push the onus of selecting the algorithm onto the developer.
 
@@ -169,7 +169,7 @@ function update($event: Event, field: "year" | "month" | "day") {
 </script>
 ```
 \begin{center}
-Implementing v-model for the datetime.
+Implementing v-model for the DateTime.
 \end{center}
 
 Usage is like this:
@@ -476,7 +476,7 @@ function update($event: Event, field: "year" | "month" | "day") {
 }
 ```
 
-I just added a check - `if (!asObject)` and return early if the `props.serialize` did not return a value.
+I just added a check - `if (!isObj)` and return early if the `props.serialize` did not return a value.
 
 Now everything works correctly, and `<DateTime>` will only update `modelValue` if the date is valid. This behavior is a design decision I made; you could do something different depending on how you would like your `<DateTime>` to work.
 
@@ -486,13 +486,12 @@ Adding support for Moment is not especially difficult or interesting - it is lef
 
 The goal here was to create a highly reusable `<DateTime>` component. If I was going to release this on npm, there is a few things I'd do.
 
-1. Remove `serialize` and `deserialize` from the `<DateTime>` component and put them into another file. Perhaps one called `strategies.js` or `serializers.js`.
-2. Write a number of strategies (serialize/deserialize pairs) for popular DateTime libraries (Luxon, Moment etc).
-3. Build and bundle the component and strategies separately. 
+1. Write a number of strategies (serialize/deserialize pairs) for popular DateTime libraries (Luxon, Moment etc).
+2. Build and bundle the component and strategies separately. 
 
 This will allow developers using tools like webpack or Rollup to take advantage of "tree shaking". When they build their final bundle for production, it will only include the `<DateTime>` component and the strategy they are using. It will also allow the developer to provide their own more opinionated strategy.
 
-To make the component even more reusable, we could consider writing it as a renderless component, like the one described in the renderless components section.
+To make the component even more reusable, we could consider writing it as a renderless component, like the one described in the Renderless Components chapter.
  
 ## Exercises
 

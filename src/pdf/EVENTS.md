@@ -50,7 +50,7 @@ I find this both less error prone and easier to understand. More often than not,
 
 Defining and emitting events is all good and well, but in general you won't just do this arbitrarily, but in response to a user doing something, like clicking, typing, or something else. 
 
-You can listen for an event using `v-on:event`, or better yet, the shorthand - `@event`. Most people reading this book wil know this - but there's some more intricacies that are worth understanding. There are *hundreds* of events defined by the Web API. You've probably encountered some of the more common events, like `click`:
+You can listen for an event using `v-on:event`, or better yet, the shorthand - `@event`. Most people reading this book will know this - but there's some more intricacies that are worth understanding. There are *hundreds* of events defined by the Web API. You've probably encountered some of the more common events, like `click`:
 
 ```html
 <button @click="foo()">Button</button>
@@ -64,7 +64,7 @@ But how about `canplaythrough`?
 
 Once the `<video>` is ready, as indicated by the `canplaythrough` event, you can respond appropriately. There are lots of events available for `HTMLVideoElement`. Making a really clean video player that uses the native events would be a good learning project. You can find a full list of native events [here](https://developer.mozilla.org/en-US/docs/Web/Events#event_listing): https://developer.mozilla.org/en-US/docs/Web/Events#event_listing.
 
-You can responde to custom events in the same way as standard HTML events. Before we get into custom events, let's talk about native events a little more.
+You can respond to custom events in the same way as standard HTML events. Before we get into custom events, let's talk about native events a little more.
 
 ## The Secret Life of `@event` 
 
@@ -113,7 +113,7 @@ function Counter () {
 
 Both frameworks do the same thing, at least conceptually. If you pass a callback function to a native event, you get the native event as the first argument (unless you pass something else).
 
-Vue will pass a native event. A `PointerEvent`, in fact, with `type: "click"`, `x` and `y` values, and various other interesting things. There isn't anything Vue specific about it. It's the raw HTML event from the underyling `<input>`. 
+Vue will pass a native event. A `PointerEvent`, in fact, with `type: "click"`, `x` and `y` values, and various other interesting things. There isn't anything Vue specific about it. It's the raw HTML event from the underlying `<input>`. 
 
 React is a little different. React will pass something they calla a `SyntheticBaseEvent`. React has it's own event system that wraps the native events. It does give you native event under the `nativeEvent` property, so it's there if you want it.
 
@@ -287,7 +287,7 @@ If I am passing any arguments, I use the third style - `@event="$event => handle
 
 The only reason for this preference is that I like to think of `@click` as taking a *callback*. If you do pass a function invocation, eg `@click="handleComplete(todo)"`, Vue converts it to the `$event => handleComplete(todo)` syntax under the hood anyway. I just like to be consistent. 
 
-I've also found that using this consistent style helps greatly when onboarding developers from other frameworks, such as React, to be helpful. Even though *you* know how Vue the invocation style will be transformed by Vue under the hood, not everyone else will, nor should they need to.
+I've also found that using this consistent style helps greatly when on boarding developers from other frameworks, such as React, to be helpful. Even though *you* know how Vue the invocation style will be transformed by Vue under the hood, not everyone else will, nor should they need to.
 
 ## Some Simple Guidelines for Events
 
@@ -365,7 +365,7 @@ A bit more code - but I think the component is more clear now.
 
 ## Be Cautious with Positional Arguments
 
-Our `createPatient` event uses positional arguments now. We could switch the order of `firstName` and `familyName`:
+Our `createPatient` event uses positional parameters now. We could switch the order of `firstName` and `familyName`:
 
 ```ts
 function handleCreate () {
@@ -375,7 +375,7 @@ function handleCreate () {
 
 Now we've got a pretty significant bug - but no compilation error, since they are both `string` types.
 
-In general, unless I only have a small number of arguments, I like to use objects for my event payloads. Now is a great time to extract an `interface`:
+In general, unless I only have a small number of parameters, I like to use objects for my event payloads. Now is a great time to extract an `interface`:
 
 ```html
 <template>
@@ -483,7 +483,7 @@ import { API } from './api'
 </script>
 ```
 
-We get type safety all the way from the event getting emitted to the API call that performs the POST request. Plus, our component is very concise - because all the business logic is abtracted away into separate modules that are not coupled to our framework, as they should be.
+We get type safety all the way from the event getting emitted to the API call that performs the POST request. Plus, our component is very concise - because all the business logic is abstracted away into separate modules that are not coupled to our framework, as they should be.
 
 ## Use the `submit` Event Correctly
 

@@ -66,7 +66,7 @@ This example shows a great use case for render functions. Without them, you migh
 </template>
 ```
 \begin{center}
-Alterntive, less flexible syntax.
+Alternative, less flexible syntax.
 \end{center}
 
 As far as general development goes, I think the former is much cleaner and lends itself to a better development experience. 
@@ -244,7 +244,7 @@ The first one is `children`. This is where the slots go. For example in:
 <Tab tabId="1">Tab #1</tab>
 ```
 
-There is one child, `Tab #1`. In this case, it is a *text node* - just some text. It could be another `VNode`, which in turn could contain more `VNodes` - a tree like structure.
+There is one child, `Tab #1`. In this case, it is a *text node* - just some text. It could be another `VNode`, which in turn could contain more `VNode` - a tree like structure.
 
 The next marked property is `props` - this one is pretty obvious, it's the props we passed. In this case, there is just one - `tabId`.
 
@@ -429,7 +429,7 @@ Which renders:
 </div>
 ```
 
-You can also pass more `VNodes`, created with nested calls to `h`:
+You can also pass more `VNode`s, created with nested calls to `h`:
 
 ```js
 const el = h(
@@ -451,7 +451,7 @@ const el = h(
 Children can be plain text or VNodes.
 \end{center}
 
-I spread it out to make it more readable. `render` functions using `h` can get messy - you need to be displined. Some tips will follow relating to this. The above call to `h` gives us:
+I spread it out to make it more readable. `render` functions using `h` can get messy - you need to be disciplined. Some tips will follow relating to this. The above call to `h` gives us:
 
 ```html
 <div class="tab" foo="bar">
@@ -574,7 +574,7 @@ This is the `h` function version of `<Tab v-on:click="update:activeTabId(tabId)"
 
 ## Filtering Content
 
-The last feature we need to implement is rendering the content - but only the content that matches the `activeTabId`. Instead of using `filter` to get the `contents` `VNodes`, we should use `find` - there will only ever be one tab selected at any given time. Use `find` instead of `filter` in the `render` function:
+The last feature we need to implement is rendering the content - but only the content that matches the `activeTabId`. Instead of using `filter` to get the `contents` `VNode`s, we should use `find` - there will only ever be one tab selected at any given time. Use `find` instead of `filter` in the `render` function:
 
 ```js
 const contentFilter = (
@@ -658,7 +658,7 @@ export const TabContainer = defineComponent({
 Completed TabContainer component.
 \end{center}
 
-It's possible to return an array of `VNodes` from `render`, which is what we do here. We kept everything nice and readable by creating separate variables for each of the different elements we are rendering - in this case, `tabs` and `tabContent`. 
+It's possible to return an array of `VNode`s from `render`, which is what we do here. We kept everything nice and readable by creating separate variables for each of the different elements we are rendering - in this case, `tabs` and `tabContent`. 
 
 It works!
 
