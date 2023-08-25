@@ -18,7 +18,7 @@ This idea comes in many forms; another is "data driven interfaces". Basically, y
 
 Given X data, your UI should be in Y state. In computer science, this idea is often referred to as *determinism*. The canonical example is this `sum` function for example:
 
-```js
+```ts
 function sum(a, b) {
   return a + b
 }
@@ -29,7 +29,7 @@ A simple sum function. It's a pure function.
 
 When called with the same value for `a` and `b`, you always get same result. The result is pre-determined. It's *deterministic*. An example of an impure function would be this:
 
-```js
+```ts
 async function fetchUserData(userId) {
   return axios.get(`/api/users/${userId}`)
 }
@@ -192,7 +192,7 @@ This search and extract mission made the task much more difficult and risky than
 
 Here is a concrete example using the above real-world scenario. Let's say a resistor (a kind of electrical component) costs $0.60. If you buy over 50, you get a 20% discount. The jQuery code-base looked something like this (but vastly more convoluted):
 
-```js
+```ts
 const $resistorCount = $('#resistors-count')
 
 $resistorCount.change((event) => {
@@ -211,7 +211,7 @@ You need to look really carefully to figure out where the UI ends and the busine
 
 If we inspect the snippet above, we can see which lines are related to the user interface, and which are the core business:
 
-```js
+```ts
 // user interface
 const $resistorCount = $('#resistors-count')
 
@@ -239,7 +239,7 @@ $resistorCount.change((event) => {
 
  This search-extract-isolate-rewrite journey is full of risk and the chance of making a mistake or missing something is very high! What would have been much better is if the business logic and UI had be separated:
 
-```js
+```ts
 // Business logic
 const resistorPrice = 0.6
 function resistorCost(price, amount) {
@@ -287,6 +287,11 @@ Understanding and identifying the different concerns in a system and correctly s
 ## Conclusion
 
 This chapter discussed props, along with some foundational concepts - separation of concerns, pure components, and user interfaces. We talked about how identifying and separating logic and side effects from pure components can make a code base easier to reason about and to test.
+
+## Exercises
+
+1. Trying writing some tests for the version of `<Sum>` that doesn't contain any side effects. 
+2. How about testing the component that makes the API request? Consider mocking/stubbing the request. For some ideas on how to approach this, see the chapter "HTTP and API Requests".
 
 You can find the completed source code in the [GitHub repository under examples/props](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
 \newline

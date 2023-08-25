@@ -19,10 +19,10 @@ If you application is simple, you probably won't need something like Vuex, Pinia
 
 ```html
 <template>
-  <h1 v-if="user">Hello, {{ user.name }}</h1>
+  <h1 v-if="user">Hello, {{ user.username }}</h1>
   <form @submit.prevent="handleAuth">
-    <input v-model="formData.username" />
-    <input v-model="formData.password" type="password" />
+    <input v-model="formData.username" id="username" />
+    <input v-model="formData.password" id="password" type="password" />
     <button>Click here to sign in</button>
   </form>
   <span v-if="error">{{ error }}</span>
@@ -33,7 +33,7 @@ import axios, { AxiosError } from "axios";
 import { reactive, ref } from "vue";
 
 interface User {
-  name: string;
+  username: string;
 }
 
 const formData = reactive({
@@ -45,12 +45,15 @@ const user = ref<User>();
 const error = ref<string>();
 
 async function handleAuth() {
+
   try {
     const response = await axios.post<User>("/login");
     user.value = response.data;
   } catch (e) {
     // Axios types aren't fantastic
-    error.value = (e as AxiosError<any, { error: string }>).response?.data?.error
+    error.value = (
+      e as AxiosError<any, { error: string }>
+    ).response?.data?.error;
   }
 }
 </script>
@@ -74,8 +77,7 @@ A test where the user successfully authenticates might look like this:
 ```ts
 import { describe, it, beforeEach, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
-import Login from "../Login.vue";
-import { createPinia, Pinia, setActivePinia } from "pinia";
+import Login from "./Login.vue";
 
 vi.mock("axios", () => {
   return {
@@ -92,28 +94,20 @@ vi.mock("axios", () => {
 });
 
 describe("login", () => {
-  let pinia: Pinia;
-
-  beforeEach(() => {
-    pinia = createPinia();
-    setActivePinia(pinia);
-  });
-
   it("successfully authenticates", async () => {
-    const { container } = render(Login, {
-      global: { plugins: [pinia] },
-    });
+    const { container } = render(Login);
 
     await fireEvent.update(
       container.querySelector("#username")!,
       "Lachlan"
     );
+
     await fireEvent.update(
       container.querySelector("#password")!,
       "secret-password"
     );
-    await fireEvent.click(screen.getByText("Click here to sign in"));
 
+    await fireEvent.click(screen.getByText("Click here to sign in"));
     await screen.findByText("Hello, Lachlan");
   });
 });
@@ -130,7 +124,7 @@ If you are working on anything other than a trivial application, you probably do
 
 More often than not, you end up with a Pinia store that looks like this:
 
-```js
+```ts
 import axios from "axios";
 import { defineStore } from "pinia";
 
@@ -209,9 +203,9 @@ You now need a Pinia store in your test, too. You have a few options. The two mo
 - Use a real Pinia store - continue mocking Axios.
 - Use a mock Pinia store.
 
-The first option would look something like this:
+The first option would look something like this. It's very similar to the first test I shared; the only difference is that we now need a Pinia store. The actual test doesn't focus on implementation details, so other than providing the Pinia store, everything else stays the same.
 
-```js
+```ts
 import { createPinia, Pinia, setActivePinia } from "pinia";
 import axios from 'axios'
 
@@ -297,7 +291,7 @@ describe("login with mocking pinia", () => {
 Mocking Piina. 
 \end{center}
 
-Since we are mocking the Pinia store now, we have bypassed `axios` entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also have fine grained control over the state of the store - in the snippet above.
+Since we are mocking the Pinia store now, we have bypassed the `axios` module entirely. This style of test is tempting at first. There is less code to write. It's very easy to write. You can also have fine grained control over the state of the store - in the snippet above.
 
 Again, the actual test code didn't change much - we are no longer passing a `store` to `render` (since we are not even using a real store in the test, we mocked it out entirely). We don't mock `axios` any more - instead we have `mockLogin`. We are asserting the correct action was called. 
 
@@ -340,7 +334,7 @@ This is better. If something breaks in either the `<Login>` or Pinia, the test w
 
 Wouldn't it be great to avoid mocking Axios, too? This way, we could not need to do:
 
-```js
+```ts
 let mockPost = vi.fn()
 
 vi.mock('axios', () => {
@@ -370,7 +364,7 @@ Both these do exactly what is discussed above - it operates one level lower than
 
 Let's try mocking the network layer instead. Basic usage is like this for Mock Service Worker:
 
-```js
+```ts
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 
@@ -390,40 +384,59 @@ A basic server with Mock Service Worker:
 
 The nice thing is we are not mocking Axios anymore. You could change you application to use `fetch` instead - and you wouldn't need to change you tests at all, because we are now mocking at a layer lower than before. 
 
-A full test using Mock Service Worker looks like this:
+A full test using Vitest and Mock Service Worker looks like this:
 
-```js
-import { render, fireEvent, screen } from '@testing-library/vue'
-import { rest } from 'msw'
-import { setupServer } from 'msw/node'
-import App from './app.vue'
-import { store } from './store.js'
+```ts
+import { describe, it, beforeEach, afterEach } from "vitest";
+import { render, fireEvent, screen } from "@testing-library/vue";
+import { rest } from "msw";
+import { SetupServer, setupServer } from "msw/node";
+import Login from "../Login.vue";
+import { createPinia, Pinia, setActivePinia } from "pinia";
 
-const server = setupServer(
-  rest.post('/login', (req, res, ctx) => {
-    return res(
-      ctx.json({
-        name: 'Lachlan'
+describe("login", () => {
+  let pinia: Pinia;
+
+  beforeEach(() => {
+    pinia = createPinia();
+    setActivePinia(pinia);
+  });
+
+  let server: SetupServer;
+
+  afterEach(() => {
+    server.close();
+  });
+
+  it("successfully authenticates", async () => {
+    server = setupServer(
+      rest.post("/login", (req, res, ctx) => {
+        return res(
+          ctx.json({
+            username: "Lachlan",
+          })
+        );
       })
-    )
-  })
-)
+    );
+    server.listen();
 
-describe('login', () => {
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+    const { container } = render(Login, {
+      global: { plugins: [pinia] },
+    });
 
-  it('successfully authenticates', async () => {
-    render(App, { store })
     await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
+      container.querySelector("#username")!,
+      "Lachlan"
+    );
     await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
-    await fireEvent.click(screen.getByText('Click here to sign in'))
+      container.querySelector("#password")!,
+      "secret-password"
+    );
+    await fireEvent.click(screen.getByText("Click here to sign in"));
 
-    await screen.findByText('Hello, Lachlan')
-  })
-})
+    await screen.findByText("Hello, Lachlan");
+  });
+}):
 ```
 \begin{center}
 Using MSW instead of mocking Axios.
@@ -439,7 +452,7 @@ it("successfully authenticates", () => {
     req.reply({
       username: "Lachlan",
     });
-  });
+  }).as("login");
 
   cy.mount(Login, { global: { plugins: [pinia] } });
 
@@ -456,17 +469,17 @@ I like this one, because all the information is contain in the `it` block. No ne
 One thing we are not doing in these tests that we were doing previously is asserting the expected payload is sent to the server. If you want to do that, you can just keep track of the posted data with an array, for example:
 
 ```ts
-const postedData: any[] = []
+const postedData: any[] = [];
 const server = setupServer(
-  rest.post('/login', (req, res, ctx) => {
-    postedData.push(req.body)
+  rest.post("/login", (req, res, ctx) => {
+    postedData.push(req.body);
     return res(
       ctx.json({
-        name: 'Lachlan'
+        name: "Lachlan",
       })
-    )
+    );
   })
-)
+);
 ```
 \begin{center}
 Keeping track of posted data.
@@ -476,22 +489,24 @@ Now you can just assert that `postedData[0]` contains the expected payload. You 
 
 For completion, Cypress does it like this:
 
-```js
+```ts
 it("successfully authenticates", () => {
+  // Alias
   cy.intercept("/login", (req) => {
     req.reply({
       username: "Lachlan",
     });
   }).as('login');
 
-  cy.mount(Login, { global: { plugins: [pinia] } });
+  // ... 
 
-  cy.get("#username").type("Lachlan");
-  cy.get("#password").type("secret-password");
-  cy.get("button").contains("Click here to sign in").click();
-
-  cy.get('@login').its('request.body').should('eql', { username: "Lachlan", password: "secret-password" })
-  cy.contains("Hello, Lachlan");
+  // Assert against request.body
+  cy.get("@login")
+    .its("request.body")
+    .should("eql", {
+      username: "Lachlan",
+      password: "secret-password",
+    });
 });
 ```
 \begin{center}
@@ -502,7 +517,7 @@ Again, all in one block - looking good!
 
 Mock Service Work and Cypress can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where these approaches really shine compared to the using `vi.mock` to mock Axios. Let's add another test for this exact case:
 
-```js
+```ts
 describe('login', () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
@@ -511,37 +526,71 @@ describe('login', () => {
     // ...
   })
 
-  it('handles incorrect credentials', async () => {
-    const error = 'Error: please check the details and try again' 
-    server.use(
-      rest.post('/login', (req, res, ctx) => {
+  it("handles incorrect credentials", async () => {
+    const error = "Error: please check the details and try again";
+    server = setupServer(
+      rest.post("/login", (req, res, ctx) => {
         return res(
-          ctx.status(403),
-          ctx.json({ error })
-        )
+          ctx.json({
+            username: "Lachlan",
+          })
+        );
       })
-    )
+    );
+    server.use(
+      rest.post("/login", (req, res, ctx) => {
+        return res(ctx.status(403), ctx.json({ error }));
+      })
+    );
+    server.listen();
 
-    render(App, { store })
-    await fireEvent.update(
-      screen.getByRole('username'), 'Lachlan')
-    await fireEvent.update(
-      screen.getByRole('password'), 'secret-password')
-    await fireEvent.click(screen.getByText('Click here to sign in'))
+    const { container } = render(Login, {
+      global: { plugins: [pinia] },
+    });
 
-    await screen.findByText(error)
-  })
+    await fireEvent.update(
+      container.querySelector("#username")!,
+      "Lachlan"
+    );
+    await fireEvent.update(
+      container.querySelector("#password")!,
+      "secret-password"
+    );
+    await fireEvent.click(screen.getByText("Click here to sign in"));
+
+    await screen.findByText(error);
+  });
 })
 ```
 \begin{center}
 A test for a failed request.
 \end{center}
 
-The Cypress version is included in the final source code. 
+It's quite verbose. The Cypress version is a quite a bit more concise, but both do the job:
+
+```ts
+it("handles incorrect credentials", () => {
+  const error = "Error: please check the details and try again";
+  cy.intercept("/login", {
+    statusCode: 403,
+    body: {
+      error,
+    },
+  });
+
+  cy.mount(Login, { global: { plugins: [pinia] } });
+
+  cy.get("#username").type("Lachlan");
+  cy.get("#password").type("secret-password");
+  cy.get("button").contains("Click here to sign in").click();
+
+  cy.contains(error);
+});
+```
 
 It's easy to extend the mock server on a test by test basis, or add additional `cy.intercept()` calls. Writing these two tests using `vi.mock` to mock Axios would be very messy!
 
-Another very cool feature about MSW is you can use it in a browser during development. It isn't showcased here, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
+MSW also works in a browser. You can use it during development to mock out APIs. It is beyond the scope of this chapter, but a good exercise would be to try it out and experiment. Can you use the same endpoint handlers for both tests and development?
 
 ## Conclusion
 
@@ -553,5 +602,6 @@ Tests MSW is not enough - you still need to test your application against a real
 
 - Trying using MSW in a browser. You can use the same mock endpoint handlers for both your tests and development.
 - Explore MSW more and see what other interesting features it offers.
+- Compare Cypress, MSW and other runners. Figure out which one like you better, and which one fits your workflow best.
 
 \pagebreak

@@ -12,7 +12,7 @@ Your user interface is a function of your data.
 
 This idea comes in many forms; another is "data driven interfaces". Basically, your user interface (UI) should be determined by the data present. Given X data, your UI should be Y. In computer science, this is referred to as *determinism*. Take this `sum` function for example:
 
-```js
+```ts
 function sum(a, b) {
   return a + b
 }
@@ -23,7 +23,7 @@ A simple sum function. It's a pure function.
 
 When called with the same value for `a` and `b`, you always get same result. The result is pre-determined. It's *deterministic*. An example of an impure function would be this:
 
-```js
+```ts
 async function fetchUserData(userId) {
   return axios.get(`/api/users/${userId}`)
 }
@@ -58,7 +58,7 @@ Declaring a variant prop with the inferior array syntax.
 
 In this example we declare props using the array syntax: `props: ['variant']`. I recommend avoiding the array syntax. Using the object syntax gives the reader more insight into the type of values `variant` can take:
 
-```js
+```ts
 export default {
   props: {
     variant: {
@@ -94,7 +94,7 @@ In our `<message>` example, we are working with regular JavaScript, so we cannot
 
 We have specified the `variant` prop is `required`, and we would like to enforce a specific subset of string values that it can receive. Vue allows us to validate props using a `validator` key. It works like this:
 
-```js
+```ts
 export default {
   props: {
     variant: {
@@ -114,7 +114,7 @@ Prop validators are like the `sum` function we talked about earlier in that they
 
 Before we add a validator, let's write a simple test for the `<message>` component. We want to test *inputs* and *outputs*. In the case of `<message>`, the `variant` prop is the input, and what is rendered is the output. We can write a test to assert the correct class is applied using Testing Library and the `classList` attribute:
 
-```js
+```ts
 import { render, screen } from '@testing-library/vue'
 import Message, { validateVariant } from './message.vue'
 
@@ -141,7 +141,7 @@ This verifies everything works as expected when a valid `variant` prop is passed
 
 Let's update the `variant` prop to have a simple validator:
 
-```js
+```ts
 export default {
   props: {
     variant: {
@@ -209,7 +209,7 @@ Exporting the validator separately to the component.
 
 Great, `validateVariant` is now exported separately and easy to test:
 
-```js
+```ts
 import { render, screen } from '@testing-library/vue'
 import Message, { validateVariant } from './message.vue'
 
@@ -271,7 +271,7 @@ Not only did I need to rewrite the entire UI layer (which was what I was paid to
 
 Here is a concrete example using the above real-world scenario. Let's say a resistor (a kind of electrical component) costs $0.60. If you buy over 50, you get a 20% discount. The jQuery code-base looked something like this:
 
-```js
+```ts
 const $resistorCount = $('#resistors-count')
 
 $resistorCount.change((event) => {
@@ -288,7 +288,7 @@ $resistorCount.change((event) => {
 
 You need to look really carefully to figure out where the UI ends and the business starts. In this scenario, I wanted to move to Vue - the perfect tool for a highly dynamic, reactive form. I had to dig through the code base and figure out this core piece of business logic, extract it, and rewrite it with some tests (of course the previous code base had no tests, like many code bases from the early 2000s). This search-extract-isolate-rewrite journey is full of risk and the chance of making a mistake or missing something is very high! What would have been much better is if the business logic and UI had be separated:
 
-```js
+```ts
 const resistorPrice = 0.6
 function resistorCost(price, amount) {
   if (amount > 50) {
@@ -361,7 +361,7 @@ The navbar component. It has one prop, authenticated. It is false by default.
 
 Before even seeing the test, it is clear we need *two* tests to cover all the use cases. The reason this is immediately clear is the `authenticated` prop is a `Boolean`, which only has two possible values. The test is not especially interesting (but the discussion that follows is!):
 
-```js
+```ts
 import { render, screen } from '@testing-library/vue'
 import Navbar from './navbar.vue'
 
@@ -392,7 +392,7 @@ The only thing that changes based on the value of `authenticated` is the button 
 
 We can refactor a little with a `renderNavbar` function:
 
-```js
+```ts
 describe('Navbar', () => {
   function renderNavbar(props) {
     render(Navbar, {
@@ -421,7 +421,7 @@ I also removed the new line between the rendering the component and making the a
 
 Although we technically have covered all the cases, I like to add the third case: where `authenticated` is explicitly set to `false`.
 
-```js
+```ts
 describe('navbar', () => {
   function renderNavbar(props) {
     render(Navbar, {

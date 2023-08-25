@@ -74,7 +74,7 @@ We probably want to test:
 
 A test where the user successfully authenticates might look like this:
 
-```js
+```ts
 import { render, fireEvent, screen } from '@testing-library/vue'
 import App from './app.vue'
 
@@ -113,7 +113,7 @@ Testing a failed request is straight forward as well - you would just throw an e
 
 If you are working on anything other than a trivial application, you probably don't want to store the response in component local state. The most common way to scale a Vue app has traditionally been Vuex. More often than not, you end up with a Vuex store that looks like this:
 
-```js
+```ts
 import axios from 'axios'
 
 export const store = {
@@ -146,7 +146,7 @@ There are many strategies for error handling in this set up. You can have a loca
 
 Either way, the `<login>` component using a Vuex store would look something like this:
 
-```js
+```ts
 <template>
   <!-- no change -->
 </template>
@@ -193,7 +193,7 @@ You now need a Vuex store in your test, too. You have a few options. The two mos
 
 The first option would look something like this:
 
-```js
+```ts
 import { store } from './store.js'
 
 describe('login', () => {
@@ -211,7 +211,7 @@ I like this option. We continue to mock `axios`. The only change we made to the 
 
 To further illustrate this is a good test, I am going to make another refactor and convert the component to use the Composition API. Everything *should* still pass:
 
-```js
+```ts
 <template>
   <!-- no changes -->
 </template>
@@ -265,7 +265,7 @@ As your application gets larger and larger, though, using a real store can becom
 
 Testing Library does not support mocking things so easily - intentionally. They want your tests to be as production-like as possible, which means using real dependencies whenever possible. I like this philosophy. To see why I prefer to use a real Vuex store in my tests, let's see what happens if we mock Vuex using `jest.mock`. 
 
-```js
+```ts
 let mockDispatch = jest.fn()
 jest.mock('vuex', () => ({
   useStore: () => ({
@@ -323,7 +323,7 @@ This is better. If something breaks in either the `<login>` or Vuex, the test wi
 
 Wouldn't it be great to avoid mocking `axios`, too? This way, we could not need to do:
 
-```js
+```ts
 let mockPost = jest.fn()
 jest.mock('axios', () => ({
   post: (url, data) => {
@@ -346,7 +346,7 @@ A new library has come into the scene relatively recently - Mock Service Worker,
 
 Let's try it out. Basic usage is like this:
 
-```js
+```ts
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 
@@ -368,7 +368,7 @@ The nice thing is we are not mocking `axios` anymore. You could change you appli
 
 A full test using `msw` looks like this:
 
-```js
+```ts
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
@@ -407,7 +407,7 @@ You can have even less boilerplate by setting up the server in another file and 
 
 One thing we are not doing in this test that we were doing previously is asserting the expected payload is sent to the server. If you want to do that, you can just keep track of the posted data with an array, for example:
 
-```js
+```ts
 const postedData = []
 const server = setupServer(
   rest.post('/login', (req, res, ctx) => {
@@ -428,7 +428,7 @@ Now you can just assert that `postedData[0]` contains the expected payload. You 
 
 `msw` can do a lot of other things, like respond with specific HTTP codes, so you can easily simulated a failed request, too. This is where `msw` really shines compared to the using `jest.mock` to mock `axios`. Let's add another test for this exact case:
 
-```js
+```ts
 describe('login', () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())

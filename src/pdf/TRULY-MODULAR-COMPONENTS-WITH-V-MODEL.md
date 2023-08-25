@@ -218,7 +218,7 @@ We will now work on the `deserialize` prop, which is a function that will conver
 
 The next goal is to write a `deserialize` function. In pseudocode:
 
-```js
+```ts
 export function deserialize(inputDateTime) {
   // do whatever needs to be done to convert
   // the inputDateTime to a JS object with
@@ -228,7 +228,7 @@ export function deserialize(inputDateTime) {
 
 I will use Luxon's `DateTime` to demonstrate. You can create a new `DateTime` like this:
 
-```js
+```ts
 import Luxon from 'luxon'
 
 const date = Luxon.DateTime.fromObject({
@@ -444,7 +444,7 @@ In the case of an error - either we could not serialize or deserialize the value
 
 Let's update `serialize` to be more defensive:
 
-```js
+```ts
 export function serialize(value: InternalDateTime): DateTime | undefined {
   try {
     const obj = DateTime.fromObject(value);

@@ -27,7 +27,7 @@ Let's get started.
 
 I will work out of a file called `renderless-password.js`. That's right - not a `vue` file. No need - we won't be shipping a `<template>`.
 
-```js
+```ts
 export default {
   setup(props, { slots }) {
     return () => slots.default({
@@ -79,7 +79,7 @@ The next feature we will add is the password and confirmation fields. We will al
 
 First, update `renderless-password.js` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
 
-```js
+```ts
 import { computed } from 'vue'
 
 export function isMatching(password, confirmation) {
@@ -192,7 +192,7 @@ For now, we will implement a very naive complexity check. Most developers will w
 
 As with `isMatching`, we will make a `calcComplexity` a pure function. Decoupled, deterministic, and easily testable.
 
-```js
+```ts
 import { computed } from 'vue'
 
 export function isMatching() {
@@ -349,7 +349,7 @@ You could still export `complexityStyle` and test it individually, but you still
 
 By writing a test and asserting against the DOM, you test `complexityStyle` implicitly. The test would look something like this (see the source code for the full working example):
 
-```js
+```ts
 it('meets default requirements', async () => {
   render(TestComponent)
 
@@ -372,7 +372,7 @@ The application now looks like this:
 
 Let's add the final feature: a button that is only enabled when a `valid` property is `true`. The `valid` property is exposed by the `<renderless-password>` and accessed via `v-slot`.
 
-```js
+```ts
 import { computed } from 'vue'
 
 export isMatching() {

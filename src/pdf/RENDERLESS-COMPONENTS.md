@@ -41,7 +41,7 @@ All the code will be in one file - an SFC named `<RenderlessPassword>`, that int
 
 *Note*: A previous edition of this book didn't use an SFC at all. Instead, we returned a render function from `setup` like this:
 
-```js
+```ts
 export default {
   setup(props, { slots }) {
     return () => slots.default({

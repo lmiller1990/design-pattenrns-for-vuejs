@@ -189,7 +189,7 @@ We will now work on the `deserialize` prop, which is a function that will conver
 
 The next goal is to write a `deserialize` function. In pseudocode:
 
-```js
+```ts
 export function deserialize(inputDateTime) {
   // do whatever needs to be done to convert
   // the inputDateTime to a JS object with
@@ -199,7 +199,7 @@ export function deserialize(inputDateTime) {
 
 I will use Luxon's `DateTime` to demonstrate. You can create a new `DateTime` like this:
 
-```js
+```ts
 import { DateTime } from 'luxon'
 
 const date = DateTime.fromObject({
@@ -211,7 +211,7 @@ const date = DateTime.fromObject({
 
 The goal is to get from our input from `v-model`, in this case a Luxon `DateTime`, to our internal representation, `InternalDateTime`. This conversion is trivial in the case of Luxon's DateTime. You can just do `date.get()` passing in `year`, `month` or `day`. So our `deserialize` function looks like this:
 
-```js
+```ts
 // value is what is passed to `v-model`
 // in this example a Luxon DateTime
 // we need to return an InternalDateTime
@@ -339,7 +339,7 @@ We need to ensure are calling `emit('update:modelValue'`) with a Luxon `DateTime
 
 Let's write a `serialize` function to transform the value. It's simple. Luxon's `DateTime.fromObject` happens to take an object with the same shape as our `InternalDateTime` - `{ year, month, day }`. We will see a more complex example with the Moment integration.
 
-```js
+```ts
 export function serialize(value) {
   return DateTime.fromObject(value)
 }
@@ -445,7 +445,7 @@ In the case of an error - either we could not serialize or deserialize the value
 
 Let's update `serialize` to be more defensive:
 
-```js
+```ts
 export function serialize(value) {
   try {
     const obj = DateTime.fromObject(value)
@@ -462,7 +462,7 @@ export function serialize(value) {
 
 In the case that we failed to serialize the value, we just return `undefined`. Update the `emit` in `<date-time>` to use this new logic; if the value is invalid, we simply do not update modelValue:
 
-```js
+```ts
 export default {
   props: {
     // ...

@@ -79,7 +79,7 @@ One of the nice things about render function components is you can create multip
 
 Start by creating those two components. We won't be using a `vue` file, but just a plain old `ts` file. The two components, `<Tab>` and `<TabContent>` have something in common:
 
-```js
+```ts
 import { h, defineComponent, useSlots } from 'vue'
 
 export const Tab = defineComponent({
@@ -164,7 +164,7 @@ This technique is very useful when making component libraries where many compone
 
 Now we get to the exciting part - the `render` function for the `<TabContainer>` component. It is going to be a `v-model` component, which means it has a prop named `modelValue`, and emits an event named `update:modelValue`.
 
-```js
+```ts
 export const TabContainer = defineComponent({
   props: {
     modelValue: {
@@ -256,7 +256,7 @@ Now we know how to identify which component a `VNode` is using - the `type` prop
 
 The `type` property is a *direct reference* to the component the `VNode` is using. This means we can match using an object and strict equality. If this sounds a bit abstract, let's see it in action and sort the slots into `tabs` and `contents`:
 
-```js
+```ts
 export const TabContainer = defineComponent({
   // ...
   setup(props, { emit }) {
@@ -303,7 +303,7 @@ The next goal will be to render the tabs. We will also add some classes to get s
 
 First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy (amazing?) `h` function afterwards:
 
-```js
+```ts
 import { h } from 'vue'
 
 export const TabContainer = defineComponent({
@@ -390,7 +390,7 @@ What is `h`? It is derived from the term "hyperscript", which in turn owes its r
 
 It has quite a few overloads. For example, a minimal usage would be:
 
-```js
+```ts
 const el = h('div')
 ```
 \begin{center}
@@ -399,7 +399,7 @@ A minimal VNode representing a div.
 
 This will create a single `<div>` - not very useful. The second argument can be attributes, represented by an object.
 
-```js
+```ts
 const el = h('div', { class: 'tab', foo: 'bar' })`
 ```
 \begin{center}
@@ -414,7 +414,7 @@ The attributes object can take an attribute - standard or not. This would render
 
 The third and final argument is children, usually an array:
 
-```js
+```ts
 const el = h('div', { class: 'tab', foo: 'bar' }, ['Content'])`
 ```
 \begin{center}
@@ -431,7 +431,7 @@ Which renders:
 
 You can also pass more `VNode`s, created with nested calls to `h`:
 
-```js
+```ts
 const el = h(
   'div', 
   { 
@@ -461,7 +461,7 @@ I spread it out to make it more readable. `render` functions using `h` can get m
 
 As shown above, you are not just limited to standard HTML elements. You can pass a custom component to `h`, too:
 
-```js
+```ts
 const Tab = {
   setup() {
     return () => h('span')
@@ -576,7 +576,7 @@ This is the `h` function version of `<Tab v-on:click="update:activeTabId(tabId)"
 
 The last feature we need to implement is rendering the content - but only the content that matches the `activeTabId`. Instead of using `filter` to get the `contents` `VNode`s, we should use `find` - there will only ever be one tab selected at any given time. Use `find` instead of `filter` in the `render` function:
 
-```js
+```ts
 const contentFilter = (
   component: any
 ): component is typeof TabContent => {

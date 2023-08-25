@@ -36,7 +36,7 @@ We will need to validate both the name and the weight. The form with errors look
 
 We will define the constraints using an object:
 
-```js
+```ts
 const limits = {
   kg: { min: 30, max: 200 },
   lb: { min: 66, max: 440 }
@@ -60,7 +60,7 @@ We will write two validation functions: `required` and `isBetween`. While test d
 
 Let's do that - starting with the tests for the `required` validator. Each validator will return an object with the validation status, and a message if there is an error. A validated input should have this shape:
 
-```js
+```ts
 interface ValidationResult {
   valid: boolean
   message?: string
@@ -72,7 +72,7 @@ This will be the format our two validators (and any future ones) will need to co
 
 ## The `required` validator
 
-```js
+```ts
 import {
   required,
 } from './form.js'
@@ -103,7 +103,7 @@ Tests for the required validator.
 
 Basically, anything that does not evaluated to `true` is invalid; anything else is considered valid. We can get all the tests passing with this implementation:
 
-```js
+```ts
 export function required(value) {
   if (!value) {
     return {
@@ -138,7 +138,7 @@ This means we need 5 tests:
 
 For this function, it is safe to assume that only numbers can be passed as the input value; this validation is something we will handle at a higher level.
 
-```js
+```ts
 import {
   required,
   isBetween
@@ -181,7 +181,7 @@ I think the tests are simple enough to have everything in a single `expect` stat
 
 The implementation is much less code than the tests; this is not unusual.
 
-```js
+```ts
 export function isBetween(value, { min, max }) {
   if (value < min || value > max) {
     return {
@@ -214,7 +214,7 @@ There are three scenarios to consider:
 
 I don't feel the need to add tests for all the cases as we did with `isBetween`, since we already tested that thoroughly.
 
-```js
+```ts
 import {
   required,
   isBetween,
@@ -262,7 +262,7 @@ You don't have to write your tests like this. I find it useful to think in terms
 
 Personal philosophy aside - the implementation, again, is much shorter than the test code. Notice a pattern? It's common for the test code to be longer than the implementation. It might feel a little strange at first, but it's not a problem and expected for complex logic.
 
-```js
+```ts
 export function validateMeasurement(value, { constraints }) {
   const result = required(value)
   if (!result.valid) {
@@ -290,7 +290,7 @@ We have two fields: `name` and `weight`.
 
 These are the *inputs*. It should have this shape:
 
-```js
+```ts
 // definition
 interface PatientFormState {
   name: string
@@ -316,7 +316,7 @@ Object describing the patient.
 Given an input (a `patientForm`), we can valid each field. Fields when validated are either `{ valid: true }` or `{ valid: false, message: '...' }`. So the form and validity interfaces could look like this:
 
 
-```js
+```ts
 interface ValidationResult {
   valid: boolean
   messsage?: string
@@ -357,7 +357,7 @@ We will need two functions:
 
 Let's start with the tests for `isFormValid`. The form is considered valid when all fields are `valid`, so we only need two tests: the case where all fields are valid, and the case where at least one field is not: 
 
-```js
+```ts
 import {
   required,
   isBetween,
@@ -403,7 +403,7 @@ Testing isFormValid.
 
 The implementation is simple:
 
-```js
+```ts
 export function isFormValid(form) {
   return form.name.valid && form.weight.valid
 }
@@ -424,7 +424,7 @@ We will want to have quite a few tests here, to make sure we don't miss anything
 4. Patient weight is outside constraints (metric)
 \pagebreak
 
-```js
+```ts
 import {
   required,
   isBetween,
@@ -503,7 +503,7 @@ Testing patientForm.
 
 The test code is quite long! The implementation is trivial, however. In this example, I am just hard-coding the weight constraints in an object called `limits`. In a real-world system, you would likely get these from an API and pass them down to the `patientForm` function.
 
-```js
+```ts
 const limits = {
   kg: { min: 30, max: 200 },
   lb: { min: 66, max: 440 },
@@ -625,7 +625,7 @@ I added the `<pre>` block for some debugging. Everything works!
 
 We can add some basic UI tests using Testing Library, too. Here are two fairly simple ones that cover most of the functionality:
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import FormValidation from './form-validation.vue'
 
@@ -657,7 +657,7 @@ Testing the UI layer with Testing Library.
 
 Since these tests are a little larger, I am making the separation between each step clear. I like to write my tests like this:
 
-```js
+```ts
 it('...', async () => {
   // Arrange - this is where we set everything up
   render(FormValidation)

@@ -36,7 +36,7 @@ There are two buttons. One increments the `count` value by 1. The other emits a 
 
 As with the other examples, this one uses Testing Library, but you could really use any testing framework - the important part is that we have a mechanism to let us know if we break something.
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import Counter from './counter.vue'
 
@@ -55,7 +55,7 @@ Observing the emitted events with emitted().
 
 I did a `console.log(emitted())` to illustrate how `emitted` works in Testing Library. If you run the test, the console output is as follows:
 
-```json
+```js
 { 
   submit: [ 
     [ 1 ] 
@@ -68,7 +68,7 @@ A submit event was emitted with one argument: the number 1.
 
 `emitted` is an object - each event is a key, and it maps to an array with an entry for each time the event was emitted. `emit` can have any amount of arguments; if I had written `$emit('submit', 1, 2, 3,)` the output would be:
 
-```json
+```js
 { 
   submit: [ 
     [ 1, 2, 3 ] 
@@ -81,7 +81,7 @@ A submit event was emitted with three arguments, 1, 2, 3.
 
 Let's add an assertion, before we get onto the main topic: patterns and practices for emitting events.
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import Counter from './counter.vue'
 
@@ -153,7 +153,7 @@ By declaring the events a component emits, it can make it easier for other devel
 
 You can declare events in the same way you declare props; using the array syntax:
 
-```js
+```ts
 export default {
   emits: ['submit']
 }
@@ -164,7 +164,7 @@ Declaring emits with the inferior array syntax.
 
 Or the more verbose but explicit object syntax:
 
-```js
+```ts
 export default {
   emits: {
     submit: (count) => {} 
@@ -179,7 +179,7 @@ If you are using TypeScript, you will get even better type safety with this synt
 
 The object syntax also supports *validation*. As an example, we could validate the payload for an imaginary `submit` event is a number:
 
-```js
+```ts
 export default {
   emits: {
     submit: (count) => {
@@ -235,7 +235,7 @@ Another convention is emerging: I like to call event validators `xxxValidator`.
 
 I am also going to make a change to `submitValidator`; the argument *must* be a number; if not, bad things will happen. So instead of waiting for bad things to happen, I am going to throw an error:
 
-```js
+```ts
 export function submitValidator(count) {
   if (typeof count === 'string' || isNaN(count)) {
     throw Error(`
@@ -252,7 +252,7 @@ Defensive programming; failing loudly is good.
 
 `submitValidator` is just a plain old JavaScript function. It's also a pure function - it's output is solely dependant on it's inputs. This means writing tests is trivial:
 
-```js
+```ts
 describe('submitValidator', () => {
   it('throws and error when count isNaN', () => {
     const actual = () => submitValidator('1')

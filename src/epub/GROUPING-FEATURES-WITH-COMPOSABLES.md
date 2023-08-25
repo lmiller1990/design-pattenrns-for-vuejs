@@ -8,7 +8,7 @@ Vue 3's flagship feature is The Composition API; it's main selling point is to e
 
 The API we will end with looks like this:
 
-```js
+```ts
 export default {
   setup() {
     const { 
@@ -31,7 +31,7 @@ Final API.
 
 `currentBoard` is a `computed` property that looks like this:
 
-```js
+```ts
 [
   ['x', 'o', '-'],
   ['x', 'o', 'x'],
@@ -44,7 +44,7 @@ Example game board represented as multi-dmensional array.
 
 `makeMove` is a function that takes two arguments: `col` and `row`. Given this board:
 
-```js
+```ts
 [
   ['-', '-', '-'],
   ['-', '-', '-'],
@@ -54,7 +54,7 @@ Example game board represented as multi-dmensional array.
 
 Calling `makeMove({ row: 0, col: 1 })` would yield the following board (where `o` goes first)
 
-```js
+```ts
 [
   ['-', 'o', '-'],
   ['-', '-', '-'],
@@ -68,7 +68,7 @@ We will also support undo and redo, so you can go back and see see how the game 
 
 Let's start with some way to maintain the game state. I will call this variable `initialBoard`:
 
-```js
+```ts
 const initialBoard = [
   ['-', '-', '-'],
   ['-', '-', '-'],
@@ -81,7 +81,7 @@ Initial board.
 
 Before diving too far into the game logic, let's get something rendering. Remember we want to keep a history of the game for undo/redo? This means instead of overriding the current game state each move, we should just create a new game state and push it into an array. Each entry will represent a move in the game. We also need the board to be reactive, so Vue will update the UI. We can use `ref` for this. Update the code:
 
-```js
+```ts
 import { ref, readonly } from 'vue'
 
 export function useTicTacToe() {
@@ -156,7 +156,7 @@ Great! It works:
 
 Currently the component is hard coded to use `boards[0]`. What we want to do is use the last element, which is the latest game state. We can use a `computed` property for this. Update the composable:
 
-```js
+```ts
 import { ref, readonly, computed } from 'vue'
 
 export function useTicTacToe() {
@@ -217,7 +217,7 @@ Everything is still working correctly. Let's make sure everything continues to w
 
 We've written a little too much code without any tests for my liking. Now is a good time to write some, which will reveal some (potential) problems with our design.
 
-```js
+```ts
 import { useTicTacToe } from './tic-tac-toe.js'
 
 describe('useTicTacToe', () => {
@@ -243,7 +243,7 @@ It passes! Great. As it stands, there is no easy way to pre-set the game state -
 
 Update `useTicTacToe` to receive an `initialState` argument to facilitate easier testing:
 
-```js
+```ts
 import { ref, readonly, computed } from 'vue'
 
 export function useTicTacToe(initialState) {
@@ -267,7 +267,7 @@ Accept an initialState to facilitate testing.
 
 Add a test to ensure we can seed an initial state:
 
-```js
+```ts
 describe('useTicTacToe', () => {
 
   it('initializes state to an empty board', () => {
@@ -296,7 +296,7 @@ Notice we pass in `[initialState]` as an array - we are representing the state a
 
 The final feature we will add is the ability for a player to make a move. We need to keep track of the current player, and then update the board by pushing the next game state into `boards`. Let's start with a test:
 
-```js
+```ts
 describe('makeMove', () => {
   it('updates the board and adds the new state', () => {
     const game = useTicTacToe() 
@@ -320,7 +320,7 @@ There isn't anything too surprising here. After making a move, we have two game 
 
 One thing you should look out for is code like this:
 
-```js
+```ts
 game.makeMove({ row: 0, col: 0 })
 ```
 
@@ -330,7 +330,7 @@ Another thing I'd like to highlight is that we are accessing `.value` three time
 
 Back to the `makeMove` - now we have a test, let's see the implementation. The implementation is quite simple. We are using `JSON.parse(JSON.stringify())`, which feels pretty dirty - see below to find out why.
 
-```js
+```ts
 export function useTicTacToe(initialState) {
   const initialBoard = [
     ['-', '-', '-'],
@@ -365,7 +365,7 @@ This gets the test to pass. As mentioned above we are using the somewhat dirty `
 
 What you would need to do is this:
 
-```js
+```ts
 const newState = [...boards.value[boards.value.length - 1]]
 const newRow = [...newState[row]];
 ```

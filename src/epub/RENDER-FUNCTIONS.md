@@ -72,7 +72,7 @@ One of the nice things about render function components is you can create multip
 
 Start by creating those two components. We won't be using a `vue` file, but just a plain old `js` file:
 
-```js
+```ts
 import { h } from 'vue'
 
 export const TabContent = {
@@ -109,7 +109,7 @@ We do a deep dive on `h` soon - don't worry if you don't understand that fully r
 
 Before we go any further, the fact we are working with render functions, which are *just JavaScript*, allows us to make a sneaky refactor and save some boilerplate. Both components have the same props: a `tabId`. We can generalize this with a `withTabId` function and the spread (`...`) operator:
 
-```js
+```ts
 const withTabId = (content) => ({
   props: {
     tabId: {
@@ -142,7 +142,7 @@ This technique is very useful when making component libraries where many compone
 
 Now we get to the exciting part - the `render` function for the `<tab-container>` component. It has one prop - `activeTabId`:
 
-```js
+```ts
 export const TabContainer = {
   props: {
     activeTabId: String
@@ -159,7 +159,7 @@ Creating the TabContainer component and logging the default slot.
 
 If you prefer Composition API, you could also do this with `setup`:
 
-```js
+```ts
 export const TabContainer = {
   props: {
     activeTabId: String
@@ -245,7 +245,7 @@ Now we know how to identify which component a `VNode` is using - the `type` prop
 
 The `type` property is a *direct reference* to the component the `VNode` is using. This means we can match using an object and strict equality. If this sounds a bit abstract, let's see it in action and sort the slots into `tabs` and `contents`:
 
-```js
+```ts
 export const TabContainer = {
   props: {
     activeTabId: String
@@ -279,7 +279,7 @@ The next goal will be to render the tabs. We will also add some classes to get s
 
 First things first, let's render something! Enough console driven development. Import `h` from vue, and then `map` over the filtered tabs - I will explain the crazy (amazing?) `h` function afterwards:
 
-```js
+```ts
 import { h } from 'vue'
 
 export const TabContainer = {
@@ -320,7 +320,7 @@ If this looks confusing, don't worry - here comes the `h` crash course.
 
 A more complex example of a component with a `render` function that returns an array of render functions, consisting of both regular HTML elements and a custom component.
 
-```js
+```ts
 const Comp = {
   render() {
     const e1 = h('div')
@@ -347,7 +347,7 @@ We are using `h` to render our tabs - `h(tab)` - where `tab` is a `VNode`, which
 
 It has quite a few overloads. For example, a minimal usage would be:
 
-```js
+```ts
 const el = h('div')
 ```
 \begin{center}
@@ -356,7 +356,7 @@ A minimal VNode representing a div.
 
 This will create a single `<div>` - not very useful. The second argument can be attributes, represented by an object.
 
-```js
+```ts
 const el = h('div', { class: 'tab', foo: 'bar' })`
 ```
 \begin{center}
@@ -371,7 +371,7 @@ The attributes object can take an attribute - standard or not. This would render
 
 The third and final argument is children, usually an array:
 
-```js
+```ts
 const el = h('div', { class: 'tab', foo: 'bar' }, ['Content'])`
 ```
 \begin{center}
@@ -388,7 +388,7 @@ Which renders:
 
 You can also pass more `VNodes`, created with nested calls to `h`:
 
-```js
+```ts
 const el = h(
   'div', 
   { 
@@ -418,7 +418,7 @@ I spread it out to make it more readable. `render` functions using `h` can get m
 
 As shown above, you are not just limited to standard HTML elements. You can pass a custom component to `h`, too:
 
-```js
+```ts
 const Tab = {
   render() {
     return h('span')
@@ -437,7 +437,7 @@ This can get difficult to read quickly. The main strategy I use to work around t
 
 Now we have a better understanding of `h`, we can add some classes to the `<tab>` components. Each `<tab>` will have a `tab` class, and the active tab will have an `active` class. Update the `render` function:
 
-```js
+```ts
 export const TabContainer = {
   props: {
     activeTabId: String
@@ -473,7 +473,7 @@ Passing an dynamic "active" prop.
 
 Does this look familiar?
 
-```js
+```ts
 {
   class: {
     tab: true,
@@ -493,7 +493,7 @@ It's `v-bind:class` syntax! This is how you write `v-bind:class="{ tab: true, ac
 
 The active tab needs to update when the user clicks a tab. Let's implement that. Event listeners are much the same as attributes like `class`. 
 
-```js
+```ts
 {
   class: {
     tab: true,
@@ -517,7 +517,7 @@ This is the render function version of `<tab v-on:click="update:activeTabId(tabI
 
 The last feature we need to implement is rendering the content - but only the content that matches the `activeTabId`. Instead of using `filter` to get the `contents` `VNodes`, we should use `find` - there will only ever be one tab selected at any given time. Use `find` instead of `filter` in the `render` function:
 
-```js
+```ts
 const content = $slots.find(slot => 
   slot.type === TabContent &&
   slot.props.tabId === this.activeTabId
@@ -529,7 +529,7 @@ Finding the active content among the slots.
 
 Finally, we need to change what is returened. Instead of just rendering the tabs, we will render the content as well. Here is the completed `render` function:
 
-```js
+```ts
 export const TabContainer = {
   props: {
     activeTabId: String
@@ -581,7 +581,7 @@ It works!
 
 Now that we finished the implementation, we should write a test to make sure everything continues working correctly. Writing a test is pretty straight forward - the `render` function from Testing Library works fine with render functions (`vue` files are compiled into render functions, so all the tests we've been writing have been using `render` functions under the hood).
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import App from './app.vue'
 

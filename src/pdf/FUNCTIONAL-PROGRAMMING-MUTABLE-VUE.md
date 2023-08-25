@@ -14,7 +14,7 @@ The goal is to refactor the Tic Tic Toe logic to be more in line with the functi
 
 Let's start with `makeMove`, which is full of mutation. In our previous implementation, `makeMove` looks like this:
 
-```js
+```ts
 function makeMove(move: { row: number, col: number }) {
   const newBoard = JSON.parse(JSON.stringify(boards.value))[currentMove.value] as Board
   newBoard[move.row][move.col] = currentPlayer.value
@@ -88,7 +88,7 @@ Final API does not change - only the implementation details.
 
 Let's start with the functional core, starting with a `createGame` function:
 
-```js
+```ts
 /**
  * Core Logic
  * Framework agnostic
@@ -131,7 +131,7 @@ A simple for the initial game state.
 
 Then bulk of the logic is in the `makeMove` function. To update the board, we need the current game state, the column and row to update, and the counter (`x` or `o`). So those will be the arguments we pass to the function.
 
-```js
+```ts
 export function makeMove(
   board: Board,
   { col, row, counter }: { col: number; row: number; counter: Marker }
@@ -172,7 +172,7 @@ A test to guide us.
 
 Let's start with a verbose implementation. We will use `map` to iterate over each row. For each row, we will `map` each column. If we encounter the row and column the user has chosen, we will update the cell. Otherwise, we just return the current cell.
 
-```js
+```ts
 export function makeMove(
   board: Board,
   { col, row, counter }: { col: number; row: number; counter: Marker }
@@ -329,7 +329,7 @@ Everything now works in it's functional, loosely coupled, immutable glory.
 
 From a user point of view, nothing has changed, and we can verify this by reusing the UI test (first exercise from the previous section):
 
-```js
+```ts
 import { describe, it, expect } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/vue";
 import TicTacToeApp from "./tic-tac-toe-app.vue";
@@ -381,7 +381,7 @@ Ideally all the business logic should be in the functional core. This includes c
 
 Update `makeMove` to change the counter after updating the board, and return an object representing the new board as well as the updated counter:
 
-```js
+```ts
 export function makeMove(
   board: Board,
   { col, row, counter }: { col: number; row: number; counter: Marker }

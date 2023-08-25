@@ -102,7 +102,7 @@ function count(...args: unknown[]) {
 
 The first `<button>` calls `count` without parenthesis - as a callback. If you've done React, it's similar to what you often see there:
 
-```jsx
+```tsx
 function Counter () {
   function count (...args) {
     console.log(args)
@@ -133,7 +133,7 @@ Given this snippet of plain old HTML:
 
 Clicking this logs ... nothing. Changing it to `onclick="count()"` will call `count()`, but you won't get the native event. If you want that, you need to write some JavaScript:
 
-```js
+```ts
 document.querySelector('button').addEventListener('click', event => {
   // event is PointerEvent
 })
@@ -155,7 +155,7 @@ function count () {}
 
 We get:
 
-```js
+```ts
 import { 
   openBlock as _openBlock, 
   createElementBlock as _createElementBlock 
@@ -183,7 +183,7 @@ export default __sfc__
 
 If you have written Vue without Script Setup, you'll see this is a regular component definition using `setup`. It returns a (somewhat verbose) render function. The thing to notic is `{ onClick: count }`, which is the second argument to `_createElementBlock`. A more human readable version is:
 
-```js
+```ts
 export default {
   setup () {
     return () => h('button', { onClick: count }, "Count")
@@ -211,7 +211,7 @@ How about the other two?
 
 The Vue SFC Playground shows they compile to something slightly different:
 
-```js
+```ts
 _createElementVNode("button", {
   onClick: _cache[0] || (_cache[0] = $event => (count()))
 }, "Count"),
@@ -227,7 +227,7 @@ They are very similar. The only difference is the first one is called with no ar
 
 This is mostly academic, but it's good to know how things work under the hood. I like the second option better, since it's more explicit, and closer to standard JavaScript. I like this parallel:
 
-```js
+```ts
 document.querySelector('button')
   .addEventListener('click', $event => { ... })
 

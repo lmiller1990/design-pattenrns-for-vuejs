@@ -12,7 +12,7 @@ Instead of providing a toy example, we will see a real use case by building a si
 
 Let's quickly define a dead simple store. We won't have a complex API like Vuex - just a class with some methods. Let's start with a reactive state, and expose it in readonly fashion via a `getState` function.
 
-```js
+```ts
 import { reactive, readonly } from 'vue'
 
 export class Store {
@@ -37,7 +37,7 @@ The `#` means that the property can only be accessed inside the class instance. 
 
 We pass `state` to the constructor to let the user seed the initial state. We will take the disciplined approach and write a test.
 
-```js
+```ts
 import { Store } from './store.js'
 
 describe('store', () => {
@@ -58,7 +58,7 @@ The tests verifies everything is working correctly.
 
 Let's get something rendering before we go. Export a new instance of the store:
 
-```js
+```ts
 import { reactive, readonly } from 'vue'
 
 export class Store {
@@ -112,7 +112,7 @@ This single shared `store` is known as a *global singleton*.
 
 We will allowing adding more users via a form - but first let's add a UI test using Testing Library.
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Store } from './store.js'
 import Users from './users.vue'
@@ -149,7 +149,7 @@ Working great! We do not want to hard code any users in the store, though. This 
 
 To add a user, we will first create a `addUser` function to the store:
 
-```js
+```ts
 import { reactive, readonly } from 'vue'
 
 export class Store {
@@ -172,7 +172,7 @@ addUser can access the private state because it is declared in the Store class.
 
 I also removed the initial user, Alice, from the store. Update the tests - we can test `addUser` in isolation.
 
-```js
+```ts
 describe('store', () => {
   it('seeds the initial state', () => {
     // ...
@@ -299,7 +299,7 @@ export default {
 
 You can pass anything to `provide` - including a reactive store. Let's do that. Head to the top level file where you create your app (mine is `index.js`; see the source code for a complete example):
 
-```js
+```ts
 import { createApp } from 'vue'
 import { store } from './examples/provide-inject/store.js'
 import Users from './examples/provide-inject/users.vue'
@@ -350,7 +350,7 @@ Using inject to access the store.
 
 The final UI test is failing. We did `provide('store', store)` when we created our app, but we didn't do it in the test. Testing Library has a mounting option specifically for `provide` and `inject`: `global.provide`:
 
-```js
+```ts
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Store } from './store.js'
 import Users from './users.vue'
@@ -393,7 +393,7 @@ We can write a little abstraction to make using our store a bit more ergonomic. 
 
 Update the store:
 
-```js
+```ts
 import { reactive, readonly, inject } from 'vue'
 
 export class Store {

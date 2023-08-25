@@ -8,9 +8,11 @@ ______
 
 Forms are the primary way a user enters information into any web-based system, so getting them right is important. The focus of this section will be on forms, specifically *writing good forms*. 
 
-What exactly is a *good* form? 
+What exactly is a *good* form? I'm talking about the code, the structure, and how things are organized - not the UI/UX of forms (which is arguable more challenging - certainly an interesting topic, but not what I'm referring to as "good" in this conttext).
 
-We want to ensure the form logic is decoupled from the Vue components - this will let us test in isolation. We don't want to couple our logic to our UI layer. In my experience, user interfaces change a lot (for some reason) and seem to get thrown out every 5 years or so. Businesses, and their logic, tends to stay the same, and also tends to be more important, so we want to make sure the core logic and underlying value is resilient and reliable. Good forms have good errors and good validation. 
+In our case, we want to ensure the form logic is decoupled from the Vue components. This is similar to what we talked about in the first chapter, regarding props and separating logic from UI. This this will let us test in isolation, and be confident we are correctly capturing the business requirement. 
+
+We don't want to couple our logic to our UI layer. In my experience, user interfaces change a lot (for some reason) and seem to get thrown out every 5 years or so. Businesses, and their logic, tends to stay the same, and also tends to be more important, so we want to make sure the core logic and underlying value is resilient and reliable. Good forms have good errors and good validation. 
 
 In traditional server-rendered apps, you would only get validation after submitting the form - not a great user experience. Vue allows us to deliver a great user experience by implementing highly dynamic, client-side validation. We will make use of this and implement two levels of validation:
 
@@ -650,18 +652,30 @@ Let's add the `<template>` part now - it's very simple, just good old HTML.
     <h3>Patient Data</h3>
     <form @submit.prevent="submit">
       <div class="field">
-        <div v-if="!validatedForm.name.valid" class="error" role="error">
+        <div
+          v-if="!validatedForm.name.valid"
+          class="error"
+          role="error"
+        >
           {{ validatedForm.name.message }}
         </div>
         <label for="name">Name</label>
         <input id="name" name="name" v-model="form.name" />
       </div>
       <div class="field">
-        <div v-if="!validatedForm.weight.valid" class="error" role="error">
+        <div
+          v-if="!validatedForm.weight.valid"
+          class="error"
+          role="error"
+        >
           {{ validatedForm.weight.message }}
         </div>
         <label for="weight">Weight</label>
-        <input id="weight" name="weight" v-model.number="form.weight.value" />
+        <input
+          id="weight"
+          name="weight"
+          v-model.number="form.weight.value"
+        />
         <select id="weight-units" v-model="form.weight.units">
           <option value="kg">kg</option>
           <option value="lb">lb</option>
@@ -671,16 +685,15 @@ Let's add the `<template>` part now - it's very simple, just good old HTML.
         <button type="submit" :disabled="!valid">Submit</button>
       </div>
     </form>
-  <div>
-<pre>
-Patient Data
-{{ form }}
-</pre>
+  </div>
 
-<pre>
-Form State
-{{ validatedForm }}
-</pre>
+  <pre>  
+    Patient Data {{ form }} 
+  </pre>
+  <pre>
+    Form State 
+    {{ validatedForm }} 
+  </pre>
 </template>
 ```
 \begin{center}
@@ -699,33 +712,34 @@ I added the `<pre>` block for some debugging. You can grab the CSS from the sour
 
 ## Some Basic UI Tests
 
-We can add some basic component tests using either a browser based runner like Cypress or Playwright, or in the terminal using Jest / Vitest and Vue Test Utils / Testing Library. I tend to use Cypress, since I can exercise as much of the component as possible with as little code as possible. It's very expressive.
+We can add some basic component tests using either a browser based runner like Cypress or Playwright, or in the terminal using Jest / Vitest and Vue Test Utils / Testing Library. I tend to use Cypress, I know it well, I like it, and since I can exercise as much of the component as possible with as little code as possible. It's very expressive.
 
 ```ts
-import Form from "./Form.vue"
+import PatientForm from "../PatientForm.vue";
 
 describe("Form", () => {
   it("fills out form", () => {
-    cy.mount(Form)
-
+    cy.mount(PatientForm);
     // disabled due to errors
-    cy.get('[role="error"]').should('have.length', 2)
-    cy.get("button[type='submit']").should('be.disabled')
+    cy.get('[role="error"]').should("have.length", 2);
+    cy.get("button[type='submit']").should("be.disabled");
 
-    cy.get("input[name='name']").type("lachlan")
-    cy.get('[role="error"]').should('have.length', 1)
-    cy.get("input[name='weight']").type("30")
-    cy.get('[role="error"]').should('have.length', 0)
+    cy.get("input[name='name']").type("lachlan");
+    cy.get('[role="error"]').should("have.length", 1);
+    cy.get("input[name='weight']").type("30");
+    cy.get('[role="error"]').should("have.length", 0);
 
-    cy.get('#weight-units').select("lb")
-    // 30 lb is not valid! Error shown
-    cy.get('[role="error"]').should('have.length', 1)
-      .should('have.text', 'Must be between 66 and 440')
+    cy.get("#weight-units")
+      .select("lb")
+      // 30 lb is not valid! Error shown 
+      cy.get('[role="error"]')
+        .should("have.length", 1)
+        .should("have.text", "Must be between 66 and 440");
 
-    cy.get("input[name='weight']").clear().type("100")
-    cy.get("button[type='submit']").should('be.enabled')
-  })
-})
+    cy.get("input[name='weight']").clear().type("100");
+    cy.get("button[type='submit']").should("be.enabled");
+  });
+});
 ```
 \begin{center}
 Testing the component layer with Cypress Component Testing.
@@ -734,13 +748,13 @@ Testing the component layer with Cypress Component Testing.
 If you prefer a terminal based runner, you could use Jest or Vitest (both are very similar) along with Vue Testing Library, which uses Vue Test Utils under the hood.
 
 ```ts
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import Form from "./Form.vue"
+import PatientForm from "../PatientForm.vue";
 
-describe("Form.vue", () => {
+describe("PatientForm.vue", () => {
   it('fills out form correctly', async () => {
-    render(Form)
+    render(PatientForm)
 
     await fireEvent.update(screen.getByLabelText('Name'), 'lachlan') 
     await fireEvent.update(screen.getByDisplayValue('kg'), 'lb')
@@ -750,7 +764,7 @@ describe("Form.vue", () => {
   })
 
   it('shows errors for invalid inputs', async () => {
-    render(Form)
+    render(PatientForm)
 
     await fireEvent.update(screen.getByLabelText('Name'), '')
     await fireEvent.update(screen.getByLabelText('Weight'), '5')
