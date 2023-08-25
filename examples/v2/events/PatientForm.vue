@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
-import { Patient } from './patient';
+import type { Patient } from './patient.js';
 
 const emits = defineEmits<{
   (event: 'createPatient', patient: Patient): void

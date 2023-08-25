@@ -4,7 +4,7 @@ import { createApp } from "vue";
 // import App from "./examples/v2/renderless-password/RenderlessPasswordApp.vue"
 // import App from "./examples/v2/renderless-password/AppWithCustomValidator.vue";
 // import Counter from "./examples/v2/events/PatientForm.vue";
-import App from "./examples/v2/reusable-date-time/DateTimeBasicApp.vue"
+import App from "./examples/v2/reusable-date-time/DateTimeApp.vue"
 // import App from "./examples/v2/render-functions/RenderFunctionsApp.vue";
 // import { Comp as App } from "./examples/v2/render-functions/HExample";
 // emport App from "./examples/v2/reusable-date-time/DateTimeApp.vue";

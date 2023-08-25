@@ -54,9 +54,9 @@ export default {
 Renderless functions return slots.default() in setup or render.
 \end{center}
 
-The standard was to author components is now `<script setup>`, which does not support using a render function returned from `setup`, so I've chosen to go with that approach instead. We do discuss render functions in detail in the "Render Functions" chapter, if you prefer not to use `<template>` and `<script setup>`.
+The new standard to author components is now `<script setup>`. It's a lot more ergonomic. It does not support using a render function returned from `setup`. Returning a render function from `setup` is discussed in detail in the "Render Functions" chapter.
 
-Using `<script setup>` looks like this:
+The initial code for `<RenderlessPassword>` is as follows:
 
 ```html
 <template>
@@ -104,7 +104,7 @@ We can destructure the object passed received from `v-slot`, and are free to use
 
 The next feature we will add is the password and confirmation fields. We will also expose a `matching` property, to see if the password and confirmation are the same. 
 
-First, update `isMatching` to receive a `password` and `confirmation` prop. We also add the logic to see if the passwords match:
+First, we will define an `isMatching` function that takes `password` and `confirmation` and compared them. 
 
 ```ts
 function isMatching(password: string, confirmation: string) {
@@ -122,7 +122,7 @@ I implemented `isMatching` as a separate function, which I will wrap in `compute
 
 I like to keep the logic separate. This makes it super easy to test in isolation. This could also be considered an over optimization. One downside is we do incur an additional function declaration. You could inline all the code inside of `<RenderlessPassword>`, if you prefer that style. For the purpose of this chapter, though, I'm going to keep the logic separate, and wrap the logic using reactivity APIs, if for nothing but to promote a mindset.
 
-Updating `<RenderlessPassword>` to use `isMatching` gives us:
+Updating `<RenderlessPassword>` to use `isMatching` and receive two props, `password` and `confirmation`, gives us:
 
 ```html
 <template>
@@ -139,9 +139,9 @@ const props = defineProps<{
 
 function isMatching(password: string, confirmation: string) {
   if (!password || !confirmation) {
-    return false
+    return false;
   }
-  return password === confirmation
+  return password === confirmation;
 }
 
 const matching = computed(() =>
@@ -152,16 +152,14 @@ const matching = computed(() =>
 
 I removed `complexity` for now; we will come back to this. We aren't using it right now to check the passwords.
 
-Let's update the test component that uses `<RenderlessPassword>`:
+Let's update the test component, `<RenderlessPasswordApp>`:
 
 ```html
 <template>
   <RenderlessPassword
     :password="input.password"
     :confirmation="input.confirmation"
-    v-slot="{ 
-      matching
-    }"
+    v-slot="{ matching }"
   >
     <div class="wrapper">
       <div class="field">
@@ -215,49 +213,34 @@ For now, we will implement a very naive complexity check. Most developers will w
 - mid: length >= 7
 - low: length >= 5
 
-As with `isMatching`, we will make a `calcComplexity` a pure function. Decoupled, deterministic, and easily testable, if need be.
+As with `isMatching`, we will make a `calcComplexity` a pure function. Decoupled, deterministic, and easily testable, if need be. 
 
 ```ts
-import { computed } from 'vue'
-
-function isMatching() {
-  // ...
-}
-
 function calcComplexity(val: string) {
   if (!val) {
-    return 0
+    return 0;
   }
 
   if (val.length > 10) {
-    return 3
+    return 3;
+  } else if (val.length > 7) {
+    return 2;
+  } else if (val.length > 5) {
+    return 1;
+  } else {
+    return 0;
   }
-  if (val.length > 7) {
-    return 2
-  }
-  if (val.length > 5) {
-    return 1
-  }
-
-  return 0
 }
 ```
 \begin{center}
 Adding a simple calcComplexity function.
 \end{center}
 
-And the associated component:
-
-```html
-```
-
-And usage:
+Wrap `calcComplexity` in a `computed` property. `<RenderlessPassword>` now looks like this:
 
 ```html
 <template>
-  <template>
-    <slot :matching="matching" :complexity="complexity" />
-  </template>
+  <slot :matching="matching" :complexity="complexity" />
 </template>
 
 <script lang="ts" setup>
@@ -268,18 +251,18 @@ const props = defineProps<{
   confirmation: string;
 }>();
 
-function calcComplexity(val: string) {
-  // shown above
-}
-
-const complexity = computed(() => calcComplexity(props.password));
-
 function isMatching(password: string, confirmation: string) {
   // ...
 }
 
-const matching = computed(() =>
+function calcComplexity(val: string) {
   // ...
+}
+
+const complexity = computed(() => calcComplexity(props.password));
+
+const matching = computed(() =>
+  isMatching(props.password, props.confirmation)
 );
 </script>
 ```
@@ -290,14 +273,7 @@ Let's try it out:
 
 ```html
 <template>
-  <RenderlessPassword
-    :password="input.password"
-    :confirmation="input.confirmation"
-    v-slot="{ 
-      matching,
-      complexity
-    }"
-  >
+  <RenderlessPassword :password="input.password" :confirmation="input.confirmation" v-slot="{ matching, complexity }">
     <div class="wrapper">
       <div class="field">
         <label for="password">Password</label>
@@ -310,17 +286,11 @@ Let's try it out:
     </div>
 
     <div class="complexity-field">
-      <div
-        class="complexity"
-        :class="complexityStyle(complexity)"
-      />
+      <div class="complexity" :class="complexityStyle(complexity)" />
     </div>
 
     <p>Matches: {{ matching }}</p>
     <p>Complexity: {{ complexity }}</p>
-
-    <p>Matches: {{ matching }}</p>
-
   </RenderlessPassword>
 </template>
 
@@ -335,21 +305,17 @@ const input = reactive({
 
 const complexityStyle = (complexity: number) => {
   if (complexity >= 3) {
-    return 'high'
+    return "high";
+  } else if (complexity >= 2) {
+    return "mid";
+  } else {
+    return "low";
   }
-  if (complexity >= 2) {
-    return 'mid'
-  }
-  if (complexity >= 1) {
-    return 'low'
-  }
-
-  return 'low'
-}
+};
 </script>
 
 <style>
-  /* omitted for brevity. See source code */
+/* omitted for brevity. See source code */
 </style>
 ```
 \begin{center}
@@ -483,7 +449,7 @@ You could also write some tests for the business logic, to make sure we didn't m
 
 There are also some improvements you could try making:
 
-- Allow the developer to pass their own `calcComplexity` function as a prop. Use this if it's provided.
+- Allow the developer to pass their own `calcComplexity` function as a prop. Make it optional, and use it if provided. Fall back to our default implementation. (see the source code for how to do this).
 - Support passing a custom `isValid` function, that receives `password`, `confirmation`, `isMatching` and `complexity` as arguments.
 
 You can find the completed source code in the [GitHub repository under examples/renderless-password](https://github.com/lmiller1990/design-patterns-for-vuejs-source-code): 
