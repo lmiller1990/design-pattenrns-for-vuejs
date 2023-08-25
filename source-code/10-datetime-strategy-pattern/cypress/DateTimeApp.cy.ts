@@ -1,4 +1,5 @@
-import DateTimeApp from "./DateTimeApp.vue";
+/// <reference types="cypress" />
+import DateTimeApp from "../DateTimeApp.vue";
 
 describe("<DateTimeApp />", () => {
   it("renders", () => {

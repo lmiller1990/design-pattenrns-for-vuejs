@@ -1,13 +1,13 @@
-import { render, screen, fireEvent } from "@testing-library/vue";
+import { render, fireEvent } from "@testing-library/vue";
 import { describe, it, expect } from "vitest";
 import moment from "moment";
 import * as Luxon from "luxon";
-import DateTime from "./DateTime.vue";
+import DateTime from "../DateTime.vue";
 import {
   serialize,
   deserialize,
   serializeMoment,
-} from "./serializers.js";
+} from "../serializers.js";
 
 describe("serializeMoment", () => {
   it("serializes valid moment", () => {
@@ -83,9 +83,18 @@ test("DateTime", async () => {
     },
   });
 
-  await fireEvent.update(container.querySelector("[name='year']")!, "2019");
-  await fireEvent.update(container.querySelector("[name='month']")!, "2");
-  await fireEvent.update(container.querySelector("[name='day']")!, "3");
+  await fireEvent.update(
+    container.querySelector("[name='year']")!,
+    "2019"
+  );
+  await fireEvent.update(
+    container.querySelector("[name='month']")!,
+    "2"
+  );
+  await fireEvent.update(
+    container.querySelector("[name='day']")!,
+    "3"
+  );
 
   // 3 successful updates, 3 emits.
   expect(emitted()["update:modelValue"]).toHaveLength(3);
